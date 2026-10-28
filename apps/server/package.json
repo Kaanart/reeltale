@@ -1,0 +1,22 @@
+{
+  "name": "@reeltale/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cf:build": "cd ../.. && npm ci && npm run web:export --workspace @reeltale/mobile",
+    "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "hono": "^4.13.14",
+    "jose": "^6.2.13",
+    "zod": "^4.6.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260702.1",
+    "@types/node": "^24.19.2",
+    "typescript": "~6.0.3",
+    "wrangler": "^4"
+  }
+}

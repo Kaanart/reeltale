@@ -1,0 +1,72 @@
+{
+  // ReelTale Worker on reeltale.net: the Expo web build as static assets, plus /api/* (Hono).
+  // Deployed by Cloudflare Workers Builds from the GitHub repo: root apps/server, build `npm run cf:build`,
+  // deploy `npx wrangler deploy`. The name must stay "reeltale" (it matches the Workers Builds project).
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "reeltale",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+
+  // One canonical address: no *.workers.dev copy and no per-version preview URLs (previews would share
+  // production secrets and bindings).
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "reeltale.net", "custom_domain": true }],
+
+  "assets": {
+    "directory": "../mobile/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // These paths always go to the Worker first (API, association files, share pages with OG tags).
+    "run_worker_first": ["/api/*", "/.well-known/*", "/app-ads.txt", "/s/*", "/series/*"]
+  },
+
+  "observability": { "enabled": true },
+
+  "r2_buckets": [{ "binding": "AI_ASSETS", "bucket_name": "reeltale-ai", "jurisdiction": "eu" }],
+  "workflows": [{ "name": "reeltale-story-scene", "binding": "STORY_SCENE", "class_name": "StorySceneWorkflow" }],
+  // Automated text moderation (svc.moderation_queue → Muse Spark → svc.record_verdict).
+  "triggers": { "crons": ["*/2 * * * *"] },
+
+  // Non-secret configuration. Secrets are set with `npx wrangler secret put <NAME>` (see docs/RUNBOOK.md):
+  // SUPABASE_SECRET_KEY, REVENUECAT_WEBHOOK_AUTH, REVENUECAT_WEBHOOK_HMAC_SECRET, STREAM_API_TOKEN,
+  // STREAM_WEBHOOK_SECRET, STREAM_SIGNING_KEY_ID, STREAM_SIGNING_KEY_JWK, TURNSTILE_SECRET, META_API_KEY.
+  "vars": {
+    "APP_ENV": "production",
+    "APP_ORIGIN": "https://reeltale.net",
+    "MEDIA_ORIGIN": "https://media.reeltale.net",
+    "SUPABASE_URL": "",
+    "SUPABASE_PUBLISHABLE_KEY": "",
+    "CF_ACCOUNT_ID": "9cce6c47ad33f52fd4cf302782a65f17",
+    "STREAM_CUSTOMER_CODE": "",
+    "APPLE_TEAM_ID": "LJTQL4479V",
+    "IOS_BUNDLE_ID": "com.euragnos.reeltale",
+    "ANDROID_PACKAGE": "com.euragnos.reeltale",
+    "ANDROID_CERT_SHA256": "",
+    "ADMOB_PUBLISHER_ID": "pub-6272675197810340"
+  },
+
+  "env": {
+    "staging": {
+      "name": "reeltale-staging",
+      "routes": [{ "pattern": "staging.reeltale.net", "custom_domain": true }],
+      "r2_buckets": [{ "binding": "AI_ASSETS", "bucket_name": "reeltale-ai-staging", "jurisdiction": "eu" }],
+      "workflows": [{ "name": "reeltale-story-scene-staging", "binding": "STORY_SCENE", "class_name": "StorySceneWorkflow" }],
+      "triggers": { "crons": ["*/10 * * * *"] },
+      "vars": {
+        "APP_ENV": "staging",
+        "APP_ORIGIN": "https://staging.reeltale.net",
+        "MEDIA_ORIGIN": "https://media-staging.reeltale.net",
+        "SUPABASE_URL": "",
+        "SUPABASE_PUBLISHABLE_KEY": "",
+        "CF_ACCOUNT_ID": "9cce6c47ad33f52fd4cf302782a65f17",
+        "STREAM_CUSTOMER_CODE": "",
+        "APPLE_TEAM_ID": "LJTQL4479V",
+        "IOS_BUNDLE_ID": "com.euragnos.reeltale",
+        "ANDROID_PACKAGE": "com.euragnos.reeltale",
+        "ANDROID_CERT_SHA256": "",
+        "ADMOB_PUBLISHER_ID": "pub-6272675197810340"
+      }
+    }
+  }
+}

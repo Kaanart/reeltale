@@ -1,0 +1,19 @@
+{
+  "name": "reeltale",
+  "private": true,
+  "type": "module",
+  "description": "ReelTale monorepo: Expo app (iOS, Android, web), Cloudflare Worker, Supabase schema.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:test": "node --test supabase/tests/*.test.ts"
+  }
+}

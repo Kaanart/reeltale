@@ -1,0 +1,3 @@
+-- ReelTale seed data that every environment needs (local, staging, production).
+-- Files in seeds/ run after this one, in name order (see config.toml [db.seed]).
+-- Demo catalog data lives in seeds/90_demo.sql and must only ever be loaded into non-production.
