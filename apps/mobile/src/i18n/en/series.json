@@ -1,0 +1,50 @@
+{
+  "play": "Play",
+  "continue": "Continue",
+  "playFrom": "Play episode {{number}}",
+  "follow": "Follow",
+  "following": "Following",
+  "share": "Share",
+  "more": "More options",
+  "report": "Report",
+  "blockCreator": "Block creator",
+  "byCreator": "by {{name}}",
+  "creatorA11y": "Open {{name}}’s profile",
+  "followers_one": "{{count, number}} follower",
+  "followers_other": "{{count, number}} followers",
+  "rating": "Rating",
+  "synopsis": "Summary",
+  "showMore": "Show more",
+  "showLess": "Show less",
+  "episodes": "Episodes",
+  "tags": "Tags",
+  "status": {
+    "completed": "Completed",
+    "ongoing": "Ongoing"
+  },
+  "editorsPick": "Editor’s Pick",
+  "freeToWatch": "Free to watch",
+  "aiNotice": "This story was made with AI.",
+  "episodeRow": {
+    "unlockA11y": "Locked, {{coins}} coins",
+    "unlockedA11y": "Unlocked",
+    "freeA11y": "Free"
+  },
+  "mature": {
+    "title": "This story is for mature audiences",
+    "body": "It can include themes that some people find upsetting. Turn on mature content to watch.",
+    "turnOn": "Turn on mature content",
+    "goBack": "Go back"
+  },
+  "unavailable": {
+    "title": "This story isn’t available",
+    "body": "It may have been removed or hidden."
+  },
+  "shareMessage": "Watch {{title}} on ReelTale",
+  "followFailed": "We couldn’t update that. Please try again.",
+  "blocked": {
+    "title": "Block {{name}}?",
+    "body": "You won’t see their stories or comments.",
+    "confirm": "Block"
+  }
+}

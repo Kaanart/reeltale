@@ -1,0 +1,77 @@
+{
+  "home": {
+    "searchA11y": "Search",
+    "coinChipA11y": "Wallet, {{coins}} coins",
+    "demo": {
+      "title": "Try the demo story",
+      "body": "Pick what happens next in a short story made with AI.",
+      "cta": "Start the demo"
+    },
+    "continueWatching": "Continue watching",
+    "progress": "{{percent}}% watched",
+    "trending": "Trending",
+    "editorsPicks": "Editor’s Picks",
+    "aiStories": "AI Stories",
+    "shorts": {
+      "title": "Shorts",
+      "cta": "Watch Shorts"
+    },
+    "empty": "Nothing to show yet. Check back soon."
+  },
+  "discover": {
+    "title": "Discover",
+    "searchPlaceholder": "Search stories, tags and creators",
+    "noResults": "No results for “{{query}}”.",
+    "noResultsHint": "Check the spelling or try another word.",
+    "filters": {
+      "format": "Format",
+      "genre": "Genre",
+      "trope": "Trope",
+      "completed": "Completed",
+      "mature": "Show mature stories",
+      "matureNeedsOptIn": "Turn on mature content in Settings to see these.",
+      "clear": "Clear filters"
+    },
+    "rankings": {
+      "trending": "Trending",
+      "new": "New",
+      "completed": "Completed",
+      "editorsPicks": "Editor’s Picks",
+      "aiStories": "AI Stories"
+    },
+    "resultMeta": "{{format}} · {{episodes}}"
+  },
+  "library": {
+    "title": "Library",
+    "tabs": {
+      "following": "Following",
+      "history": "History",
+      "aiStories": "My AI stories"
+    },
+    "empty": {
+      "following": "Follow a story to find it here.",
+      "history": "Stories you watch show up here.",
+      "aiStories": "Stories you write with AI show up here."
+    },
+    "aiStatus": {
+      "planning": "Getting started",
+      "active": "In progress",
+      "completed": "Finished",
+      "failed": "Couldn’t be made",
+      "blocked": "Stopped"
+    },
+    "visibility": {
+      "private": "Only you",
+      "published": "Published"
+    },
+    "clearHistory": "Clear history",
+    "clearHistoryBody": "This removes your watch history from this account.",
+    "continue": "Continue"
+  },
+  "shorts": {
+    "title": "Shorts",
+    "watchSeries": "Watch series",
+    "captionsOn": "Captions on",
+    "empty": "No Shorts yet. Check back soon."
+  }
+}

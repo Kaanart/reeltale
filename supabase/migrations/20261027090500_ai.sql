@@ -29,8 +29,11 @@ create table public.ai_stories (
   status text not null default 'planning' check (status in ('planning', 'active', 'completed', 'failed', 'blocked')),
   visibility text not null default 'private' check (visibility in ('private', 'published')),
   published_series_id uuid references public.series (id) on delete set null,
+  -- The app's id for the tap that started the story: a retried request finds the same story.
+  request_id uuid,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint one_story_per_request unique (owner_id, request_id)
 );
 create index ai_stories_owner_idx on public.ai_stories (owner_id, created_at desc);
 create trigger ai_stories_touch before update on public.ai_stories
@@ -166,7 +169,10 @@ revoke all on function app_private.require_story_consent(uuid) from public, anon
 
 -- Start a story: story + root scene + job + coin hold, atomically. The premise is moderated by the
 -- Workflow's first step (a blocked premise fails the job, which refunds the hold).
-create function svc.ai_start_story(p_user uuid, p_premise text, p_tags text[], p_mode text) returns jsonb
+-- p_request_id (from the app, one per tap) makes retries safe: the same id returns the same story, job
+-- and hold instead of charging again.
+create function svc.ai_start_story(p_user uuid, p_premise text, p_tags text[], p_mode text,
+                                   p_request_id uuid default null) returns jsonb
 language plpgsql
 security definer
 set search_path = ''
@@ -186,10 +192,19 @@ begin
     raise exception 'mode_unavailable' using errcode = '22023';   -- video mode ships after QA
   end if;
   perform app_private.lock_wallet(p_user);
+  if p_request_id is not null then
+    -- The wallet lock serialises this user's starts, so a concurrent retry waits and then finds the story.
+    select s.id into v_story from public.ai_stories s where s.owner_id = p_user and s.request_id = p_request_id;
+    if v_story is not null then
+      select sc.id into v_scene from public.ai_scenes sc where sc.story_id = v_story and sc.parent_scene_id is null;
+      select j.id into v_job from public.ai_jobs j where j.scene_id = v_scene order by j.created_at desc limit 1;
+      return jsonb_build_object('story_id', v_story, 'scene_id', v_scene, 'job_id', v_job, 'existing', true);
+    end if;
+  end if;
   perform app_private.ai_check_daily_caps(p_user, 'story_start');
 
-  insert into public.ai_stories (owner_id, premise, tags, mode)
-  values (p_user, btrim(p_premise), coalesce(p_tags, '{}'), p_mode)
+  insert into public.ai_stories (owner_id, premise, tags, mode, request_id)
+  values (p_user, btrim(p_premise), coalesce(p_tags, '{}'), p_mode, p_request_id)
   returning id into v_story;
   insert into public.ai_scenes (story_id, depth) values (v_story, 1) returning id into v_scene;
   insert into public.ai_jobs (user_id, story_id, scene_id, kind, lane, budget_micros)
@@ -199,11 +214,11 @@ begin
   v_hold := svc.ai_hold(p_user, 'story:' || v_story, app_private.cfg_int('ai_story_start_coins', 50),
                         jsonb_build_object('story_id', v_story, 'job_id', v_job));
   update public.ai_jobs set hold_txn = (v_hold ->> 'hold_txn')::bigint where id = v_job;
-  return jsonb_build_object('story_id', v_story, 'scene_id', v_scene, 'job_id', v_job);
+  return jsonb_build_object('story_id', v_story, 'scene_id', v_scene, 'job_id', v_job, 'existing', false);
 end;
 $$;
-revoke all on function svc.ai_start_story(uuid, text, text[], text) from public, anon, authenticated;
-grant execute on function svc.ai_start_story(uuid, text, text[], text) to service_role;
+revoke all on function svc.ai_start_story(uuid, text, text[], text, uuid) from public, anon, authenticated;
+grant execute on function svc.ai_start_story(uuid, text, text[], text, uuid) to service_role;
 
 -- The reader picked a choice: child scene + job + hold. Choosing the same option again returns the
 -- existing scene and job (double taps and retries are free). A scene whose job failed (and was

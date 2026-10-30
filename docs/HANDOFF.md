@@ -2,6 +2,51 @@
 
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
+## Oct 29: four tracks merged into the main tree, all tests green, not committed yet
+The four tracks below were built by agents, each reviewed adversarially and fixed (16 proven findings, all fixed with
+regression tests), then **merged into the main working tree (uncommitted)**. Backups: `prep/patches/track1-3.patch`
+(each worktree's changes) and `prep/patches/integration-wip.patch` (the whole main-tree diff at the time of writing).
+Track 4 (app core) lives directly in `apps/mobile/src/core/`, `apps/mobile/src/i18n/`, `apps/mobile/tsconfig.core.json`.
+Tracks: 1 ingest (`20261028090000_ingest.sql`), 2 trust & editor tools (`20261028090100_trust.sql`), 3 rate limits + FX
+(`20261028090200_fx.sql`), 4 app core. Reports: `~/.claude/projects/-Users-kaanuysal-claude-ReelTale/c34fe42a-c069-4963-886d-75f066fa2e9b/subagents/workflows/wf_a6a08e26-90c/journal.jsonl`.
+
+Integration fixes already applied on top (by the lead, after the reviews):
+- One fence helper (`unfence`/`fenceText` in `src/ai/prompts.ts`) now used by the text cron (`moderation/review.ts`, which
+  had no marker stripping: a title containing `TEXT>>>` could close the fence), `scene.ts` and `episode-media.ts`.
+- `readCappedText` in `src/lib/http.ts` (moved from routes/report.ts); both webhooks use it instead of unbounded `c.req.text()`.
+- Public poster cache `public, max-age=300` (was 1 year immutable: a takedown would stay cached); animated GIF preview off
+  unless `INGEST_ANIMATED_PREVIEW=on` (its other ~23 frames are never reviewed).
+- Ingest sweep is its own cron step (`ingestCron`), so it runs without the Meta key.
+- AI story starts are idempotent: `ai_stories.request_id` + `svc.ai_start_story(..., p_request_id)`, route field
+  `request_id`, app client `request_id` (one per tap, reused on retry). Tests added in ai.test.ts, ai-routes.test.ts, api.test.ts.
+
+**Fixed since (Oct 29):** the 8 merge-fallout tests. The app maps all new server error names (strings in
+`i18n/en/errors.json`; FX/ingest-only names are listed as server-only in the test); poster tests expect no animated
+preview by default; the cron passes its fetch to the ingest sweep too, and the cron tests expect the sweep's one
+`moderation_queue` call. Results: Worker 151/151, app core 171/171, both `tsc` clean. **The full DB suite with all
+merged migrations passes: 139/139** (`perl -e 'alarm 1500; exec @ARGV' node --test supabase/tests/*.test.ts`, about
+10 minutes). The agent worktrees are removed; their changes live in the main tree (and `prep/patches/`).
+**Next: ask Kaan to commit**, then the real `npm install` and the Expo app.
+Open items the reviewers left (add to the list below when integrating): block_user is an existence oracle for account ids
+(low); no statement of reasons for Editor's Pick withdrawal (low); FX backoff waits an extra hour (low); per-IP limits
+only on failed-auth /api and share pages (documented); ingest doesn't recheck upload consent at review time (medium:
+add a consent check to `svc.ingest_context`); currencies the ECB doesn't quote stay pending for a person to value.
+
+To resume the rest:
+1. `pgrep -fl "node --test"`: kill leftover test processes (they once ate 4 GB of RAM).
+2. Toolchain: the scratchpad symlink (`node_modules`) dies with the session. Disk has 13 GB free: delete the symlink and
+   run a real `npm install` at the repo root (see "How to continue").
+5. Clean up after a green full run: `git worktree unlock <path>`, `git worktree remove --force <path>`,
+   `git branch -D worktree-wf_a6a08e26-90c-N` for N = 1, 2, 3. `.claude/worktrees/` is git-ignored.
+
+App install (Expo SDK 57.0.31; versions from Expo's `bundledNativeModules.json`, use `npx expo install` to match):
+react 19.2.3, react-native 0.86.3, react-dom 19.2.3, react-native-web ~0.21.0, expo-router ~57.0.29, expo-video ~57.0.5,
+expo-image ~57.0.5, expo-audio ~57.0.5, expo-camera ~57.0.6, expo-secure-store ~57.0.4, react-native-reanimated 4.5.1,
+react-native-worklets 0.10.1, react-native-gesture-handler ~2.32.0, react-native-screens ~4.26.0,
+react-native-safe-area-context ~5.7.0, @shopify/flash-list 2.0.2, @sentry/react-native ~7.11.0 (not 8),
+react-native-keyboard-controller 1.21.9, expo-dev-client ~57.0.20, expo-updates ~57.0.26. Not in Expo's list (pick
+versions by hand): react-native-mmkv, react-native-purchases, @react-native-google-signin/google-signin.
+
 ## Right where the last session stopped (Oct 27, D2 evening, autonomous session while Kaan was away)
 - Last finished: the AI StoryScene Workflow + `/api/ai/*` routes, and fixes for the second DB review (moderation redesign,
   four ledger edge cases, age block on both email and phone). All tests green: DB 106, Worker 58, shared 6, `tsc` clean.

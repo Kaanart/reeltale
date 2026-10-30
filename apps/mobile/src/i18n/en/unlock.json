@@ -1,0 +1,37 @@
+{
+  "title": "Unlock this episode",
+  "episode": "{{series}} · Episode {{number}}",
+  "price": "Price",
+  "youHave_one": "You have {{count, number}} coin",
+  "youHave_other": "You have {{count, number}} coins",
+  "unlock": "Unlock",
+  "unlockFor": "Unlock for {{price}}",
+  "unlocking": "Unlocking…",
+  "useFreePass": "Use Free Pass",
+  "freePassesLeft_one": "{{count}} Free Pass left today",
+  "freePassesLeft_other": "{{count}} Free Passes left today",
+  "freePassesNone": "No Free Passes left today",
+  "getCoins": "Get coins",
+  "joinVip": "Join VIP",
+  "discount": "VIP discount: {{percent}}% off",
+  "vipPrice": "With VIP: {{price}}",
+  "permanent": "Unlocks are permanent for your account.",
+  "priceChanged": "The price changed. It’s now {{price}}.",
+  "notEnough_one": "You need 1 more coin to unlock this.",
+  "notEnough_other": "You need {{count, number}} more coins to unlock this.",
+  "balanceAfter": "Balance after unlocking: {{price}}",
+  "unlocked": "Unlocked",
+  "alreadyUnlocked": "You already unlocked this episode.",
+  "own": "This is your own episode.",
+  "freePass": {
+    "title": "Free Pass",
+    "body": "Unlock one episode a day for free. VIP members get an extra one.",
+    "resets": "You get a new Free Pass every day.",
+    "used": "You’ve used today’s Free Pass.",
+    "success": "Unlocked with your Free Pass."
+  },
+  "debt": {
+    "title": "Coins needed first",
+    "body": "A refunded purchase left your coins short. Coins you get next will cover that first."
+  }
+}

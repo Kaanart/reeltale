@@ -1,0 +1,43 @@
+{
+  "title": "Create",
+  "subtitle": "Write a story with AI, upload your own, or make stop-motion.",
+  "ai": {
+    "title": "Write an AI story",
+    "body": "Write the opening. AI writes and draws the scenes, and you choose what happens next.",
+    "usesCoins": "Uses coins",
+    "priceHint": "Starts from {{price}}"
+  },
+  "upload": {
+    "title": "Upload an episode",
+    "body": "Share a vertical video of up to 2 minutes.",
+    "note": "Anyone 18+ can upload. To earn money, apply to earn in the studio."
+  },
+  "stopMotion": {
+    "title": "Make stop-motion",
+    "body": "Capture frames with your camera and turn them into an episode."
+  },
+  "consent": {
+    "ai": {
+      "title": "Allow AI to make your story",
+      "body": "To write and draw your story, we send what you type, and your choices, to AI models from Meta. Narration may be read by a voice model from Google, through Cloudflare. We don’t send your name or email.",
+      "accept": "Allow",
+      "decline": "Not now",
+      "manage": "You can change this any time in Settings."
+    },
+    "upload": {
+      "title": "Allow us to process your uploads",
+      "body": "To check your videos and add captions and tags, we send them to AI models from Meta, which read the picture and the speech.",
+      "attestation": "I made this video, or I have the right to share it, and everyone in it agrees to be shown.",
+      "accept": "Allow and continue",
+      "decline": "Not now",
+      "manage": "You can change this any time in Settings."
+    },
+    "voice": {
+      "title": "Allow voice input",
+      "body": "To turn your voice into text, we send the recording to an AI model from Meta.",
+      "accept": "Allow",
+      "decline": "Not now",
+      "manage": "You can change this any time in Settings."
+    }
+  }
+}

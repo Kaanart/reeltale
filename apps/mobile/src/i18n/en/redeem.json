@@ -1,0 +1,24 @@
+{
+  "title": "Redeem an access code",
+  "intro": "Enter the code you were given to add bonus coins and AI access to your account.",
+  "label": "Access code",
+  "placeholder": "Enter your code",
+  "submit": "Redeem",
+  "submitting": "Checking…",
+  "human": "Checking that you’re a person…",
+  "success": {
+    "coins_one": "{{count, number}} bonus coin added. It expires on {{date}}.",
+    "coins_other": "{{count, number}} bonus coins added. They expire on {{date}}.",
+    "ai_one": "AI stories are on for {{count}} day.",
+    "ai_other": "AI stories are on for {{count}} days.",
+    "already": "You’ve already used this code."
+  },
+  "syncNote": "Your coins also show up in the ReelTale apps.",
+  "errors": {
+    "invalid_code": "That code isn’t valid or has expired.",
+    "code_used_up": "That code has been used up.",
+    "web_only": "Codes can only be redeemed on the ReelTale website.",
+    "turnstile_failed": "We couldn’t confirm you’re a person. Please try again.",
+    "format": "Codes use letters, numbers and dashes, and are at least 6 characters long."
+  }
+}

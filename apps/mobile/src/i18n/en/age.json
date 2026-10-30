@@ -1,0 +1,32 @@
+{
+  "gate": {
+    "title": "When were you born?",
+    "body": "ReelTale is for adults. You must be 18 or older.",
+    "hint": "You can’t change this later.",
+    "pick": "Choose your date of birth",
+    "dateLabel": "Date of birth",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "continue": "Continue",
+    "checking": "Checking…",
+    "confirmTitle": "Is this right?",
+    "confirmBody": "You were born on {{date}}. We can’t change it later.",
+    "confirm": "Yes, that’s right",
+    "edit": "Go back"
+  },
+  "errors": {
+    "invalid_format": "Enter your date of birth as day, month and year.",
+    "invalid_date": "That date doesn’t exist. Check it and try again.",
+    "too_old": "Check the year. We can’t use dates before 1900.",
+    "in_future": "That date is in the future."
+  },
+  "blocked": {
+    "title": "You can’t use ReelTale yet",
+    "body": "ReelTale is only for adults 18 and older, so we can’t open your account. Your account and data are being deleted.",
+    "dataLink": "How we delete your data",
+    "signOut": "Sign out"
+  },
+  "adultsOnly": "For adults 18+",
+  "adultsOnlyLong": "ReelTale is for adults aged 18 and older."
+}

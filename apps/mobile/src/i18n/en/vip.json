@@ -1,0 +1,53 @@
+{
+  "title": "ReelTale VIP",
+  "tagline": "More coins, lower prices, more Free Passes.",
+  "plan": {
+    "plus": "Plus",
+    "premium": "Premium"
+  },
+  "period": {
+    "week": "week",
+    "month": "month",
+    "year": "year"
+  },
+  "perks": {
+    "coins_one": "{{count, number}} bonus coin each {{period}}",
+    "coins_other": "{{count, number}} bonus coins each {{period}}",
+    "coinsValid": "Bonus coins last until your next renewal.",
+    "discount": "{{percent}}% off every unlock",
+    "freePass": "1 extra Free Pass a day",
+    "ai": "Write AI comic stories (scenes use coins)"
+  },
+  "price": "{{price}} per {{period}}",
+  "trial": {
+    "line": "{{days}}-day free trial, then {{price}} per {{period}}.",
+    "coins_one": "The trial includes {{count}} bonus coin. Your full coins start when the subscription begins.",
+    "coins_other": "The trial includes {{count}} bonus coins. Your full coins start when the subscription begins."
+  },
+  "subscribe": "Subscribe",
+  "subscribing": "Waiting for the store…",
+  "start": "Start free trial",
+  "restore": "Restore purchases",
+  "terms": "Terms",
+  "privacy": "Privacy",
+  "autoRenew": "Your subscription renews automatically until you cancel. You can manage or cancel it at any time in your {{store}} settings.",
+  "chargedAt": "Payment is charged to your {{store}} account at confirmation of purchase.",
+  "active": {
+    "title": "You’re a VIP",
+    "plan": "{{plan}} plan",
+    "renews": "Renews on {{date}}",
+    "ends": "Ends on {{date}}",
+    "manage": "Manage subscription",
+    "next": "Your next coins arrive when your subscription renews."
+  },
+  "status": {
+    "success": "Welcome to VIP.",
+    "cancelled": "Purchase cancelled.",
+    "pending": "Your purchase is waiting for approval.",
+    "failed": "The purchase didn’t go through. If you were charged, your VIP will start shortly.",
+    "unavailable": "VIP isn’t available right now. Please try again later.",
+    "restored": "Your purchases were restored.",
+    "nothingToRestore": "We didn’t find any purchases to restore."
+  },
+  "joinCta": "Join VIP"
+}

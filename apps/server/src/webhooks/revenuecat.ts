@@ -3,11 +3,13 @@
 // protection). Processing happens before we answer: we return 200 only after the database committed,
 // so a failure makes RevenueCat retry, and the ledger's dedupe makes retries harmless.
 
+import { readCappedText } from '../lib/http.ts';
 import type { Context } from 'hono';
 import { z } from 'zod';
 import type { AppContext } from '../env.ts';
 import { serviceDb, DbError, type Db } from '../lib/db.ts';
 import { timingSafeEqual, verifyTimestampedHmac } from '../lib/crypto.ts';
+import { ecbRates, formatDecimal, netAmount, toEurMicros, utcDate, workerCache, type FxRates } from '../lib/fx.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -48,24 +50,57 @@ const SUB_GRANTS: Record<string, { coins: number }> = { 'reeltale.plus.monthly':
 const TRIAL_COINS = 100;
 
 /**
- * Net proceeds in euro micros, only when the purchase was made in EUR (RevenueCat's `price` is USD).
- * Other currencies return null: the lot is marked valuation_pending and valued later from an ECB rate.
+ * Net proceeds of a EUR purchase in euro micros (RevenueCat's `price` is USD, so the price in the purchased
+ * currency is used). Exact decimal maths, floored once (see lib/fx.ts). Null for other currencies and
+ * when tax or commission is unknown.
  */
 export function netEurMicros(ev: RcEvent): number | null {
-  if (ev.currency !== 'EUR' || ev.price_in_purchased_currency == null) return null;
-  const gross = ev.price_in_purchased_currency;
-  const tax = ev.tax_percentage ?? null;
-  const commission = ev.commission_percentage ?? null;
-  if (gross <= 0 || tax == null || commission == null) return null;
-  // RevenueCat's tax and commission are fractions of the gross price.
-  const net = gross * (1 - tax - commission);
-  return net > 0 ? Math.floor(net * 1_000_000) : null;
+  if (ev.currency?.toUpperCase() !== 'EUR') return null;
+  const net = netAmount(ev.price_in_purchased_currency, ev.tax_percentage, ev.commission_percentage);
+  return net ? toEurMicros(net) : null;
+}
+
+export interface Valuation {
+  /** For credit_purchase / grant_sub_coins. Null leaves the lot valuation_pending. */
+  netEurMicros: number | null;
+  /** A production purchase in another currency: offered to the FX queue (the DB ignores it once valued). */
+  foreign: { currency: string; netAmount: string; purchasedAt: string } | null;
+}
+
+const NO_VALUE: Valuation = { netEurMicros: null, foreign: null };
+
+/**
+ * An event's net proceeds in euro micros: EUR directly, other currencies with the ECB rate for the
+ * purchase's UTC date once it is published (never an older one in its place). Sandbox purchases are worth
+ * nothing, so no rate is fetched for them.
+ */
+export async function valueEvent(ev: RcEvent, fx: FxRates | null): Promise<Valuation> {
+  const currency = ev.currency?.toUpperCase() ?? '';
+  const net = netAmount(ev.price_in_purchased_currency, ev.tax_percentage, ev.commission_percentage);
+  if (!net || !/^[A-Z]{3}$/.test(currency)) return NO_VALUE;
+  if (currency === 'EUR') return { netEurMicros: toEurMicros(net), foreign: null };
+  if (ev.environment === 'SANDBOX') return NO_VALUE;
+  const at = new Date(ev.purchased_at_ms ?? ev.event_timestamp_ms);
+  if (Number.isNaN(at.getTime())) return NO_VALUE;
+  const foreign = { currency, netAmount: formatDecimal(net), purchasedAt: at.toISOString() };
+  let micros: number | null = null;
+  try {
+    const r = fx ? await fx.rate(currency, utcDate(at.getTime())) : null;
+    if (r?.ok) micros = toEurMicros(net, r.rate);
+  } catch (err) {
+    console.error('fx rate failed', err instanceof Error ? err.message : err);
+  }
+  return { netEurMicros: micros, foreign };
 }
 
 export type Outcome = { status: number; body: Record<string, unknown> };
 
-/** Apply one event. Pure apart from the db calls, so it's unit-testable with a fake Db. */
-export async function applyRevenueCatEvent(db: Db, ev: RcEvent): Promise<Outcome> {
+/**
+ * Apply one event. Pure apart from the db calls and the rate lookup, so it's unit-testable with fakes.
+ * Non-EUR purchases are offered to the FX queue on every delivery (the DB decides whether the lot still
+ * needs a value), so a retry after a failure between the two calls still records them.
+ */
+export async function applyRevenueCatEvent(db: Db, ev: RcEvent, fx: FxRates | null = null): Promise<Outcome> {
   if (ev.type === 'TEST') return { status: 200, body: { ok: true, ignored: 'test' } };
   if (!UUID.test(ev.app_user_id)) {
     // Anonymous RevenueCat ids ($RCAnonymousID:…) never get coins; the app logs in with the Supabase id
@@ -79,11 +114,21 @@ export async function applyRevenueCatEvent(db: Db, ev: RcEvent): Promise<Outcome
 
   if (ev.type === 'NON_RENEWING_PURCHASE') {
     if (!ev.transaction_id || !ev.product_id) return { status: 400, body: { error: 'missing_fields' } };
+    const value = await valueEvent(ev, fx);
+    if (value.netEurMicros == null && !value.foreign && env === 'production') {
+      // Unknown tax or commission: the lot stays valuation_pending until someone values it by hand.
+      console.warn('revenuecat purchase without known net proceeds', ev.id);
+    }
     const r = await db.rpc('credit_purchase', {
       p_user: ev.app_user_id, p_event_id: ev.id, p_store: store, p_store_transaction_id: ev.transaction_id,
-      p_product_id: ev.product_id, p_environment: env, p_net_eur_micros: netEurMicros(ev),
+      p_product_id: ev.product_id, p_environment: env, p_net_eur_micros: value.netEurMicros,
     });
-    return { status: 200, body: { ok: true, result: r } };
+    if (!value.foreign) return { status: 200, body: { ok: true, result: r } };
+    const fxStatus = await db.rpc('record_purchase_fx', {
+      p_store: store, p_store_transaction_id: ev.transaction_id, p_currency: value.foreign.currency,
+      p_net_amount: value.foreign.netAmount, p_purchased_at: value.foreign.purchasedAt,
+    });
+    return { status: 200, body: { ok: true, result: r, fx: fxStatus } };
   }
 
   if (isRefund && ev.product_id && !SUB_GRANTS[ev.product_id]) {
@@ -123,11 +168,18 @@ export async function applyRevenueCatEvent(db: Db, ev: RcEvent): Promise<Outcome
     // New paid period: grant its coins (idempotent per subscription + period start).
     if ((ev.type === 'INITIAL_PURCHASE' || ev.type === 'RENEWAL') && ev.expiration_at_ms > Date.now()) {
       const trial = periodType === 'trial';
+      const value = trial ? NO_VALUE : await valueEvent(ev, fx);
       await db.rpc('grant_sub_coins', {
         p_user: ev.app_user_id, p_original_txn: original, p_period_start: start, p_grant_no: 1,
         p_coins: trial ? TRIAL_COINS : SUB_GRANTS[ev.product_id]!.coins, p_expires_at: end,
-        p_net_eur_micros_total: trial ? null : netEurMicros(ev), p_environment: env, p_is_trial: trial,
+        p_net_eur_micros_total: value.netEurMicros, p_environment: env, p_is_trial: trial,
       });
+      if (value.foreign) {
+        await db.rpc('record_sub_grant_fx', {
+          p_original_txn: original, p_period_start: start, p_grant_no: 1, p_currency: value.foreign.currency,
+          p_net_amount: value.foreign.netAmount,
+        });
+      }
     }
     return { status: 200, body: { ok: true } };
   }
@@ -143,8 +195,8 @@ export async function revenueCatWebhook(c: Context<AppContext>) {
   const auth = c.req.header('Authorization') ?? '';
   if (!timingSafeEqual(auth, env.REVENUECAT_WEBHOOK_AUTH)) return c.json({ error: 'unauthorized' }, 401);
 
-  const raw = await c.req.text();
-  if (raw.length > 64 * 1024) return c.json({ error: 'too_large' }, 413);
+  const raw = await readCappedText(c.req.raw, 64 * 1024);
+  if (raw === null) return c.json({ error: 'too_large' }, 413);
   const sig = await verifyTimestampedHmac({
     header: c.req.header('X-RevenueCat-Webhook-Signature'), rawBody: raw,
     secret: env.REVENUECAT_WEBHOOK_HMAC_SECRET, tsKey: 't', sigKey: 'v1', nowSec: Math.floor(Date.now() / 1000),
@@ -160,7 +212,8 @@ export async function revenueCatWebhook(c: Context<AppContext>) {
   }
 
   try {
-    const out = await applyRevenueCatEvent(serviceDb(env), ev);
+    const fx = ecbRates({ cache: workerCache(), cacheKeyBase: env.APP_ORIGIN, timeoutMs: 5000 });
+    const out = await applyRevenueCatEvent(serviceDb(env), ev, fx);
     return c.json(out.body, out.status as 200);
   } catch (err) {
     // 5xx → RevenueCat retries (5 times over ~80 min). Known permanent errors get 200 + a log line so

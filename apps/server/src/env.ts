@@ -5,6 +5,18 @@ export interface Env {
   /** Private R2 bucket for AI story assets (sheets, panels, manifests). Never public. */
   AI_ASSETS: R2Bucket;
   STORY_SCENE: Workflow<{ jobId: string }>;
+  /** Public R2 bucket served at MEDIA_ORIGIN (episode posters and previews). Only approved media is written. */
+  MEDIA: R2Bucket;
+  /** After a Stream upload is ready: review, transcript, poster and preview (workflows/episode-ingest.ts). */
+  EPISODE_INGEST: Workflow<{ episodeId: string; assetId: string }>;
+  /** Where the ingest review's transcript comes from: 'stream_captions' (default) or 'off'. */
+  INGEST_TRANSCRIPT?: string;
+  /** 'on' adds a short animated GIF preview next to the poster (off: unreviewed frames would be public). */
+  INGEST_ANIMATED_PREVIEW?: string;
+  /** Rate limiters (src/lib/rate-limit.ts). Optional: without a binding nothing is limited (local tests). */
+  RATE_LIMIT_USER?: RateLimit;
+  RATE_LIMIT_AI?: RateLimit;
+  RATE_LIMIT_IP?: RateLimit;
 
   APP_ENV: 'production' | 'staging' | 'development';
   APP_ORIGIN: string;
@@ -28,6 +40,8 @@ export interface Env {
   STREAM_SIGNING_KEY_ID?: string;
   STREAM_SIGNING_KEY_JWK?: string;
   TURNSTILE_SECRET?: string;
+  /** Key for the daily-rotating IP hashes that rate-limit the logged-out notice form (any long random string). */
+  IP_HASH_SECRET?: string;
   META_API_KEY?: string;
 }
 

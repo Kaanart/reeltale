@@ -1,0 +1,33 @@
+{
+  "label": "Made with AI",
+  "labelLong": "This was made with AI.",
+  "badgeA11y": "Made with AI. Tap to learn more.",
+  "disclosure": {
+    "title": "Made with AI",
+    "body": "The pictures, words and any voice-over in this were made by AI models. Stories like this are always labelled."
+  },
+  "progress": {
+    "queued": "Getting started",
+    "planning": "Planning the story",
+    "casting": "Casting the characters",
+    "writing": "Writing the scene",
+    "drawing": "Drawing the panels",
+    "checking": "Checking the pictures",
+    "framing": "Framing the shots",
+    "ready": "Ready",
+    "working": "Working on your story",
+    "failed": "We couldn’t finish this scene",
+    "blocked": "This scene couldn’t be made"
+  },
+  "failure": {
+    "blocked": "This scene couldn’t be created safely. Your coins were refunded.",
+    "failed": "We couldn’t finish this scene. Your coins were refunded.",
+    "paused": "AI stories are paused for today because they’re very busy. Your coins were refunded. Please try again tomorrow."
+  },
+  "failureActions": {
+    "tryAnother": "Try another choice",
+    "edit": "Edit your story",
+    "retry": "Try again"
+  },
+  "stepsA11y": "Step {{current}} of {{total}}: {{label}}"
+}

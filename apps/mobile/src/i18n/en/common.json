@@ -1,0 +1,82 @@
+{
+  "appName": "ReelTale",
+  "actions": {
+    "accept": "Accept",
+    "back": "Back",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "close": "Close",
+    "continue": "Continue",
+    "delete": "Delete",
+    "done": "Done",
+    "edit": "Edit",
+    "learnMore": "Learn more",
+    "next": "Next",
+    "notNow": "Not now",
+    "ok": "OK",
+    "remove": "Remove",
+    "report": "Report",
+    "retry": "Try again",
+    "save": "Save",
+    "search": "Search",
+    "seeAll": "See all",
+    "share": "Share",
+    "submit": "Submit"
+  },
+  "nav": {
+    "home": "Home",
+    "discover": "Discover",
+    "create": "Create",
+    "library": "Library",
+    "me": "Me"
+  },
+  "state": {
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "empty": "Nothing here yet.",
+    "offlineBanner": "You’re offline. Some things may not load.",
+    "backOnline": "Back online.",
+    "somethingWentWrong": "Something went wrong."
+  },
+  "coins": {
+    "count_one": "{{count, number}} coin",
+    "count_other": "{{count, number}} coins",
+    "approx": "about {{amount}}",
+    "approxInline": "(≈ {{amount}})",
+    "beforeDiscount": "{{price}} before discount"
+  },
+  "format": {
+    "live_action": "Live action",
+    "stop_motion": "Stop-motion",
+    "ai_generated": "AI story"
+  },
+  "maturity": {
+    "general": "General",
+    "mature": "Mature"
+  },
+  "episode": {
+    "number": "Episode {{number}}",
+    "numberShort": "Ep. {{number}}",
+    "count_one": "{{count}} episode",
+    "count_other": "{{count}} episodes",
+    "free": "Free",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "earlyAccess": "Early access",
+    "duration": "{{seconds}} s"
+  },
+  "tabs": {
+    "a11y": "Main navigation"
+  },
+  "link": {
+    "opening": "Opening…",
+    "notWorking": "This link doesn’t work any more.",
+    "openApp": "Open in the app",
+    "goHome": "Go to Home"
+  },
+  "a11y": {
+    "coin": "coin",
+    "locked": "Locked episode",
+    "madeWithAi": "Made with AI"
+  }
+}

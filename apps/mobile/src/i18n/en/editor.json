@@ -1,0 +1,49 @@
+{
+  "title": "Editor",
+  "tabs": {
+    "candidates": "Candidates",
+    "moderation": "Moderation",
+    "reports": "Reports"
+  },
+  "candidates": {
+    "title": "Editor’s Pick candidates",
+    "intro": "AI stories that meet the viewing thresholds.",
+    "metrics": {
+      "viewers": "Viewers",
+      "completion": "Completion",
+      "rating": "Rating",
+      "follows": "Follows"
+    },
+    "report": "AI editor’s report",
+    "pick": "Make Editor’s Pick",
+    "reject": "Not now",
+    "note": "Note",
+    "notePlaceholder": "Add a note for the creator (optional)",
+    "picked": "Marked as an Editor’s Pick.",
+    "empty": "No candidates right now."
+  },
+  "moderation": {
+    "title": "Moderation queue",
+    "pending": "Waiting for review",
+    "aiVerdict": "AI verdict",
+    "approve": "Approve",
+    "remove": "Remove",
+    "reason": "Reason",
+    "statement": "Statement of reasons",
+    "statementHint": "Written for you from the reason you pick. Edit it before you send.",
+    "send": "Send decision",
+    "done": "Decision saved.",
+    "empty": "The queue is empty.",
+    "needsEditor": "Needs a person to decide"
+  },
+  "reports": {
+    "title": "Reports",
+    "empty": "No open reports.",
+    "target": "Reported content",
+    "action": "Action",
+    "dismiss": "Dismiss",
+    "takedown": "Take down",
+    "reporter": "Reported by"
+  },
+  "notAllowed": "You don’t have access to the editor tools."
+}

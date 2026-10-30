@@ -2,3 +2,4 @@
 // must be exported from the entry module, and they import cloudflare:* modules Node can't load.
 export { default } from './app.ts';
 export { StorySceneWorkflow } from './workflows/story-scene.ts';
+export { EpisodeIngestWorkflow } from './workflows/episode-ingest.ts';

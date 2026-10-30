@@ -1,0 +1,85 @@
+{
+  "title": "Settings",
+  "account": {
+    "title": "Account",
+    "email": "Email",
+    "signInMethod": "Signed in with",
+    "methods": {
+      "apple": "Apple",
+      "google": "Google",
+      "email": "Email code",
+      "password": "Password"
+    },
+    "signOut": "Sign out"
+  },
+  "mature": {
+    "title": "Mature content",
+    "body": "Show stories with mature themes. They’re hidden until you turn this on.",
+    "confirmTitle": "Show mature stories?",
+    "confirmBody": "These stories can include themes that some people find upsetting. They never include explicit sexual content.",
+    "confirm": "Turn on"
+  },
+  "aiConsents": {
+    "title": "AI and your data",
+    "intro": "You can turn each one off any time. Turning one off stops that feature from using AI.",
+    "story": {
+      "title": "AI stories",
+      "body": "Send what you write and your choices to AI models from Meta to make your story. Narration may be read by a voice model from Google."
+    },
+    "upload": {
+      "title": "Checking uploads",
+      "body": "Let AI from Meta read your uploaded videos to add captions and tags and check them for safety."
+    },
+    "voice": {
+      "title": "Voice input",
+      "body": "Send your voice to an AI model from Meta to turn it into text."
+    },
+    "on": "On",
+    "off": "Off",
+    "turnedOff": "Turned off.",
+    "turnedOn": "Turned on."
+  },
+  "captionsDefault": {
+    "title": "Captions",
+    "body": "Show captions when a video starts."
+  },
+  "legal": {
+    "title": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "coins": "Coins Policy",
+    "creator": "Creator Terms",
+    "community": "Community Guidelines",
+    "loading": "Loading…",
+    "loadFailed": "We couldn’t load this page. Please try again."
+  },
+  "support": {
+    "title": "Report a problem",
+    "body": "Tell us what went wrong and we’ll look into it.",
+    "placeholder": "What happened?",
+    "send": "Send",
+    "sent": "Thanks. We’ll take a look."
+  },
+  "delete": {
+    "title": "Delete account",
+    "body": "This removes your account and everything you made. Some records we’re required to keep by law stay, without your name where we can.",
+    "whatGoes": "What’s deleted",
+    "whatGoesBody": "Your profile, library, stories and uploads.",
+    "whatStays": "What we keep",
+    "whatStaysBody": "Records of payments and tax that the law requires.",
+    "subscription": {
+      "title": "Your subscription is still active",
+      "body": "Deleting your account doesn’t stop your {{store}} subscription. It keeps billing until you cancel it.",
+      "manage": "Manage subscription"
+    },
+    "continue": "Continue",
+    "confirmTitle": "Type {{word}} to confirm",
+    "confirmWord": "DELETE",
+    "confirmLabel": "Confirmation",
+    "confirmHint": "Type the word exactly as shown.",
+    "confirm": "Delete my account",
+    "deleting": "Deleting…",
+    "failed": "We couldn’t start the deletion. Please try again.",
+    "done": "Your account is being deleted. You’ve been signed out."
+  }
+}

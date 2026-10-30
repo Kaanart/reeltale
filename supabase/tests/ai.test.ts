@@ -190,3 +190,28 @@ test('the generation log is append-only and the job context has the path', async
   await db.asPostgres();
   await db.fails('update app_private.ai_generations set cost_micros = 0', [], /append-only/);
 });
+
+test('a retried start with the same request id returns the same story and charges once', async () => {
+  const u = await storyteller();
+  const rid = crypto.randomUUID();
+  const startWith = async (id: string) => {
+    await db.asService();
+    return (await db.one<{ r: Start & { existing: boolean } }>(
+      `select svc.ai_start_story($1, $2, array['mystery'], 'comic', $3) as r`, [u, PREMISE, id])).r;
+  };
+  const a = await startWith(rid);
+  const b = await startWith(rid);
+  assert.equal(a.existing, false);
+  assert.equal(b.existing, true);
+  assert.deepEqual([b.story_id, b.scene_id, b.job_id], [a.story_id, a.scene_id, a.job_id]);
+  assert.equal(await balance(u), 475, 'held once');
+  const c = await startWith(crypto.randomUUID());
+  assert.notEqual(c.story_id, a.story_id);
+  assert.equal(await balance(u), 425);
+  // Another user's request id never matches.
+  const v = await storyteller();
+  await db.asService();
+  const other = (await db.one<{ r: Start & { existing: boolean } }>(
+    `select svc.ai_start_story($1, $2, array['mystery'], 'comic', $3) as r`, [v, PREMISE, rid])).r;
+  assert.equal(other.existing, false);
+});

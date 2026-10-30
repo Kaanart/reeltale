@@ -168,3 +168,14 @@ test('manifests and panels are served only through the access check, only next t
   assert.equal((await call(e, `/api/ai/scenes/${SCENE}/manifest`)).status, 404);
   assert.equal((await call(e, `/api/ai/scenes/${SCENE}/assets/panel-2.webp`)).status, 404);
 });
+
+test('a start retried with the same request id is passed through and not launched again', async () => {
+  const { e, created } = env();
+  const rid = '55555555-5555-4555-8555-555555555555';
+  rpc = () => ({ body: { ...started, existing: true } });
+  const r = await call(e, '/api/ai/stories', { method: 'POST', body: { premise: PREMISE, request_id: rid } });
+  assert.equal(r.status, 202);
+  assert.equal(rpcCalls[0]?.args.p_request_id, rid);
+  assert.equal(created.length, 0);
+  assert.equal((await call(e, '/api/ai/stories', { method: 'POST', body: { premise: PREMISE, request_id: 'nope' } })).status, 400);
+});

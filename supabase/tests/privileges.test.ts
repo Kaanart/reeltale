@@ -55,6 +55,9 @@ export const AUTHENTICATED_COLUMNS: Record<string, Partial<Record<'SELECT' | 'UP
     SELECT: ['auto_renew', 'environment', 'period_end', 'period_start', 'period_type', 'product_id', 'status', 'store',
       'store_original_transaction_id', 'tier', 'user_id'],
   },
+  // Trust & safety: reporters read their own reports, never who reported or who decided; blocks are owner-only.
+  'public.reports': { SELECT: ['created_at', 'details', 'id', 'reason', 'resolved_at', 'status', 'target_id', 'target_type'] },
+  'public.blocks': { SELECT: ['blocked_id', 'blocker_id', 'created_at'] },
 };
 
 // Table-level grants for `authenticated` (only where column grants can't express it, e.g. DELETE).
@@ -63,8 +66,10 @@ export const AUTHENTICATED_TABLE_GRANTS: string[] = ['public.follows:DELETE'];
 // Functions `authenticated` may execute (schema.name).
 export const AUTHENTICATED_FUNCTIONS = [
   'public.accept_terms',
+  'public.block_user',
   'public.creator_is_live',
   'public.get_episode_price',
+  'public.get_my_moderation_actions',
   'public.get_my_role',
   'public.get_my_wallet',
   'public.has_ai_access',
@@ -72,6 +77,7 @@ export const AUTHENTICATED_FUNCTIONS = [
   'public.is_adult',
   'public.my_mature_opt_in',
   'public.profile_is_listed',
+  'public.report_content',
   'public.report_underage_signal',
   'public.request_account_deletion',
   'public.set_ai_consent',
@@ -83,6 +89,7 @@ export const AUTHENTICATED_FUNCTIONS = [
   'public.studio_set_series_status',
   'public.studio_update_episode',
   'public.studio_update_series',
+  'public.unblock_user',
   'public.unlock_episode',
   'public.use_free_pass',
 ];

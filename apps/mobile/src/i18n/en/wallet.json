@@ -1,0 +1,86 @@
+{
+  "title": "Wallet",
+  "balance": "Balance",
+  "balanceA11y_one": "{{count, number}} coin",
+  "balanceA11y_other": "{{count, number}} coins",
+  "paid": {
+    "title": "Coins you bought",
+    "hint": "These never expire."
+  },
+  "bonus": {
+    "title": "Bonus coins",
+    "hint": "These expire on the dates below. The ones that expire first are used first.",
+    "none": "You have no bonus coins right now."
+  },
+  "lot": {
+    "coins_one": "{{count, number}} coin",
+    "coins_other": "{{count, number}} coins",
+    "expiresOn": "Expires {{date}}",
+    "expiresInDays_one": "Expires in {{count}} day",
+    "expiresInDays_other": "Expires in {{count}} days",
+    "expiresToday": "Expires today"
+  },
+  "source": {
+    "vip": "VIP coins",
+    "trial": "Trial coins",
+    "bonus": "Bonus coins",
+    "returned": "Returned coins",
+    "test": "Test coins"
+  },
+  "expiringSoon": {
+    "title": "Expiring soon",
+    "body_one": "{{count, number}} bonus coin expires within a week.",
+    "body_other": "{{count, number}} bonus coins expire within a week.",
+    "cta": "Use them"
+  },
+  "freePasses": {
+    "title": "Free Passes",
+    "left": "{{left}} left today",
+    "none": "None left today",
+    "hint": "You get a new Free Pass every day."
+  },
+  "debt": {
+    "title": "A refund left your coins short",
+    "body_one": "You’re 1 coin short after a refund. Coins you get next will cover that first.",
+    "body_other": "You’re {{count, number}} coins short after a refund. Coins you get next will cover that first."
+  },
+  "history": {
+    "title": "History",
+    "empty": "Your coin activity will show up here.",
+    "types": {
+      "purchase": "Coins added",
+      "unlock": "Episode unlocked",
+      "ai": "AI story",
+      "refund": "Refund",
+      "expired": "Coins expired",
+      "grant": "Coins added",
+      "returned": "Coins returned"
+    }
+  },
+  "getCoins": "Get coins",
+  "vip": "VIP",
+  "policy": "Coins can’t be cashed out or transferred.",
+  "refreshFailed": "We couldn’t update your wallet. Pull down to try again.",
+  "store": {
+    "title": "Get coins",
+    "pack": "{{coins}} coins",
+    "packA11y": "{{coins}} coins for {{price}}",
+    "perUnit": "About {{coins}} coins per {{unit}}",
+    "bestValue": "Best value",
+    "restore": "Restore purchases",
+    "restoring": "Restoring…",
+    "restored": "Your purchases were restored.",
+    "nothingToRestore": "We didn’t find any purchases to restore.",
+    "terms": "Terms",
+    "coinsPolicy": "Coins Policy",
+    "privacy": "Privacy",
+    "unavailable": "Coin packs aren’t available right now. Please try again later.",
+    "waiting": "Waiting for the store…",
+    "success": "Coins added to your wallet.",
+    "cancelled": "Purchase cancelled.",
+    "pending": "Your purchase is waiting for approval. We’ll add the coins when it’s approved.",
+    "failed": "The purchase didn’t go through. If you were charged, your coins will arrive shortly.",
+    "delayed": "Your coins are on the way. This can take a minute.",
+    "nonExpiring": "Coins you buy never expire."
+  }
+}

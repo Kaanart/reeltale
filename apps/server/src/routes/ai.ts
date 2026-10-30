@@ -29,6 +29,8 @@ const StartBody = z.object({
   premise: z.string().trim().min(20).max(1000),
   tags: z.array(z.string().regex(/^[a-z0-9-]{2,40}$/)).max(10).default([]),
   mode: z.literal('comic').default('comic'),
+  /** One id per tap, reused on retries, so a retried start never charges twice. */
+  request_id: z.string().uuid().optional(),
 });
 
 aiRoutes.post('/stories', async (c) => {
@@ -38,11 +40,13 @@ aiRoutes.post('/stories', async (c) => {
   try {
     r = await serviceDb(c.env).rpc<Started>('ai_start_story', {
       p_user: c.get('userId'), p_premise: body.data.premise, p_tags: body.data.tags, p_mode: body.data.mode,
+      p_request_id: body.data.request_id ?? null,
     });
   } catch (err) {
     return dbErrorResponse(c, err);
   }
-  if (!(await launch(c, r.job_id))) return jsonError(c, 503, 'generation_unavailable');
+  // A retry of a start that already happened: its workflow was launched (or the job refunded) back then.
+  if (!r.existing && !(await launch(c, r.job_id))) return jsonError(c, 503, 'generation_unavailable');
   return c.json(r, 202);
 });
 

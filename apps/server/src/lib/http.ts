@@ -56,12 +56,17 @@ const CLIENT_SAFE_DB_ERRORS = new Set([
   'episode_not_ready', 'series_not_found', 'invalid_date_of_birth', 'date_of_birth_already_set',
   'ai_consent_required', 'mode_unavailable', 'invalid_choice', 'scene_not_found', 'scene_not_continuable',
   'scene_in_progress',
+  // Trust & safety (notice form, editor tools)
+  'not_found', 'report_not_found', 'report_mismatch', 'not_eligible', 'conflict_of_interest', 'not_an_editor',
+  'invalid_ground', 'invalid_statement', 'invalid_decision', 'invalid_status', 'invalid_version', 'invalid_target',
+  'invalid_reason', 'invalid_details', 'invalid_notifier',
 ]);
 
 function statusFor(error: string): number {
   if (error === 'not_authenticated') return 401;
   if (error === 'not_adult' || error === 'ai_access_required' || error === 'ai_consent_required') return 403;
-  if (error.endsWith('_not_found')) return 404;
+  if (error === 'not_an_editor' || error === 'conflict_of_interest') return 403;
+  if (error === 'not_found' || error.endsWith('_not_found')) return 404;
   if (error === 'rate_limited') return 429;
   if (error.startsWith('invalid_') || error === 'mode_unavailable') return 400;
   return 409;
@@ -77,4 +82,34 @@ export function dbErrorResponse(c: Context, err: unknown) {
   }
   console.error('db error', err instanceof Error ? err.message : err);
   return jsonError(c, 500, 'internal_error');
+}
+
+/**
+ * Read a request body as text, refusing (null) anything over `max` bytes without buffering it: unauthenticated
+ * endpoints check signatures and tokens only after reading, so an unbounded read would let anyone make the
+ * Worker hold a huge body in memory.
+ */
+export async function readCappedText(req: Request, max: number): Promise<string | null> {
+  if (Number(req.headers.get('Content-Length') ?? 0) > max) return null;
+  if (!req.body) return '';
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) {
+      await reader.cancel().catch(() => {});
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
 }

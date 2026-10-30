@@ -12,7 +12,7 @@ import { z } from 'zod';
 import type { MetaClient, SamBox } from './meta.ts';
 import {
   characterSheetPrompt, cleanPlatePrompt, panelCheckPrompt, panelImagePrompt, planPrompt, scenePrompt,
-  textModerationPrompt, type ModeratedText,
+  textModerationPrompt, fenceText, type ModeratedText,
 } from './prompts.ts';
 
 // Rough list prices in USD micros, used to reserve budget before a call (actual cost is logged after).
@@ -96,7 +96,7 @@ export async function moderateText(deps: SceneDeps, kind: ModeratedText, text: s
     deps.meta.chatJson({
       model: 'muse-spark-1.3', schemaName: 'text_verdict', schema: TextVerdictSchema, effort: 'low',
       system: textModerationPrompt(kind),
-      user: `<<<TEXT\n${clipped}\nTEXT>>>`,
+      user: fenceText(clipped),
     }));
   return data;
 }

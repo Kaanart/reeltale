@@ -5,7 +5,7 @@
 
 import { TextVerdictSchema, type TextVerdict } from '@reeltale/shared';
 import { MetaApiError, type MetaClient } from '../ai/meta.ts';
-import { textModerationPrompt } from '../ai/prompts.ts';
+import { fenceText, textModerationPrompt } from '../ai/prompts.ts';
 
 export const TEXT_TARGETS = ['series', 'series_edit', 'episode_edit'] as const;
 type TextTarget = (typeof TEXT_TARGETS)[number];
@@ -66,7 +66,7 @@ export async function reviewBatch(io: ReviewIO, limit = 10): Promise<ReviewSumma
         const { data } = await io.meta.chatJson({
           model: MODEL, schemaName: 'text_verdict', schema: TextVerdictSchema, effort: 'low',
           system: textModerationPrompt(item.target === 'episode_edit' ? 'title' : 'listing'),
-          user: `<<<TEXT\n${text}\nTEXT>>>`,
+          user: fenceText(text),
         });
         decision = decide(data);
         categories = data.categories;

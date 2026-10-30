@@ -1,0 +1,48 @@
+{
+  "back": "Back",
+  "title": "{{series}} · Episode {{number}}",
+  "like": "Like",
+  "liked": "Liked",
+  "comments": "Comments",
+  "share": "Share",
+  "report": "Report",
+  "mute": "Mute",
+  "unmute": "Unmute",
+  "play": "Play",
+  "pause": "Pause",
+  "scrubber": "Video position",
+  "captions": {
+    "label": "Captions",
+    "on": "Captions on",
+    "off": "Captions off",
+    "language": "Caption language",
+    "none": "No captions for this episode."
+  },
+  "next": {
+    "label": "Next episode",
+    "countdown": "Next episode in {{seconds}}",
+    "cancel": "Stay here",
+    "locked": "Next episode is locked"
+  },
+  "end": {
+    "title": "You’re all caught up",
+    "body": "New episodes will appear here when they’re out.",
+    "backToSeries": "Back to the series"
+  },
+  "loadFailed": "We couldn’t load this video.",
+  "reconnecting": "Reconnecting…",
+  "expired": "This video link has expired. Loading a new one…",
+  "keyboardHint": "Use the up and down arrow keys to switch episodes.",
+  "swipeHint": "Swipe up for the next episode.",
+  "poster": {
+    "locked": "Locked episode"
+  },
+  "commentsSheet": {
+    "title": "Comments",
+    "placeholder": "Add a comment…",
+    "post": "Post",
+    "empty": "No comments yet. Be the first.",
+    "checked": "Comments are checked for safety before they appear.",
+    "rejected": "That comment can’t be posted."
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "me": {
+    "title": "Me",
+    "editProfile": "Edit profile",
+    "displayName": "Display name",
+    "handle": "Handle",
+    "bio": "Bio",
+    "bioHint": "Your bio is checked for safety when you save it.",
+    "bioRefused": "We can’t use that bio. Try something else.",
+    "handleTaken": "That handle is taken.",
+    "handleInvalid": "Handles use 3 to 30 letters, numbers and underscores.",
+    "avatar": "Change photo",
+    "vipStatus": "VIP",
+    "notVip": "Not a VIP",
+    "links": {
+      "wallet": "Wallet",
+      "library": "Library",
+      "studio": "Studio",
+      "settings": "Settings"
+    },
+    "saved": "Profile saved."
+  },
+  "user": {
+    "title": "Profile",
+    "stories": "Stories",
+    "noStories": "No stories yet.",
+    "followers_one": "{{count, number}} follower",
+    "followers_other": "{{count, number}} followers",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockedNote": "You blocked this person.",
+    "notFound": "We couldn’t find that profile.",
+    "report": "Report"
+  }
+}

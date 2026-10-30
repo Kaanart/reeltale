@@ -1,0 +1,178 @@
+{
+  "new": {
+    "title": "Write an AI story",
+    "stepOf": "Step {{current}} of {{total}}",
+    "opening": {
+      "title": "How does your story begin?",
+      "placeholder": "Start your story…",
+      "hint": "Write between {{min}} and {{max}} characters.",
+      "counter": "{{length}} / {{max}}",
+      "tooShort": "Add a little more. You need at least {{min}} characters.",
+      "tooLong": "That’s over {{max}} characters. Make it shorter.",
+      "dictate": "Say it instead",
+      "listening": "Listening…",
+      "dictateFailed": "We couldn’t hear that. Try again, or type it.",
+      "ideasTitle": "Need an idea?",
+      "ideas": {
+        "lighthouse": "A lighthouse keeper finds letters from someone who isn’t born yet.",
+        "market": "Every night the market sells a memory nobody wants to lose.",
+        "train": "A night train stops at a station that isn’t on any map."
+      }
+    },
+    "look": {
+      "title": "Pick a look",
+      "genre": "Genre",
+      "style": "Picture style",
+      "styles": {
+        "ink_watercolor": "Ink & watercolor",
+        "clean_manga": "Clean manga",
+        "noir": "Noir",
+        "storybook": "Storybook"
+      },
+      "format": "Format",
+      "comic": "Comic",
+      "comicHint": "Illustrated panels with a short narration",
+      "video": "Video",
+      "videoSoon": "Coming soon"
+    },
+    "confirm": {
+      "title": "Ready to begin?",
+      "cost": "Story start",
+      "costIncludes": "Includes the story plan and the first scene.",
+      "balance": "Your balance",
+      "begin": "Begin",
+      "notEnough": "You don’t have enough coins for this yet.",
+      "getCoins": "Get coins",
+      "sendNote": "What you write is sent to AI models from Meta to make your story.",
+      "refundNote": "If a scene can’t be made, your coins are refunded."
+    },
+    "starting": {
+      "title": "Making your story",
+      "body": "This can take a little while. You can leave this screen and come back, and your story keeps going."
+    }
+  },
+  "player": {
+    "scene": "Scene {{number}}",
+    "play": "Play",
+    "pause": "Pause",
+    "replay": "Watch again",
+    "narration": "Narration",
+    "narrationOn": "Narration on",
+    "narrationOff": "Narration off",
+    "captions": "Captions",
+    "tapToSkip": "Tap to skip ahead",
+    "back": "Back",
+    "map": "Story map",
+    "info": "How this scene was made",
+    "report": "Report",
+    "loading": "Loading the scene…",
+    "loadFailed": "We couldn’t load this scene.",
+    "imageFailed": "A picture didn’t load.",
+    "speakerLine": "{{name}}: {{line}}"
+  },
+  "choices": {
+    "title": "What happens next?",
+    "ready": "Ready",
+    "hintLabel": "Hint",
+    "sayYourChoice": "Say your choice",
+    "writeYourOwn": "Write your own",
+    "writeYourOwnHint": "Free. We check it before it’s used.",
+    "writePlaceholder": "What do you do next?",
+    "writeChecked": "Checking your idea…",
+    "writeRefused": "We can’t use that idea. Try something else.",
+    "regenerate": "Redraw a panel",
+    "regenerateCost_one": "Redraw for {{count}} coin",
+    "regenerateCost_other": "Redraw for {{count}} coins",
+    "choiceCost_one": "Costs {{count}} coin",
+    "choiceCost_other": "Costs {{count}} coins",
+    "voiceHeard": "We heard: “{{text}}”",
+    "voiceNoMatch": "That didn’t match a choice. Try again.",
+    "taken": "You chose: {{label}}",
+    "inProgress": "Your next scene is being made."
+  },
+  "ending": {
+    "title": "The end",
+    "body": "You reached an ending.",
+    "publish": "Publish this story",
+    "startAnother": "Start another story",
+    "viewMap": "See the whole story"
+  },
+  "scene": {
+    "blocked": "This scene couldn’t be created safely. Your coins were refunded.",
+    "failed": "We couldn’t finish this scene. Your coins were refunded.",
+    "tryAnother": "Try another choice",
+    "edit": "Edit",
+    "retry": "Try again",
+    "retryCost_one": "Try again for {{count}} coin",
+    "retryCost_other": "Try again for {{count}} coins"
+  },
+  "map": {
+    "title": "Story map",
+    "youAreHere": "You are here",
+    "visited": "Visited",
+    "notVisited": "Not visited yet",
+    "ending": "Ending",
+    "choice": "Choice {{label}}",
+    "pickPath": "Tap a scene to open it.",
+    "empty": "Your map grows as you make choices."
+  },
+  "howMade": {
+    "title": "How this scene was made",
+    "intro": "AI models made this scene. Here is what each step used.",
+    "step": "Step",
+    "model": "Model",
+    "time": "Time",
+    "cost": "Cost",
+    "latency": "{{ms}} ms",
+    "details": "Show details",
+    "hideDetails": "Hide details",
+    "showOutline": "Show the subject outline",
+    "hideOutline": "Hide the subject outline",
+    "created": "Made {{date}}",
+    "signed": "Content credentials attached",
+    "notSigned": "No content credentials yet",
+    "tasks": {
+      "plan": "Story plan",
+      "sheets": "Character sheets",
+      "script": "Script",
+      "panels": "Panels",
+      "check": "Safety check",
+      "focus": "Subject finder",
+      "plate": "Background",
+      "tts": "Narration voice",
+      "vtt": "Captions",
+      "unknown": "Step"
+    }
+  },
+  "publish": {
+    "title": "Publish your story",
+    "pickPath": {
+      "title": "Choose the path to publish",
+      "body": "Pick the ending you want people to read. They’ll follow that path from the start."
+    },
+    "details": {
+      "title": "Title",
+      "cover": "Cover",
+      "coverHint": "We’ll draw a cover for you, or pick a picture from the story.",
+      "tags": "Tags"
+    },
+    "report": {
+      "title": "AI editor’s report",
+      "body": "A quick read of your story, with ideas to make it better.",
+      "loading": "Reading your story…",
+      "failed": "We couldn’t make the report. You can still publish.",
+      "scores": {
+        "coherence": "Coherence",
+        "pacing": "Pacing",
+        "originality": "Originality"
+      },
+      "suggestions": "Suggestions"
+    },
+    "notice": "Published AI stories are free to watch and always labelled as made with AI.",
+    "publish": "Publish",
+    "publishing": "Publishing…",
+    "published": "Your story is published.",
+    "share": "Share",
+    "needsReview": "Your story will appear after a quick safety check."
+  }
+}

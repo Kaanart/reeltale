@@ -8,6 +8,8 @@ function env(over: Partial<Env> = {}): Env {
     ASSETS: { fetch: async () => new Response('<!doctype html><html><head></head><body></body></html>', { headers: { 'Content-Type': 'text/html' } }) } as unknown as Fetcher,
     AI_ASSETS: {} as unknown as R2Bucket,
     STORY_SCENE: {} as unknown as Workflow<{ jobId: string }>,
+    MEDIA: {} as unknown as R2Bucket,
+    EPISODE_INGEST: {} as unknown as Workflow<{ episodeId: string; assetId: string }>,
     APP_ENV: 'development',
     APP_ORIGIN: 'https://reeltale.net',
     MEDIA_ORIGIN: 'https://media.reeltale.net',

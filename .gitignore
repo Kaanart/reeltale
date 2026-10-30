@@ -67,3 +67,6 @@ yarn-error.*
 
 # Throwaway probe tests written during reviews
 supabase/tests/.review-*
+
+# Agent worktrees (parallel work in progress; never commit)
+.claude/worktrees/

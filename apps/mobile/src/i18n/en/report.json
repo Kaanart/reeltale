@@ -1,0 +1,33 @@
+{
+  "title": "Report",
+  "intro": "Tell us what’s wrong. Reports are private.",
+  "reason": "Reason",
+  "reasons": {
+    "sexual": "Sexual content",
+    "minor_safety": "Someone under 18",
+    "real_person": "Looks like a real person without their consent",
+    "hate_harassment": "Hate or harassment",
+    "violence": "Violence",
+    "self_harm": "Self-harm",
+    "copyright": "Copyright or someone else’s work",
+    "spam": "Spam or scam",
+    "other": "Something else"
+  },
+  "details": "Details",
+  "detailsPlaceholder": "Tell us more (optional)",
+  "goodFaith": "I’m reporting this in good faith, and what I’ve said is accurate.",
+  "submit": "Send report",
+  "submitting": "Sending…",
+  "thanks": "Thanks. We’ll review it.",
+  "alsoBlock": "Block this creator too",
+  "needReason": "Pick a reason.",
+  "needGoodFaith": "Tick the box to confirm.",
+  "failed": "We couldn’t send your report. Please try again.",
+  "target": {
+    "series": "Series",
+    "episode": "Episode",
+    "scene": "AI scene",
+    "comment": "Comment",
+    "user": "Profile"
+  }
+}

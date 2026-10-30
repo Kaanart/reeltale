@@ -23,14 +23,32 @@
 
   "observability": { "enabled": true },
 
-  "r2_buckets": [{ "binding": "AI_ASSETS", "bucket_name": "reeltale-ai", "jurisdiction": "eu" }],
-  "workflows": [{ "name": "reeltale-story-scene", "binding": "STORY_SCENE", "class_name": "StorySceneWorkflow" }],
-  // Automated text moderation (svc.moderation_queue → Muse Spark → svc.record_verdict).
+  // MEDIA is public through its custom domain (MEDIA_ORIGIN) and only ever holds approved media.
+  "r2_buckets": [
+    { "binding": "AI_ASSETS", "bucket_name": "reeltale-ai", "jurisdiction": "eu" },
+    { "binding": "MEDIA", "bucket_name": "reeltale-media", "jurisdiction": "eu" }
+  ],
+  "workflows": [
+    { "name": "reeltale-story-scene", "binding": "STORY_SCENE", "class_name": "StorySceneWorkflow" },
+    { "name": "reeltale-episode-ingest", "binding": "EPISODE_INGEST", "class_name": "EpisodeIngestWorkflow" }
+  ],
+  // Automated text moderation (svc.moderation_queue → Muse Spark → svc.record_verdict) on every tick; the
+  // tick at minute 0 also values non-EUR coins from ECB rates (src/ledger/fx-valuations.ts).
   "triggers": { "crons": ["*/2 * * * *"] },
+
+  // Rate limits (src/lib/rate-limit.ts), counted per Cloudflare location, approximate. Wrangler ≥ 4.36.
+  // period can only be 10 or 60 (Retry-After assumes 60). namespace_id: a positive integer, unique on the
+  // account (bindings with the same id share counters, even across Workers); staging has its own.
+  "ratelimits": [
+    { "name": "RATE_LIMIT_USER", "namespace_id": "73101", "simple": { "limit": 120, "period": 60 } },
+    { "name": "RATE_LIMIT_AI", "namespace_id": "73102", "simple": { "limit": 10, "period": 60 } },
+    { "name": "RATE_LIMIT_IP", "namespace_id": "73103", "simple": { "limit": 60, "period": 60 } }
+  ],
 
   // Non-secret configuration. Secrets are set with `npx wrangler secret put <NAME>` (see docs/RUNBOOK.md):
   // SUPABASE_SECRET_KEY, REVENUECAT_WEBHOOK_AUTH, REVENUECAT_WEBHOOK_HMAC_SECRET, STREAM_API_TOKEN,
-  // STREAM_WEBHOOK_SECRET, STREAM_SIGNING_KEY_ID, STREAM_SIGNING_KEY_JWK, TURNSTILE_SECRET, META_API_KEY.
+  // STREAM_WEBHOOK_SECRET, STREAM_SIGNING_KEY_ID, STREAM_SIGNING_KEY_JWK, TURNSTILE_SECRET, META_API_KEY,
+  // IP_HASH_SECRET (keys the daily IP hashes of the logged-out notice form).
   "vars": {
     "APP_ENV": "production",
     "APP_ORIGIN": "https://reeltale.net",
@@ -43,16 +61,28 @@
     "IOS_BUNDLE_ID": "com.euragnos.reeltale",
     "ANDROID_PACKAGE": "com.euragnos.reeltale",
     "ANDROID_CERT_SHA256": "",
-    "ADMOB_PUBLISHER_ID": "pub-6272675197810340"
+    "ADMOB_PUBLISHER_ID": "pub-6272675197810340",
+    "INGEST_TRANSCRIPT": "stream_captions"
   },
 
   "env": {
     "staging": {
       "name": "reeltale-staging",
       "routes": [{ "pattern": "staging.reeltale.net", "custom_domain": true }],
-      "r2_buckets": [{ "binding": "AI_ASSETS", "bucket_name": "reeltale-ai-staging", "jurisdiction": "eu" }],
-      "workflows": [{ "name": "reeltale-story-scene-staging", "binding": "STORY_SCENE", "class_name": "StorySceneWorkflow" }],
+      "r2_buckets": [
+        { "binding": "AI_ASSETS", "bucket_name": "reeltale-ai-staging", "jurisdiction": "eu" },
+        { "binding": "MEDIA", "bucket_name": "reeltale-media-staging", "jurisdiction": "eu" }
+      ],
+      "workflows": [
+        { "name": "reeltale-story-scene-staging", "binding": "STORY_SCENE", "class_name": "StorySceneWorkflow" },
+        { "name": "reeltale-episode-ingest-staging", "binding": "EPISODE_INGEST", "class_name": "EpisodeIngestWorkflow" }
+      ],
       "triggers": { "crons": ["*/10 * * * *"] },
+      "ratelimits": [
+        { "name": "RATE_LIMIT_USER", "namespace_id": "73111", "simple": { "limit": 120, "period": 60 } },
+        { "name": "RATE_LIMIT_AI", "namespace_id": "73112", "simple": { "limit": 10, "period": 60 } },
+        { "name": "RATE_LIMIT_IP", "namespace_id": "73113", "simple": { "limit": 60, "period": 60 } }
+      ],
       "vars": {
         "APP_ENV": "staging",
         "APP_ORIGIN": "https://staging.reeltale.net",
@@ -65,7 +95,8 @@
         "IOS_BUNDLE_ID": "com.euragnos.reeltale",
         "ANDROID_PACKAGE": "com.euragnos.reeltale",
         "ANDROID_CERT_SHA256": "",
-        "ADMOB_PUBLISHER_ID": "pub-6272675197810340"
+        "ADMOB_PUBLISHER_ID": "pub-6272675197810340",
+        "INGEST_TRANSCRIPT": "stream_captions"
       }
     }
   }
