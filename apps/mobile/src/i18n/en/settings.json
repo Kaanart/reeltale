@@ -8,7 +8,8 @@
       "apple": "Apple",
       "google": "Google",
       "email": "Email code",
-      "password": "Password"
+      "password": "Password",
+      "demo": "Demo account"
     },
     "signOut": "Sign out"
   },
@@ -51,7 +52,8 @@
     "creator": "Creator Terms",
     "community": "Community Guidelines",
     "loading": "Loading…",
-    "loadFailed": "We couldn’t load this page. Please try again."
+    "loadFailed": "We couldn’t load this page. Please try again.",
+    "aiPolicy": "AI Content Policy"
   },
   "support": {
     "title": "Report a problem",
@@ -70,7 +72,10 @@
     "subscription": {
       "title": "Your subscription is still active",
       "body": "Deleting your account doesn’t stop your {{store}} subscription. It keeps billing until you cancel it.",
-      "manage": "Manage subscription"
+      "bodyUnnamed": "Deleting your account doesn’t stop your subscription. It keeps billing until you cancel it.",
+      "manage": "Manage subscription",
+      "titleGeneric": "If you have a subscription",
+      "bodyGeneric": "Deleting your account doesn’t cancel it. It keeps billing until you cancel it in the store you subscribed through."
     },
     "continue": "Continue",
     "confirmTitle": "Type {{word}} to confirm",
@@ -80,6 +85,24 @@
     "confirm": "Delete my account",
     "deleting": "Deleting…",
     "failed": "We couldn’t start the deletion. Please try again.",
-    "done": "Your account is being deleted. You’ve been signed out."
+    "done": "Your account is being deleted. You’ve been signed out.",
+    "stores": {
+      "app_store": "App Store",
+      "play_store": "Google Play"
+    },
+    "signOutFailed": "Your account is being deleted. Sign out to finish on this device."
+  },
+  "toggle": {
+    "on": "On",
+    "off": "Off"
+  },
+  "blocked": {
+    "title": "Blocked accounts",
+    "intro": "People you block don’t show up for you, and their stories are hidden. You can unblock them here.",
+    "none": "You haven’t blocked anyone.",
+    "account": "Blocked account",
+    "since": "Blocked {{date}}",
+    "unblock": "Unblock",
+    "unblockA11y": "Unblock the account you blocked on {{date}}"
   }
 }

@@ -15,8 +15,9 @@
     "coins_other": "{{count, number}} bonus coins each {{period}}",
     "coinsValid": "Bonus coins last until your next renewal.",
     "discount": "{{percent}}% off every unlock",
-    "freePass": "1 extra Free Pass a day",
-    "ai": "Write AI comic stories (scenes use coins)"
+    "ai": "Write AI comic stories (scenes use coins)",
+    "freePass_one": "{{count}} extra Free Pass a day",
+    "freePass_other": "{{count}} extra Free Passes a day"
   },
   "price": "{{price}} per {{period}}",
   "trial": {
@@ -49,5 +50,8 @@
     "restored": "Your purchases were restored.",
     "nothingToRestore": "We didn’t find any purchases to restore."
   },
-  "joinCta": "Join VIP"
+  "joinCta": "Join VIP",
+  "perksTitle": "What you get",
+  "comingSoon": "VIP membership is coming soon.",
+  "notActive": "You’re not a VIP yet."
 }

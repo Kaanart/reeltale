@@ -18,7 +18,8 @@
     "expiresOn": "Expires {{date}}",
     "expiresInDays_one": "Expires in {{count}} day",
     "expiresInDays_other": "Expires in {{count}} days",
-    "expiresToday": "Expires today"
+    "expiresToday": "Expires today",
+    "rowA11y": "{{source}}: {{coins}}. {{expiry}}"
   },
   "source": {
     "vip": "VIP coins",
@@ -82,5 +83,6 @@
     "failed": "The purchase didn’t go through. If you were charged, your coins will arrive shortly.",
     "delayed": "Your coins are on the way. This can take a minute.",
     "nonExpiring": "Coins you buy never expire."
-  }
+  },
+  "comingSoon": "Coin packs are coming soon."
 }

@@ -307,6 +307,14 @@ test('transient provider errors are retried; a review that keeps failing goes to
   assert.match(h3.logs.join('\n'), /down/);
 });
 
+test('without the creator\'s consent at review time an editor decides, and nothing goes to the model', async () => {
+  const { meta, calls } = fakeMeta();
+  const h = harness(meta, { claims: ['no_consent'], contexts: [ctxOf(), ctxOf(), ctxOf({ awaiting_editor: true })] });
+  assert.equal(await run(h), 'held');
+  assert.equal(calls.length, 0);
+  assert.deepEqual(h.calls('record_verdict'), [verdictArgs('needs_editor', { p_reason: 'no_consent', p_model: null })]);
+});
+
 test('over the daily review cap an editor decides, without a model call; a reviewed version is left alone', async () => {
   const { meta, calls } = fakeMeta();
   const h = harness(meta, { claims: ['over_cap'], contexts: [ctxOf(), ctxOf(), ctxOf({ awaiting_editor: true })] });

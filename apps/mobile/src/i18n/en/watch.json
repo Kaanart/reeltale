@@ -1,6 +1,7 @@
 {
   "back": "Back",
   "title": "{{series}} · Episode {{number}}",
+  "screenTitle": "Episode player",
   "like": "Like",
   "liked": "Liked",
   "comments": "Comments",
@@ -22,7 +23,9 @@
     "label": "Next episode",
     "countdown": "Next episode in {{seconds}}",
     "cancel": "Stay here",
-    "locked": "Next episode is locked"
+    "locked": "Next episode is locked",
+    "title": "Up next",
+    "episode": "Episode {{number}}: {{title}}"
   },
   "end": {
     "title": "You’re all caught up",
@@ -44,5 +47,11 @@
     "empty": "No comments yet. Be the first.",
     "checked": "Comments are checked for safety before they appear.",
     "rejected": "That comment can’t be posted."
+  },
+  "previous": "Previous episode",
+  "openSettings": "Open settings",
+  "demo": {
+    "notice": "Demo playback: a placeholder clip, not the real episode",
+    "unavailable": "Demo playback isn’t available on this device. Here’s the poster instead."
   }
 }

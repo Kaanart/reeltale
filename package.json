@@ -15,5 +15,13 @@
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "db:test": "node --test supabase/tests/*.test.ts"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.12",
+    "@types/node": "^24.19.2",
+    "typescript": "~6.0.3"
+  },
+  "overrides": {
+    "expo-asset": "~57.0.20"
   }
 }

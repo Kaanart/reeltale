@@ -260,7 +260,10 @@ begin
   end if;
   update app_private.fx_valuations
   set attempts = v_attempts, last_error = left(coalesce(p_error, 'unknown'), 200),
+      -- The cron runs at minute 0 and writes this a few seconds later: without the slack, every wait would
+      -- miss its tick and last an extra hour.
       next_attempt_at = now() + least(interval '1 hour' * power(2, v_attempts - 1), interval '24 hours')
+                        - interval '5 minutes'
   where id = p_id;
   return 'retry';
 end;

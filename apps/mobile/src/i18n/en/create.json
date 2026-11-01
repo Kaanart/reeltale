@@ -1,12 +1,23 @@
 {
   "title": "Create",
-  "subtitle": "Write a story with AI, upload your own, or make stop-motion.",
+  "subtitle": "Make a story of your own.",
   "ai": {
     "title": "Write an AI story",
     "body": "Write the opening. AI writes and draws the scenes, and you choose what happens next.",
     "usesCoins": "Uses coins",
-    "priceHint": "Starts from {{price}}"
+    "priceHint": "Starts from {{price}}",
+    "cta": "Start writing",
+    "priceDetail": "to begin, then {{scene}} for each new scene"
   },
+  "stories": {
+    "title": "Your stories",
+    "untitled": "Untitled story",
+    "rowA11y": "{{title}}, {{status}}"
+  },
+  "more": {
+    "title": "More ways to create"
+  },
+  "comingSoon": "Coming soon",
   "upload": {
     "title": "Upload an episode",
     "body": "Share a vertical video of up to 2 minutes.",
@@ -22,7 +33,8 @@
       "body": "To write and draw your story, we send what you type, and your choices, to AI models from Meta. Narration may be read by a voice model from Google, through Cloudflare. We don’t send your name or email.",
       "accept": "Allow",
       "decline": "Not now",
-      "manage": "You can change this any time in Settings."
+      "manage": "You can change this any time in Settings.",
+      "policy": "Read the AI policy"
     },
     "upload": {
       "title": "Allow us to process your uploads",

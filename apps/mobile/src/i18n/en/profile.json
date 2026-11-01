@@ -16,9 +16,14 @@
       "wallet": "Wallet",
       "library": "Library",
       "studio": "Studio",
-      "settings": "Settings"
+      "settings": "Settings",
+      "vip": "VIP"
     },
-    "saved": "Profile saved."
+    "saved": "Profile saved.",
+    "anonymous": "ReelTale reader",
+    "vipHint": "See what VIP gives.",
+    "refreshFailed": "We couldn’t update this page. Pull down to try again.",
+    "noBio": "No bio yet."
   },
   "user": {
     "title": "Profile",

@@ -1,6 +1,7 @@
 {
   "new": {
     "title": "Write an AI story",
+    "editing": "Your earlier opening is filled in. Change anything you like.",
     "stepOf": "Step {{current}} of {{total}}",
     "opening": {
       "title": "How does your story begin?",
@@ -18,6 +19,16 @@
         "market": "Every night the market sells a memory nobody wants to lose.",
         "train": "A night train stops at a station that isn’t on any map."
       }
+    },
+    "tags": {
+      "title": "Tags",
+      "picked": "{{selected}} of {{max}}",
+      "hint": "Pick up to {{max}} to steer the story. They’re optional.",
+      "loadFailed": "Tags didn’t load. You can begin without them.",
+      "genres": "Genres",
+      "tropes": "Story ideas",
+      "showAll": "Show all",
+      "showFewer": "Show fewer"
     },
     "look": {
       "title": "Pick a look",
@@ -44,11 +55,22 @@
       "notEnough": "You don’t have enough coins for this yet.",
       "getCoins": "Get coins",
       "sendNote": "What you write is sent to AI models from Meta to make your story.",
-      "refundNote": "If a scene can’t be made, your coins are refunded."
+      "refundNote": "If a scene can’t be made, your coins are refunded.",
+      "consentFirst": "Allow AI above to begin.",
+      "fixOpening": "Write your opening first."
     },
     "starting": {
       "title": "Making your story",
       "body": "This can take a little while. You can leave this screen and come back, and your story keeps going."
+    }
+  },
+  "list": {
+    "status": {
+      "planning": "Being made",
+      "active": "In progress",
+      "completed": "Finished",
+      "failed": "Couldn’t be made",
+      "blocked": "Couldn’t be made"
     }
   },
   "player": {
@@ -68,7 +90,11 @@
     "loading": "Loading the scene…",
     "loadFailed": "We couldn’t load this scene.",
     "imageFailed": "A picture didn’t load.",
-    "speakerLine": "{{name}}: {{line}}"
+    "speakerLine": "{{name}}: {{line}}",
+    "makingScene": "Making your next scene",
+    "panel": "Panel {{current}} of {{total}}",
+    "reportScene": "Report this scene",
+    "demoSample": "Demo: every story plays the same sample scenes, whatever you write. Nothing is sent anywhere."
   },
   "choices": {
     "title": "What happens next?",
@@ -88,7 +114,9 @@
     "voiceHeard": "We heard: “{{text}}”",
     "voiceNoMatch": "That didn’t match a choice. Try again.",
     "taken": "You chose: {{label}}",
-    "inProgress": "Your next scene is being made."
+    "inProgress": "Your next scene is being made.",
+    "blockedPath": "This path can’t be drawn. Pick another one.",
+    "storyEnded": "This story has reached an ending, so no new scenes can be made. Scenes you’ve already made still open."
   },
   "ending": {
     "title": "The end",
@@ -142,6 +170,12 @@
       "tts": "Narration voice",
       "vtt": "Captions",
       "unknown": "Step"
+    },
+    "by": "{{provider}} · {{model}}",
+    "providers": {
+      "meta": "Meta",
+      "google": "Google",
+      "cloudflare": "Cloudflare"
     }
   },
   "publish": {

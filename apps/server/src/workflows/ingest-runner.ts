@@ -231,8 +231,10 @@ export async function runIngest(io: IngestIO, step: IngestStepRunner, payload: I
       }));
       if (claim === 'reviewed') return 'skipped';
       if (claim === 'stale') continue;
-      const v: Verdict = claim === 'over_cap'
-        ? { decision: 'needs_editor', categories: [], reason: 'daily_review_cap', model: null }
+      // Over the daily cap, or the creator withdrew consent (or was blocked) since uploading: a person
+      // reviews it and nothing is sent to the model.
+      const v: Verdict = claim === 'over_cap' || claim === 'no_consent'
+        ? { decision: 'needs_editor', categories: [], reason: claim === 'over_cap' ? 'daily_review_cap' : 'no_consent', model: null }
         : await review(round, cur);
       const result = await record(`verdict:${round}`, cur.content_version, v);
       if (result === 'stale_verdict') continue;

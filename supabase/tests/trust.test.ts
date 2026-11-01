@@ -343,6 +343,10 @@ test('blocking hides the creator\'s series and profile from the blocker only; un
   await db.asUser(u);
   await db.fails('select public.block_user($1)', [u], /cannot_block_self/);
   await db.fails('select public.block_user($1)', [randomId()], /user_not_found/);
+  // A hidden account (no adult date of birth yet) answers like a missing one.
+  const hidden = await db.createUser(`hidden-${randomId()}@example.com`);
+  await db.asUser(u);
+  await db.fails('select public.block_user($1)', [hidden], /user_not_found/);
   await db.fails('insert into public.blocks (blocker_id, blocked_id) values ($1, $2)', [u, c], /permission denied/);
   await db.fails('delete from public.blocks', [], /permission denied/);
   await db.asAnon();
@@ -547,6 +551,10 @@ test('Editor\'s Pick: approved, live series only, never the editor\'s own; recor
   assert.equal(await pick(s, false), 'applied');
   assert.deepEqual((await actions(s)).map((x) => [x.action, x.facts, x.editor_id]),
     [['editors_pick_on', 'Strong pilot', ed], ['editors_pick_off', 'Strong pilot', ed]]);
+  // Losing the pick ends the series' earnings: the creator gets a statement for it (not for gaining it).
+  await db.asUser(c);
+  const statements = (await db.one<{ r: { action: string; target_id: string }[] }>('select public.get_my_moderation_actions() as r')).r;
+  assert.deepEqual(statements.filter((x) => x.target_id === s).map((x) => x.action), ['editors_pick_off']);
 
   await assert.rejects(pick(s, true, c), /not_an_editor/);
   await assert.rejects(pick(randomId(), true), /not_found/);

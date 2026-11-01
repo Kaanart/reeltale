@@ -83,3 +83,13 @@ test('HTML from assets gets a strict CSP', async () => {
   assert.ok(!csp.includes("'unsafe-eval'"));
   assert.match(csp, /https:\/\/example\.supabase\.co/);
 });
+
+test('every request runs the Worker first, so static files get the security headers too', async () => {
+  // Files the asset layer serves on its own skip the Worker: index.html once went out with no CSP.
+  const { readFileSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const jsonc = readFileSync(fileURLToPath(new URL('../wrangler.jsonc', import.meta.url).href), 'utf8');
+  const json = jsonc.replace(/^\s*\/\/.*$/gm, '').replace(/,(\s*[}\]])/g, '$1');
+  const config = JSON.parse(json) as { assets: { run_worker_first: unknown } };
+  assert.equal(config.assets.run_worker_first, true);
+});

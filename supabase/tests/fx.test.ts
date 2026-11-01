@@ -229,7 +229,8 @@ test('failures back off 1 h, 2 h, ... 24 h, give up after 14 attempts or at once
     assert.equal(await fail(true), 'retry');
     waits.push((await fxRow(id)).wait_min);
   }
-  assert.deepEqual(waits, [60, 120, 240, 480, 960, 1440, 1440]);
+  // 5 minutes early, so the hourly cron tick (minute 0) catches each retry on time.
+  assert.deepEqual(waits, [55, 115, 235, 475, 955, 1435, 1435]);
   assert.equal((await fxRow(id)).last_error, 'not_published_yet');
   await db.asPostgres();
   await db.q('update app_private.fx_valuations set attempts = 12 where id = $1', [id]);

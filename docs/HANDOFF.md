@@ -2,50 +2,41 @@
 
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
-## Oct 29: four tracks merged into the main tree, all tests green, not committed yet
-The four tracks below were built by agents, each reviewed adversarially and fixed (16 proven findings, all fixed with
-regression tests), then **merged into the main working tree (uncommitted)**. Backups: `prep/patches/track1-3.patch`
-(each worktree's changes) and `prep/patches/integration-wip.patch` (the whole main-tree diff at the time of writing).
-Track 4 (app core) lives directly in `apps/mobile/src/core/`, `apps/mobile/src/i18n/`, `apps/mobile/tsconfig.core.json`.
-Tracks: 1 ingest (`20261028090000_ingest.sql`), 2 trust & editor tools (`20261028090100_trust.sql`), 3 rate limits + FX
-(`20261028090200_fx.sql`), 4 app core. Reports: `~/.claude/projects/-Users-kaanuysal-claude-ReelTale/c34fe42a-c069-4963-886d-75f066fa2e9b/subagents/workflows/wf_a6a08e26-90c/journal.jsonl`.
-
-Integration fixes already applied on top (by the lead, after the reviews):
-- One fence helper (`unfence`/`fenceText` in `src/ai/prompts.ts`) now used by the text cron (`moderation/review.ts`, which
-  had no marker stripping: a title containing `TEXT>>>` could close the fence), `scene.ts` and `episode-media.ts`.
-- `readCappedText` in `src/lib/http.ts` (moved from routes/report.ts); both webhooks use it instead of unbounded `c.req.text()`.
-- Public poster cache `public, max-age=300` (was 1 year immutable: a takedown would stay cached); animated GIF preview off
-  unless `INGEST_ANIMATED_PREVIEW=on` (its other ~23 frames are never reviewed).
-- Ingest sweep is its own cron step (`ingestCron`), so it runs without the Meta key.
-- AI story starts are idempotent: `ai_stories.request_id` + `svc.ai_start_story(..., p_request_id)`, route field
-  `request_id`, app client `request_id` (one per tap, reused on retry). Tests added in ai.test.ts, ai-routes.test.ts, api.test.ts.
-
-**Fixed since (Oct 29):** the 8 merge-fallout tests. The app maps all new server error names (strings in
-`i18n/en/errors.json`; FX/ingest-only names are listed as server-only in the test); poster tests expect no animated
-preview by default; the cron passes its fetch to the ingest sweep too, and the cron tests expect the sweep's one
-`moderation_queue` call. Results: Worker 151/151, app core 171/171, both `tsc` clean. **The full DB suite with all
-merged migrations passes: 139/139** (`perl -e 'alarm 1500; exec @ARGV' node --test supabase/tests/*.test.ts`, about
-10 minutes). The agent worktrees are removed; their changes live in the main tree (and `prep/patches/`).
-**Next: ask Kaan to commit**, then the real `npm install` and the Expo app.
-Open items the reviewers left (add to the list below when integrating): block_user is an existence oracle for account ids
-(low); no statement of reasons for Editor's Pick withdrawal (low); FX backoff waits an extra hour (low); per-IP limits
-only on failed-auth /api and share pages (documented); ingest doesn't recheck upload consent at review time (medium:
-add a consent check to `svc.ingest_context`); currencies the ECB doesn't quote stay pending for a person to value.
-
-To resume the rest:
-1. `pgrep -fl "node --test"`: kill leftover test processes (they once ate 4 GB of RAM).
-2. Toolchain: the scratchpad symlink (`node_modules`) dies with the session. Disk has 13 GB free: delete the symlink and
-   run a real `npm install` at the repo root (see "How to continue").
-5. Clean up after a green full run: `git worktree unlock <path>`, `git worktree remove --force <path>`,
-   `git branch -D worktree-wf_a6a08e26-90c-N` for N = 1, 2, 3. `.claude/worktrees/` is git-ignored.
-
-App install (Expo SDK 57.0.31; versions from Expo's `bundledNativeModules.json`, use `npx expo install` to match):
-react 19.2.3, react-native 0.86.3, react-dom 19.2.3, react-native-web ~0.21.0, expo-router ~57.0.29, expo-video ~57.0.5,
-expo-image ~57.0.5, expo-audio ~57.0.5, expo-camera ~57.0.6, expo-secure-store ~57.0.4, react-native-reanimated 4.5.1,
-react-native-worklets 0.10.1, react-native-gesture-handler ~2.32.0, react-native-screens ~4.26.0,
-react-native-safe-area-context ~5.7.0, @shopify/flash-list 2.0.2, @sentry/react-native ~7.11.0 (not 8),
-react-native-keyboard-controller 1.21.9, expo-dev-client ~57.0.20, expo-updates ~57.0.26. Not in Expo's list (pick
-versions by hand): react-native-mmkv, react-native-purchases, @react-native-google-signin/google-signin.
+## Oct 29 (evening): app scaffold + real install
+- Commits: `f14651b` (backend), `4b58fa5` (ingest, trust & safety, rate limits, FX, app core). Not pushed.
+- **Real `npm install` done** (754 packages, 877 MB; the scratchpad symlink is gone). `package-lock.json` exists now,
+  so Workers Builds' `npm ci` can work. Disk: 11 GB free.
+- `apps/mobile` is a real Expo SDK 57 app: `package.json` (versions from Expo's bundledNativeModules), `app.config.ts`
+  (bundle ids, associated domains, Android app links, blocked media permissions, web output `single`), `eas.json`,
+  `tsconfig.json` (extends expo/tsconfig.base, TypeScript 6.0), `src/lib/i18n.ts`, a root layout and a placeholder home.
+- Verified: shared 6, Worker 152, app core 171 tests; `tsc` clean for server, shared, app core and the **whole app**
+  (one RN 0.86 API change fixed in the UI kit); `npx expo export --platform web` builds (2.1 MB, no inline scripts).
+- **Security gap found by running it** (`wrangler dev`, launch config `.claude/launch.json` → "worker"): with
+  `run_worker_first` limited to a few paths, index.html and every SPA route were served by the asset layer with **no
+  CSP or security headers**. Now `run_worker_first: true` (every request through the Worker, files via ASSETS);
+  checked live with curl (CSP, HSTS, nosniff on HTML, JS and API), plus a config regression test.
+- **Oct 30: the app's first full version is built** (not committed yet; ask Kaan). Foundation + four feature tracks,
+  each reviewed adversarially (24 proven findings fixed, incl. buyers losing access to closed/hidden episodes they paid
+  for, private AI panels cached on disk, the account-deletion subscription warning being skippable, hidden series
+  looking free). Verified: app 384 tests, `tsc` clean (app, core, server, shared), Worker 153, DB 139, demo web export
+  (3.8 MB, `--clear` when switching demo/live), and a click-through in the browser through the local Worker
+  (`.claude/launch.json` "worker"): welcome → demo → Home → watch (free episode plays, locked episode → unlock sheet →
+  plays) → story/new (ideas, tags, consent, 50 coins) → progress steps → living comic → wallet. No console errors.
+  - Screens: (auth) welcome/email/code/password/birthday/blocked/terms; tabs Home, Discover, Create, Library, Me;
+    series/[slug], watch/[episodeId] (pager, players pool, unlock sheet, Free Pass, progress), story/new,
+    story/[id] (job progress, comic player, choices, "how it was made"), wallet, vip, settings (mature opt-in,
+    AI consents, legal links, sign out, delete account), report modal, block, redeem (web only).
+  - Demo mode: `EXPO_PUBLIC_DEMO=1` or automatic without Supabase; fixtures in `src/demo` + per-track `demo.ts`; demo
+    state is in memory (a page reload resets coins spent).
+  - Packages added by the foundation: async-storage, aes-js, hls.js 1.7.3, @expo/vector-icons, Inter + Literata fonts,
+    expo-asset pinned via root `overrides` (expo-audio pulled 58).
+- **App gaps (not built):** studio/upload and stop-motion maker, editor screens, Shorts feed, in-app purchases
+  (RevenueCat) and VIP purchase, native Google sign-in, publishing an AI story; AI comic episodes (`r2_manifest`) can't
+  play in live mode (Worker playback signs Stream only); web screen readers don't hear unlock/countdown announcements;
+  an episode row shows nothing when its price fails to load; tag filter count not enforced. **Design call for Kaan:**
+  white on the accent colour is 3.6:1 (below AA 4.5:1) on primary buttons and selected chips; darken the accent or
+  add a darker `accentStrong` for text-on-accent.
+- Nothing has run on iOS/Android or against a live Supabase/Worker yet.
 
 ## Right where the last session stopped (Oct 27, D2 evening, autonomous session while Kaan was away)
 - Last finished: the AI StoryScene Workflow + `/api/ai/*` routes, and fixes for the second DB review (moderation redesign,
@@ -117,6 +108,16 @@ _(updated as each area lands; see `docs/CHANGELOG.md` for detail)_
 10. When the global AI budget breaker trips, new jobs fail and refund at the first paid step. A cheap pre-check in
     `ai_start_story`/`ai_choose` (and the showcase-replay fallback in the app) would be friendlier.
 11. Second-review item left open on purpose: `environment` labels on unlock/recredit transactions (see 2 above; cosmetic).
+12. Per-IP rate limits only cover failed-auth `/api/*` calls and the share-page DB lookup; association files and other
+    unauthenticated Worker paths are unlimited (documented deviation; Cloudflare advises against IP keys behind NAT).
+13. Purchases in currencies the ECB doesn't quote (TWD, SAR, AED, …) stay `valuation_pending` with an FX row marked
+    failed; a person values them with `svc.value_lot`. Production subscription periods with a zero or unknown price also
+    stay pending.
+14. AI story start with a Workflow launch failure: the refund is attempted at once but errors are swallowed; the stale
+    sweeper refunds later. The app's message says coins "will be returned".
+(Closed on Oct 29, with tests: ingest rechecks upload consent and adulthood at review time; `block_user` treats hidden
+accounts like missing ones; creators get a statement when Editor's Pick is withdrawn; FX retries land on the hourly
+tick; the Worker-first routing gives static files the security headers.)
 
 ## How to continue (next session)
 1. Check disk: `df -h /System/Volumes/Data`. Under ~10 GB free: don't `npm install` the app; keep to the light toolchain below.

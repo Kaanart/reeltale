@@ -20,7 +20,7 @@ export const AUTHENTICATED_COLUMNS: Record<string, Partial<Record<'SELECT' | 'UP
   'public.tags': { SELECT: ['id', 'kind', 'name_i18n', 'slug', 'sort'] },
   'public.series': {
     SELECT: ['completed', 'cover_key', 'created_at', 'creator_id', 'default_price_coins', 'editors_pick', 'format',
-      'free_episode_count', 'id', 'language', 'maturity', 'moderation_status', 'origin', 'published_at', 'slug', 'status',
+      'free_episode_count', 'fts', 'id', 'language', 'maturity', 'moderation_status', 'origin', 'published_at', 'slug', 'status',
       'synopsis', 'tag_ids', 'title', 'updated_at'],
   },
   'public.episodes': {

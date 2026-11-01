@@ -10,20 +10,27 @@
     "continueWatching": "Continue watching",
     "progress": "{{percent}}% watched",
     "trending": "Trending",
+    "new": "New",
+    "completed": "Completed",
     "editorsPicks": "Editor’s Picks",
     "aiStories": "AI Stories",
     "shorts": {
       "title": "Shorts",
       "cta": "Watch Shorts"
     },
-    "empty": "Nothing to show yet. Check back soon."
+    "empty": "Nothing to show yet. Check back soon.",
+    "seeAllA11y": "See all {{title}}",
+    "continueA11y": "Continue {{title}}, {{episode}}, {{progress}}",
+    "cardMeta": "{{format}} · {{status}}"
   },
   "discover": {
     "title": "Discover",
-    "searchPlaceholder": "Search stories, tags and creators",
+    "searchPlaceholder": "Search stories and tags",
     "noResults": "No results for “{{query}}”.",
     "noResultsHint": "Check the spelling or try another word.",
     "filters": {
+      "title": "Filters",
+      "titleWithCount": "Filters ({{active}})",
       "format": "Format",
       "genre": "Genre",
       "trope": "Trope",
@@ -66,7 +73,9 @@
     },
     "clearHistory": "Clear history",
     "clearHistoryBody": "This removes your watch history from this account.",
-    "continue": "Continue"
+    "continue": "Continue",
+    "watched": "Watched",
+    "episodeLine": "{{episode}} · {{title}}"
   },
   "shorts": {
     "title": "Shorts",

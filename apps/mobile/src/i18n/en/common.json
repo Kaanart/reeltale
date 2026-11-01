@@ -78,5 +78,9 @@
     "coin": "coin",
     "locked": "Locked episode",
     "madeWithAi": "Made with AI"
+  },
+  "demo": {
+    "badge": "Demo",
+    "a11y": "Demo mode. Sample data only."
   }
 }

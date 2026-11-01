@@ -32,6 +32,8 @@
   },
   "debt": {
     "title": "Coins needed first",
-    "body": "A refunded purchase left your coins short. Coins you get next will cover that first."
+    "body": "A refunded purchase left your coins short. Coins you get next will cover that first.",
+    "amount_one": "Still to cover: {{count, number}} coin",
+    "amount_other": "Still to cover: {{count, number}} coins"
   }
 }

@@ -11,7 +11,11 @@
     "coins_other": "{{count, number}} bonus coins added. They expire on {{date}}.",
     "ai_one": "AI stories are on for {{count}} day.",
     "ai_other": "AI stories are on for {{count}} days.",
-    "already": "You’ve already used this code."
+    "already": "You’ve already used this code.",
+    "title": "Code accepted",
+    "done": "Your code was accepted.",
+    "coinsOnly_one": "{{count, number}} bonus coin added.",
+    "coinsOnly_other": "{{count, number}} bonus coins added."
   },
   "syncNote": "Your coins also show up in the ReelTale apps.",
   "errors": {
@@ -20,5 +24,8 @@
     "web_only": "Codes can only be redeemed on the ReelTale website.",
     "turnstile_failed": "We couldn’t confirm you’re a person. Please try again.",
     "format": "Codes use letters, numbers and dashes, and are at least 6 characters long."
-  }
+  },
+  "notAvailable": "Redeeming codes isn’t available right now.",
+  "securityCheck": "Security check",
+  "another": "Redeem another code"
 }

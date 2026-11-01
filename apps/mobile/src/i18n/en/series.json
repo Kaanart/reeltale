@@ -38,7 +38,9 @@
   },
   "unavailable": {
     "title": "This story isn’t available",
-    "body": "It may have been removed or hidden."
+    "body": "It may have been removed or hidden.",
+    "matureHint": "If it is a mature story, you can turn on mature content in Settings.",
+    "openSettings": "Open Settings"
   },
   "shareMessage": "Watch {{title}} on ReelTale",
   "followFailed": "We couldn’t update that. Please try again.",
@@ -46,5 +48,7 @@
     "title": "Block {{name}}?",
     "body": "You won’t see their stories or comments.",
     "confirm": "Block"
-  }
+  },
+  "continueFrom": "Continue episode {{number}}",
+  "noEpisodes": "No episodes yet."
 }

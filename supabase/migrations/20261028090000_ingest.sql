@@ -220,6 +220,8 @@ grant execute on function svc.ingest_context(uuid) to service_role;
 --   'stale'     the episode moved on: another upload, another version, or no longer waiting for review
 --   'reviewed'  this version already has a verdict
 --   'over_cap'  the platform's daily review cap is reached: hand the episode to an editor, no model call
+--   'no_consent' the creator is no longer a live adult or withdrew the upload-processing consent for Meta
+--               since uploading: the frames must not go to Meta; hand the episode to an editor
 create function svc.ingest_claim_review(p_episode uuid, p_asset_id text, p_version integer) returns text
 language plpgsql
 security definer
@@ -227,9 +229,11 @@ set search_path = ''
 as $$
 declare
   v_day date := (now() at time zone 'utc')::date;
+  v_creator uuid;
 begin
   perform svc.require_service_role();
-  perform 1 from public.episodes e
+  select s.creator_id into v_creator from public.episodes e
+  join public.series s on s.id = e.series_id
   join app_private.episode_media m on m.episode_id = e.id
   where e.id = p_episode and e.status = 'ready' and e.moderation_status = 'pending'
     and e.content_version = p_version and m.asset_id = p_asset_id
@@ -240,6 +244,12 @@ begin
   if exists (select 1 from app_private.moderation_verdicts v
              where v.target = 'episode' and v.target_id = p_episode and v.version = p_version) then
     return 'reviewed';
+  end if;
+  -- Checked at the moment the frames would go to Meta (consent can be withdrawn after the upload), and
+  -- before a retried claim is honoured.
+  if not app_private.is_live_adult(v_creator)
+     or not app_private.has_ai_consent(v_creator, 'upload_processing', 'meta') then
+    return 'no_consent';
   end if;
   if exists (select 1 from app_private.ingest_reviews r where r.episode_id = p_episode and r.version = p_version) then
     return 'ok';

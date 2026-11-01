@@ -17,8 +17,10 @@
     "directory": "../mobile/dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    // These paths always go to the Worker first (API, association files, share pages with OG tags).
-    "run_worker_first": ["/api/*", "/.well-known/*", "/app-ads.txt", "/s/*", "/series/*"]
+    // Every request goes to the Worker first. Files served straight by the asset layer would skip the
+    // Worker's CSP and security headers (found on Oct 29: index.html had none); the Worker serves files
+    // through the ASSETS binding and adds the headers to every response.
+    "run_worker_first": true
   },
 
   "observability": { "enabled": true },

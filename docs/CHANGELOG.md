@@ -2,6 +2,39 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-10-30: the app's screens
+- Built by a workflow: one foundation agent (clients, encrypted native session store, auth with the 18+ gate and
+  Terms, gated routes, tabs, demo mode with fixtures and generated images), then catalog, watch, AI story and me tracks
+  in parallel, each reviewed by a fresh agent that proved findings before fixing them. Two session limits cut runs
+  short; both were resumed from the workflow cache, the second time with a "finish your partial work" note.
+- Lead's integration: granted `series.fts` so live search matches synopses and tags (the catalog had a title-only
+  fallback and a test that fails once the grant exists, as a reminder to drop it; done); moved a SQL comment out of a
+  grant list (an app test parses the grants).
+- Click-through in the browser (demo, through the local Worker) found no errors. Note for testers: demo coins live in
+  memory, so a page reload resets the wallet.
+
+## 2026-10-29 (night): review leftovers closed while the screens were built
+- Ingest: `svc.ingest_claim_review` now answers 'no_consent' when the creator withdrew the upload-processing consent
+  for Meta or is no longer a live adult; the runner hands the episode to an editor and sends nothing to the model.
+- `block_user` answers hidden accounts (unknown age, blocked) like missing ids, so it can't reveal them.
+- Creators now see a statement of reasons when Editor's Pick is withdrawn (it ends the series' earnings).
+- FX retries are scheduled 5 minutes early so the hourly cron tick picks them up on time (they were an hour late).
+- A test-only type clash (Workers vs Node `URL`) in the new config test was fixed; DB 139, Worker 153, `tsc` clean.
+
+## 2026-10-28/29: four parallel tracks, merge, app scaffold
+- Episode ingest, trust & safety + editor tools, rate limits + FX valuation, and the app core were built by four agents
+  in parallel (three in isolated git worktrees), each attacked by a fresh reviewer that had to prove findings with a
+  failing test before fixing them (16 fixed). The first review run died with the session limit and was resumed from the
+  workflow's cache. Merge conflicts were only in env.ts, app.ts and wrangler.jsonc.
+- Fixed while merging: the text-moderation prompt fence could be closed by a title; webhooks read unbounded bodies;
+  public posters cached for a year (a takedown would stay visible); the animated preview published ~23 unreviewed
+  frames (now off by default); the ingest sweep never ran without the Meta key; AI story starts could charge twice on a
+  client retry (now idempotent with `request_id`).
+- Real install and Expo scaffold; first full app typecheck and web export. Running the Worker locally showed the HTML
+  had no CSP at all (asset layer bypassed the Worker); fixed with `run_worker_first: true` and a config test.
+- Lesson: leftover orphaned test processes from `perl alarm` timeouts ate 4 GB of RAM; every agent prompt now includes
+  a cleanup step, and runs end with a `pgrep` check.
+
 ## 2026-10-27 (evening): AI workflow, second DB review
 - AI scene pipeline as a Cloudflare Workflow. `src/workflows/scene-runner.ts` holds the steps and has no `cloudflare:*`
   imports, so it's tested in Node with a fake step runner that memoises and retries like Workflows. `story-scene.ts` is the

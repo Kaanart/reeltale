@@ -227,6 +227,14 @@ test('one paid review per version of the current upload, within the platform-wid
     await db.asPostgres();
     assert.equal((await db.q('select 1 from app_private.ingest_reviews where episode_id = $1', [ep2])).length, 0);
 
+    // Consent withdrawn after the upload: the frames must not go to Meta, even for an existing claim.
+    await db.asUser(c);
+    await db.q(`select public.set_ai_consent('upload_processing', array['meta'], 'v1', false)`);
+    assert.equal(await claim(ep, a, v2), 'no_consent');
+    await db.asUser(c);
+    await db.q(`select public.set_ai_consent('upload_processing', array['meta'], 'v1', true)`);
+    assert.equal(await claim(ep, a, v2), 'ok');
+
     // A version with a verdict is never reviewed again; a decided episode is stale.
     assert.equal(await verdict(ep, 'needs_editor', v2), 'held');
     assert.equal(await claim(ep, a, v2), 'reviewed');

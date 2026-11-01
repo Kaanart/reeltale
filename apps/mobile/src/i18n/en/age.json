@@ -13,7 +13,12 @@
     "confirmTitle": "Is this right?",
     "confirmBody": "You were born on {{date}}. We can’t change it later.",
     "confirm": "Yes, that’s right",
-    "edit": "Go back"
+    "edit": "Go back",
+    "placeholders": {
+      "day": "DD",
+      "month": "MM",
+      "year": "YYYY"
+    }
   },
   "errors": {
     "invalid_format": "Enter your date of birth as day, month and year.",

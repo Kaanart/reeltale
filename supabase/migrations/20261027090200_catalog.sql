@@ -171,9 +171,11 @@ grant execute on function public.creator_is_live(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------------------------
 revoke all on public.series from anon, authenticated;
+-- fts is the search vector (title, tag names, synopsis: nothing that isn't readable already), granted so the app's
+-- full-text search can filter on it.
 grant select (id, creator_id, slug, title, synopsis, cover_key, language, format, origin, editors_pick, maturity,
               status, moderation_status, free_episode_count, default_price_coins, completed, tag_ids,
-              published_at, created_at, updated_at)
+              published_at, created_at, updated_at, fts)
   on public.series to authenticated;
 alter table public.series enable row level security;
 

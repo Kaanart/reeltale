@@ -330,7 +330,9 @@ begin
   if p_user = v_uid then
     raise exception 'cannot_block_self' using errcode = '22023';
   end if;
-  if not exists (select 1 from public.profiles p where p.id = p_user) then
+  -- Hidden accounts (unknown age, blocked) answer exactly like ids that don't exist, so blocking can't be
+  -- used to find out that a hidden account exists.
+  if not app_private.is_live_adult(p_user) then
     raise exception 'user_not_found' using errcode = 'P0002';
   end if;
   insert into public.blocks (blocker_id, blocked_id) values (v_uid, p_user)
@@ -381,7 +383,9 @@ begin
            order by a.created_at desc, a.id desc)
     from (
       select m.* from app_private.moderation_actions m
-      where m.action = 'take_down'
+      -- Takedowns, and withdrawn Editor's Picks (they end the series' earnings: a restriction the creator
+      -- is owed a statement of reasons for).
+      where m.action in ('take_down', 'editors_pick_off')
         and ((m.target_type = 'series'
               and exists (select 1 from public.series s where s.id = m.target_id and s.creator_id = v_uid))
              or (m.target_type = 'episode'
