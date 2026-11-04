@@ -29,8 +29,14 @@ Next steps, in order:
    (check that it's non-empty first). Then `node apps/server/scripts/meta-smoke.ts <scratch dir>` (about $0.10).
 3. Check live: `/?demo=1` → Explore the demo → catalog, watch, story; Leave the demo; Kaan signs in by email code
    (Supabase's default mail only reaches org members: fine for him) and starts a real AI story.
-4. Judge accounts (RUNBOOK step 9): password users with auto-confirm + an access code row. Production DB writes
-   from Claude may be refused by the auto-mode classifier: give Kaan the command or SQL.
+4. **NEW DIRECTION (DECISIONS.md 2026-11-04): WebNovel-style storefront, first ~10 episodes free without an
+   account, no judge accounts.** Before 9 PM, do the smallest version that judges feel: logged-out browsing of the
+   catalog on the web (public paths for Home/Discover/series/watch of free episodes, mature hidden, one-time 18+
+   confirmation), the Home layout moved toward the WebNovel screenshots (`prep/reference/webnovel/`), and
+   `free_episode_count` default 10 (new migration; Kaan runs `db push`). Without footage, logged-out visitors see
+   the demo catalog: simplest path is to show the demo fixtures to logged-out web visitors (the `?demo=1` mode
+   already does this) and keep live mode for signed-in users. Keep tests green; deploy with `wrangler deploy`.
+   Judge accounts are dropped; an access code for AI coins is still useful (RUNBOOK step 9, SQL for Kaan).
 5. `docs/HACKATHON.md`: write-up (Meta usage table, judge walkthrough, access paths) + a 2–3 min video script; Kaan
    records. Submission: video, write-up, repo (make it PUBLIC: GitHub → Settings → visibility), site + `/?demo=1`.
 

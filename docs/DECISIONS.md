@@ -3,6 +3,32 @@
 The full product and architecture plan is `prep/BLUEPRINT.md` (approved Oct 22, not in git). This file records
 decisions made since, newest first, with the reason. Change a decision by adding a new entry, not by editing an old one.
 
+## 2026-11-04
+- **A WebNovel-style storefront for short video series, open without an account (Kaan).** Reference screenshots
+  of webnovel.com are in `prep/reference/webnovel/1-7.webp` (not in git: third-party material). The site works like
+  WebNovel, but every "book" is a series of short vertical video episodes (1–2 min). **The first ~10 episodes of every
+  series are free to anyone, without an account**; sign-in is only needed for coins/unlocks, Library/follows,
+  AI stories and creating. Reason: judges and visitors should start watching in one click, as on WebNovel.
+  What this means:
+  - Logged-out web visitors can browse Home, Browse/Discover, Rankings, series pages and free episodes (today only
+    `/`, `/about`, `/notice` are public: `PUBLIC_WEB_PATHS` in `apps/mobile/src/lib/gate.ts`). Personal things stay
+    behind the gate.
+  - **18+ still applies** (the product is adults-only): a one-time "I'm 18 or older" confirmation before
+    logged-out watching (remembered on the device), mature series hidden from logged-out visitors, and the full
+    date-of-birth gate at sign-up as today. AI generation stays account-only (Meta ToS 18+).
+  - Free episodes: default `free_episode_count` becomes 10 (today 6, check 3–500 in `20261027090200_catalog.sql`).
+    Migrations are applied now, so this is a NEW migration (default + the studio RPC default), not an edit.
+  - Playback of free episodes without a session: a public, IP-rate-limited path in the Worker for free episodes only
+    (locked episodes still need a session and an unlock). No footage exists yet, so the demo catalog (fixtures) is
+    what visitors see until real series are uploaded.
+  - Layout from the screenshots: top nav (Browse, Rankings, Create, search, Library, Sign in); a hero carousel
+    ("Weekly pick") next to a "Meet ReelTale" news list; "Weekly featured" cover row with Switch; three ranking
+    columns (Power / New / Collection) as numbered lists with cover, genre and rating; tag chips; Readers' picks;
+    New arrivals with a large preview and "Watch now"; Editors' choice grid; Completed row; promo banners
+    (Original series, Become a creator, Creator guide); dark footer with columns. Covers are 9:16 posters here.
+  - **No judge accounts** (Kaan). Judges watch without an account; the write-up says how to try AI stories
+    (sign up with e-mail, then an access code on /redeem for coins).
+
 ## 2026-11-01
 - **Web first for the hackathon (Kaan).** The native apps likely won't be ready by Nov 4, so the submission is the
   website at reeltale.net (the Expo web build served by the Worker). Work from here prioritises what judges see on the
