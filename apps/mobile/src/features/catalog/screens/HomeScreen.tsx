@@ -12,7 +12,7 @@ import { DemoStoryCard } from '../components/DemoStoryCard';
 import { IconButton } from '../components/IconButton';
 import { SeeAllLink } from '../components/SeeAllLink';
 import { Shelf } from '../components/Shelf';
-import { EmptyState, ErrorState } from '../components/States';
+import { ErrorState } from '../components/States';
 import { MeetReelTale } from '../components/store/MeetReelTale';
 import { EditorsChoice, NewArrivals } from '../components/store/NewArrivals';
 import { POSTER_GAP, PosterRow, PosterRowSkeleton } from '../components/store/PosterCard';
@@ -20,13 +20,14 @@ import { PromoBanners } from '../components/store/PromoBanners';
 import { Rankings, type RankingList } from '../components/store/Rankings';
 import { HeaderButton, SectionHeader, useSectionGap } from '../components/store/SectionHeader';
 import { TagCloud } from '../components/store/TagCloud';
-import { WeeklyPick, WeeklyPickSkeleton } from '../components/store/WeeklyPick';
+import { WeeklyPick, WeeklyPickInvite, WeeklyPickSkeleton } from '../components/store/WeeklyPick';
 import { useHistory, useRefreshOnFocus, useSeriesCards, useTags } from '../hooks';
 import { CONTINUE_MAX_CARDS, CONTINUE_MIN_CARD_WIDTH } from '../layout';
 import { continueWatching, SHELF_SIZE, type HistoryEntry } from '../logic';
 import { routes } from '../routes';
 import {
-  buildStorefront, canSwitch, FEATURED_PAGE, nextWindowStart, popularTags, posterColumns, rotatingWindow,
+  ARRIVALS_MAX, buildStorefront, canSwitch, COMPLETED_MAX, EDITORS_MAX, FEATURED_PAGE, heroMode, nextWindowStart,
+  padWithPlaceholders, popularTags, posterColumns, RANK_SIZE, rotatingWindow,
 } from '../storefront';
 
 /** How many recent series Home cuts Weekly featured, the rankings, New arrivals and the tags from. */
@@ -52,7 +53,8 @@ const renderContinue = (e: HistoryEntry, width: number) => <ContinueCard entry={
 //   Completed series
 //   Promo banners: Browse all series, Become a creator, Make a story with AI
 // and the site footer (PageContainer). Everything comes from the catalog's own lists (storefront.ts): no
-// ratings, view counts or prices.
+// ratings, view counts or prices. Rows the catalog can't fill end in "Coming soon" placeholders
+// (padWithPlaceholders), and with no series at all the Weekly pick invites creators instead (heroMode).
 
 export function HomeScreen() {
   const { t } = useTranslation();
@@ -78,8 +80,8 @@ export function HomeScreen() {
   const posterCols = posterColumns(columnWidth(width), POSTER_GAP);
   const featuredPage = isCompact ? FEATURED_PAGE : posterCols;
   const [featuredStart, setFeaturedStart] = useState(0);
-  const featured = rotatingWindow(store.featured, featuredStart, featuredPage);
-  const completedRow = store.completed.slice(0, featuredPage);
+  const featured = padWithPlaceholders(rotatingWindow(store.featured, featuredStart, featuredPage), featuredPage);
+  const completedRow = padWithPlaceholders(store.completed, Math.min(COMPLETED_MAX, featuredPage));
 
   const [refreshing, setRefreshing] = useState(false);
   const refetchAll = useCallback(
@@ -101,23 +103,24 @@ export function HomeScreen() {
 
   const loading = pool.isPending;
   const failed = pool.isError && !pool.data;
-  const empty = !loading && !failed && store.featured.length === 0;
 
   const rankings: RankingList[] = [
-    { ranking: 'trending', title: t('home:home.trending'), items: store.rankings.trending },
-    { ranking: 'new', title: t('home:home.new'), items: store.rankings.fresh },
-    { ranking: 'completed', title: t('home:home.completed'), items: store.rankings.completed },
+    { ranking: 'trending', title: t('home:home.trending'), items: padWithPlaceholders(store.rankings.trending, RANK_SIZE) },
+    { ranking: 'new', title: t('home:home.new'), items: padWithPlaceholders(store.rankings.fresh, RANK_SIZE) },
+    { ranking: 'completed', title: t('home:home.completed'), items: padWithPlaceholders(store.rankings.completed, RANK_SIZE) },
   ];
 
-  // With nothing to feature (an empty or unreachable catalog) the demo story takes the carousel's place, and
-  // is not offered a second time further down.
-  const heroLoading = loading || picks.isPending;
-  const heroIsDemo = !heroLoading && store.hero.length === 0;
-  const hero = heroLoading
+  // An empty catalog: the Weekly pick invites creators. An unreachable one: the demo story takes the
+  // carousel's place, and is not offered a second time further down.
+  const mode = heroMode({ loading: loading || picks.isPending, failed, count: store.hero.length });
+  const heroIsDemo = mode === 'demo';
+  const hero = mode === 'loading'
     ? <WeeklyPickSkeleton />
-    : heroIsDemo
+    : mode === 'demo'
       ? <DemoStoryCard onStart={startDemo} variant="hero" />
-      : <WeeklyPick series={store.hero} tags={tagRows} />;
+      : mode === 'invite'
+        ? <WeeklyPickInvite />
+        : <WeeklyPick series={store.hero} tags={tagRows} />;
   const continueShelf = (
     <Shelf
       title={t('home:home.continueWatching')}
@@ -130,8 +133,9 @@ export function HomeScreen() {
     />
   );
 
-  const arrivals = store.arrivals.length > 0 ? <NewArrivals items={store.arrivals} tags={tagRows} /> : null;
-  const editors = store.editors.length > 0 ? <EditorsChoice items={store.editors} tags={tagRows} /> : null;
+  // Each section waits for its own list; an empty list shows its placeholders.
+  const arrivals = pool.data ? <NewArrivals items={padWithPlaceholders(store.arrivals, ARRIVALS_MAX)} tags={tagRows} /> : null;
+  const editors = picks.data ? <EditorsChoice items={padWithPlaceholders(store.editors, EDITORS_MAX)} tags={tagRows} /> : null;
 
   return (
     <PageContainer
@@ -155,10 +159,6 @@ export function HomeScreen() {
       {failed ? (
         <Section gap={gap}>
           <ErrorState error={pool.error} onRetry={() => void refetchAll()} />
-        </Section>
-      ) : empty ? (
-        <Section gap={gap}>
-          <EmptyState title={t('home:home.empty')} />
         </Section>
       ) : (
         <>
@@ -230,7 +230,7 @@ export function HomeScreen() {
         </Section>
       ) : null}
 
-      {store.completed.length > 0 ? (
+      {completed.data ? (
         <Section gap={gap} testID="home-completed">
           <SectionHeader
             title={t('home:home.store.completedSeries')}

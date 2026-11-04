@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -18,6 +18,7 @@ import { headingLevel } from '../a11y';
 import { Cover, POSTER_RATIO } from '../Cover';
 import { DecorativeIcon } from '../DecorativeIcon';
 import { MaturityMarker } from '../MaturityMarker';
+import { ComingSoonArt, hiddenFromScreenReaders } from './ComingSoon';
 import { SectionHeader } from './SectionHeader';
 import { useStoreText } from './useStoreText';
 
@@ -229,6 +230,49 @@ function Slide({ series, tags, index, count }: { series: SeriesCard; tags: reado
         </View>
       </View>
       {isCompact ? actions : null}
+    </View>
+  );
+}
+
+/**
+ * The Weekly pick's place while the catalog has no series at all: a "Coming soon" poster in the film strip and
+ * an invitation to post a series (Become a creator). Never shown when there is a series to feature, and never
+ * a slide among real ones (heroMode).
+ */
+export function WeeklyPickInvite() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { size, isCompact } = useLayout();
+  const action = (
+    <View style={styles.actions}>
+      <Button
+        label={t('home:home.store.comingSoon.invite.cta')}
+        size={isCompact ? 'sm' : 'md'}
+        onPress={() => router.push('/create' as Href)}
+      />
+    </View>
+  );
+  return (
+    <View testID="home-weekly-pick-invite">
+      <SectionHeader title={t('home:home.store.weeklyPick')} />
+      <View style={styles.slideWrap}>
+        <View style={[styles.slide, isCompact && styles.slideCompact]}>
+          {/* The heading beside it says the same: the poster is decoration. */}
+          <View {...hiddenFromScreenReaders}>
+            <FilmStrip>
+              <ComingSoonArt width={POSTER_WIDTH[size]} ratio={POSTER_RATIO} words="title" sprockets={false} style={styles.poster} />
+            </FilmStrip>
+          </View>
+          <View style={styles.body}>
+            <Text variant={isCompact ? 'heading' : 'display'} accessibilityRole="header" {...headingLevel(3)}>
+              {t('home:home.store.comingSoon.invite.title')}
+            </Text>
+            <Text style={styles.synopsis}>{t('home:home.store.comingSoon.invite.body')}</Text>
+            {isCompact ? null : action}
+          </View>
+        </View>
+        {isCompact ? action : null}
+      </View>
     </View>
   );
 }

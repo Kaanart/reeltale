@@ -8,11 +8,12 @@ import { colors, fonts, radius, space, type ColorName } from '../../../../theme/
 import { useEpisodeSummary } from '../../hooks';
 import { isAiSeries, type Ranking, type SeriesCard } from '../../logic';
 import { routes } from '../../routes';
-import { rankLabel, rankTone } from '../../storefront';
+import { isPlaceholder, rankLabel, rankTone, slotKey, type Placeholder, type Slot } from '../../storefront';
 import { headingLevel } from '../a11y';
 import { CardLink } from '../CardLink';
 import { Cover, POSTER_RATIO } from '../Cover';
 import { DiscoverLink } from '../SeeAllLink';
+import { ComingSoon, ComingSoonArt, SlotCell } from './ComingSoon';
 import { SectionHeader } from './SectionHeader';
 import { useStoreText } from './useStoreText';
 
@@ -26,7 +27,8 @@ const TONE: Record<'first' | 'second' | 'third', ColorName> = { first: 'accentSt
 export interface RankingList {
   ranking: Ranking;
   title: string;
-  items: readonly SeriesCard[];
+  /** Up to five series, then "Coming soon" placeholders (padWithPlaceholders). */
+  items: readonly Slot<SeriesCard>[];
 }
 
 /** "Rankings": Trending, New and Completed side by side (stacked on phones), each a numbered list of five. */
@@ -72,10 +74,10 @@ function RankingColumn({ list, tags }: { list: RankingList; tags: readonly TagRo
         </Text>
       ) : (
         <View role={web ? 'list' : undefined} aria-label={list.title} style={styles.rows}>
-          {list.items.map((s, i) => (
-            <View key={s.id} role={web ? 'listitem' : undefined}>
-              <RankRow series={s} index={i} tags={tags} />
-            </View>
+          {list.items.map((slot, i) => (
+            <SlotCell key={slotKey(slot)} slot={slot}>
+              {isPlaceholder(slot) ? <PlaceholderRow placeholder={slot} /> : <RankRow series={slot} index={i} tags={tags} />}
+            </SlotCell>
           ))}
         </View>
       )}
@@ -126,6 +128,29 @@ function RankRow({ series, index, tags }: { series: SeriesCard; index: number; t
         </>
       )}
     />
+  );
+}
+
+/** A place no series fills yet: the film-frame cover, "Coming soon" and the hint, no rank number. Not a link. */
+function PlaceholderRow({ placeholder }: { placeholder: Placeholder }) {
+  const { t } = useTranslation();
+  return (
+    <ComingSoon announced={placeholder.announced} style={styles.row}>
+      <ComingSoonArt width={COVER_WIDTH} ratio={POSTER_RATIO} style={styles.cover} />
+      <View style={styles.rowText}>
+        <View style={styles.titleLine}>
+          <View style={styles.rank} />
+          <Text variant="body" color="inkMuted" numberOfLines={1} style={styles.title}>
+            {t('home:home.store.comingSoon.title')}
+          </Text>
+        </View>
+        <View style={styles.details}>
+          <Text variant="bodySmall" color="inkMuted" numberOfLines={2}>
+            {t('home:home.store.comingSoon.hint')}
+          </Text>
+        </View>
+      </View>
+    </ComingSoon>
   );
 }
 

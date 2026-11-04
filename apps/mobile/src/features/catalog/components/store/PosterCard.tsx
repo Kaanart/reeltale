@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Platform, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 
 import { focusRing, ResponsiveGrid, useLayout } from '../../../../components/layout';
@@ -6,11 +7,12 @@ import type { TagRow } from '../../../../lib/types';
 import { fonts, layout, motion, radius, space } from '../../../../theme/tokens';
 import { isAiSeries, type SeriesCard } from '../../logic';
 import { routes } from '../../routes';
-import { FEATURED_PAGE, POSTER_MIN_WIDTH } from '../../storefront';
+import { FEATURED_PAGE, isPlaceholder, POSTER_MIN_WIDTH, slotKey, type Placeholder, type Slot } from '../../storefront';
 import { CardLink } from '../CardLink';
 import { Cover, POSTER_RATIO } from '../Cover';
 import { MaturityMarker } from '../MaturityMarker';
 import { TILE_LIFT } from '../SeriesTile';
+import { ComingSoon, ComingSoonArt, SlotCell, SlotGrid } from './ComingSoon';
 import { useStoreText } from './useStoreText';
 
 const TITLE_LINES = 2;
@@ -65,43 +67,57 @@ export function PosterCard({ series, width, tags }: { series: SeriesCard; width:
   );
 }
 
+/**
+ * A "Coming soon" poster after a row's real series: the film-frame placeholder with "Coming soon" and the hint
+ * where a title and genre would be. Not a link.
+ */
+export function PlaceholderPoster({ placeholder, width }: { placeholder: Placeholder; width: number }) {
+  const { t } = useTranslation();
+  return (
+    <ComingSoon announced={placeholder.announced} style={{ width }}>
+      <ComingSoonArt width={width} ratio={POSTER_RATIO} />
+      <View style={styles.text}>
+        <Text variant="bodySmall" color="inkMuted" numberOfLines={1} style={styles.title}>
+          {t('home:home.store.comingSoon.title')}
+        </Text>
+        <Text variant="caption" color="inkMuted" numberOfLines={2} style={styles.meta}>
+          {t('home:home.store.comingSoon.hint')}
+        </Text>
+      </View>
+    </ComingSoon>
+  );
+}
+
 /** Space between posters in a row (HomeScreen counts the columns with it: posterColumns). */
 export const POSTER_GAP = space.lg;
 
 /**
- * One row of posters. Medium and wide windows: `columns` across (posterColumns, eight at most), filling the
- * page column, so the caller passes exactly one row. Phones and the apps: posters POSTER_MIN_WIDTH wide in a
- * row that scrolls sideways, so the AI label fits on every picture.
+ * One row of posters: the real series, then any "Coming soon" placeholders (padWithPlaceholders). Medium and
+ * wide windows: `columns` across (posterColumns, eight at most), filling the page column, so the caller passes
+ * exactly one row. Phones and the apps: posters POSTER_MIN_WIDTH wide in a row that scrolls sideways, so the
+ * AI label fits on every picture.
  */
 export function PosterRow({
   items, tags, label, columns,
-}: { items: readonly SeriesCard[]; tags: readonly TagRow[]; label: string; columns: number }) {
+}: { items: readonly Slot<SeriesCard>[]; tags: readonly TagRow[]; label: string; columns: number }) {
   const { isCompact } = useLayout();
   const web = Platform.OS === 'web';
+  const renderSlot = (slot: Slot<SeriesCard>, width: number) =>
+    isPlaceholder(slot) ? <PlaceholderPoster placeholder={slot} width={width} /> : <PosterCard series={slot} width={width} tags={tags} />;
   if (isCompact) {
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.swipe} contentContainerStyle={styles.swipeContent}>
         <View role={web ? 'list' : undefined} aria-label={label} style={styles.swipeList}>
-          {items.map((s) => (
-            <View key={s.id} role={web ? 'listitem' : undefined}>
-              <PosterCard series={s} width={POSTER_MIN_WIDTH} tags={tags} />
-            </View>
+          {items.map((slot) => (
+            <SlotCell key={slotKey(slot)} slot={slot}>
+              {renderSlot(slot, POSTER_MIN_WIDTH)}
+            </SlotCell>
           ))}
         </View>
       </ScrollView>
     );
   }
-  return (
-    <ResponsiveGrid
-      items={items}
-      keyExtractor={(s) => s.id}
-      columns={{ medium: columns, wide: columns }}
-      gap={POSTER_GAP}
-      accessibilityLabel={label}
-      style={styles.row}
-      renderItem={(s, { width }) => <PosterCard series={s} width={width} tags={tags} />}
-    />
-  );
+  return <SlotGrid slots={items} columns={columns} gap={POSTER_GAP} label={label} style={styles.row} renderSlot={renderSlot} />;
 }
 
 const SKELETON_ITEMS = Array.from({ length: FEATURED_PAGE }, (_, i) => i);

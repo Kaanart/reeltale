@@ -8,9 +8,9 @@ import { demoCards } from '../../features/catalog/demo.ts';
 import type { SeriesCard } from '../../features/catalog/logic.ts';
 import {
   applyCarouselAction, ARRIVALS_MAX, buildStorefront, canSwitch, carouselKeyAction, CAROUSEL_INTERVAL_MS, COMPLETED_MAX,
-  EDITORS_MAX, episodeSummary, FEATURED_PAGE, HERO_MAX, heroSeries, newestFirst, nextWindowStart, popularTags,
-  POSTER_MIN_WIDTH, posterColumns, primaryGenre, RANK_SIZE, rankLabel, rankTone, rotatingWindow, shouldAutoAdvance,
-  uniqueById, wrapIndex,
+  EDITORS_MAX, episodeSummary, FEATURED_PAGE, HERO_MAX, heroMode, heroSeries, isPlaceholder, newestFirst, nextWindowStart,
+  padWithPlaceholders, popularTags, POSTER_MIN_WIDTH, posterColumns, primaryGenre, RANK_SIZE, rankLabel, rankTone, realItems,
+  rotatingWindow, shouldAutoAdvance, uniqueById, wrapIndex,
 } from '../../features/catalog/storefront.ts';
 import { columnWidth, gridItemWidth } from '../../components/layout/logic.ts';
 import { colors } from '../../theme/tokens.ts';
@@ -213,6 +213,71 @@ test('Weekly featured is one row of posters wide enough for the AI label, at eve
   assert.equal(posterColumns(0, GAP), 1);
 });
 
+// ---- "Coming soon" placeholders -----------------------------------------------------------------------
+
+test('a short row is padded with placeholders after its real series, never past its size', () => {
+  const row = padWithPlaceholders([card('a'), card('b')], 5);
+  assert.equal(row.length, 5);
+  assert.deepEqual(row.slice(0, 2).map((s) => (isPlaceholder(s) ? null : s.id)), ['a', 'b'], 'the real series come first, in order');
+  assert.deepEqual(row.map(isPlaceholder), [false, false, true, true, true]);
+  assert.deepEqual(realItems(row).map((s) => s.id), ['a', 'b']);
+  const keys = row.map((s) => (isPlaceholder(s) ? s.key : s.id));
+  assert.equal(new Set(keys).size, keys.length, 'every key in the row is unique');
+});
+
+test('a full row gets no placeholders, and a longer list is cut to the row', () => {
+  const five = ['a', 'b', 'c', 'd', 'e'].map((id) => card(id));
+  assert.equal(padWithPlaceholders(five, 5).filter(isPlaceholder).length, 0);
+  assert.deepEqual(padWithPlaceholders(five, 3).map((s) => (isPlaceholder(s) ? null : s.id)), ['a', 'b', 'c']);
+  assert.deepEqual(padWithPlaceholders(five, 0), []);
+  assert.deepEqual(padWithPlaceholders(five, -2), []);
+  assert.deepEqual(padWithPlaceholders(five, Number.NaN), []);
+  assert.equal(padWithPlaceholders(five, 7.9).length, 7, 'a fractional size rounds down');
+});
+
+test('only the first placeholder in a row is announced, and a placeholder names no series', () => {
+  const empty = padWithPlaceholders<SeriesCard>([], FEATURED_PAGE);
+  assert.equal(empty.length, FEATURED_PAGE, 'an empty catalog still fills the row');
+  assert.deepEqual(empty.map((s) => isPlaceholder(s) && s.announced), [true, false, false, false, false, false, false, false]);
+  const after = padWithPlaceholders([card('a')], 3).filter(isPlaceholder);
+  assert.deepEqual(after.map((p) => p.announced), [true, false], 'the first placeholder after real series');
+  for (const p of empty) {
+    assert.deepEqual(Object.keys(p).sort(), ['announced', 'key', 'placeholder'], 'no title, genre, label or link');
+  }
+});
+
+test('every storefront row of the demo catalog fills to its size, real series first', () => {
+  const store = buildStorefront({
+    pool: demoCards({ ranking: 'trending', limit: 60 }, false),
+    picks: demoCards({ ranking: 'editorsPicks', limit: 12 }, false),
+    completed: demoCards({ ranking: 'completed', limit: 12 }, false),
+  });
+  const rows: [string, SeriesCard[], number][] = [
+    ['Weekly featured', rotatingWindow(store.featured, 0, FEATURED_PAGE), FEATURED_PAGE],
+    ['Trending', store.rankings.trending, RANK_SIZE],
+    ['New', store.rankings.fresh, RANK_SIZE],
+    ['Completed ranking', store.rankings.completed, RANK_SIZE],
+    ['New arrivals', store.arrivals, ARRIVALS_MAX],
+    ['Editors’ choice', store.editors, EDITORS_MAX],
+    ['Completed series', store.completed, COMPLETED_MAX],
+  ];
+  for (const [name, items, size] of rows) {
+    const row = padWithPlaceholders(items, size);
+    assert.equal(row.length, size, name);
+    assert.deepEqual(realItems(row), items, `${name}: the real series are all there, first`);
+    assert.equal(row.filter((s) => isPlaceholder(s) && s.announced).length, items.length < size ? 1 : 0, name);
+  }
+});
+
+test('Weekly pick: the carousel whenever there is a series, the creator invitation only for an empty catalog', () => {
+  assert.equal(heroMode({ loading: true, failed: false, count: 0 }), 'loading');
+  assert.equal(heroMode({ loading: false, failed: false, count: 3 }), 'slides');
+  assert.equal(heroMode({ loading: false, failed: false, count: 1 }), 'slides', 'one real slide, no placeholder slides');
+  assert.equal(heroMode({ loading: false, failed: false, count: 0 }), 'invite');
+  assert.equal(heroMode({ loading: false, failed: true, count: 0 }), 'demo', 'an unreachable catalog is not an empty one');
+  assert.equal(heroMode({ loading: false, failed: true, count: 2 }), 'slides');
+});
+
 // ---- Colours -------------------------------------------------------------------------------------------
 
 function luminance(hex: string): number {
@@ -289,6 +354,7 @@ test('the storefront and the footer use tokens, not raw colours', () => {
     'features/catalog/components/store/PromoBanners.tsx',
     'features/catalog/components/store/SectionHeader.tsx',
     'features/catalog/components/store/TagCloud.tsx',
+    'features/catalog/components/store/ComingSoon.tsx',
   ];
   for (const file of files) {
     const text = readFileSync(join(src, file), 'utf8');

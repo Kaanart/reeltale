@@ -3,19 +3,20 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { focusRing, ResponsiveGrid, useInteraction, useLayout } from '../../../../components/layout';
+import { focusRing, useInteraction, useLayout } from '../../../../components/layout';
 import { AIBadge, Button, Text } from '../../../../components/ui';
 import type { TagRow } from '../../../../lib/types';
 import { colors, fonts, layout, radius, space } from '../../../../theme/tokens';
 import { useEpisodeSummary } from '../../hooks';
 import { isAiSeries, type SeriesCard } from '../../logic';
 import { routes } from '../../routes';
-import { wrapIndex } from '../../storefront';
+import { isPlaceholder, realItems, slotKey, wrapIndex, type Placeholder, type Slot } from '../../storefront';
 import { headingLevel } from '../a11y';
 import { CardLink } from '../CardLink';
-import { Cover, POSTER_RATIO } from '../Cover';
+import { Cover, COVER_RATIO, POSTER_RATIO } from '../Cover';
 import { DecorativeIcon } from '../DecorativeIcon';
 import { MaturityMarker } from '../MaturityMarker';
+import { ComingSoon, ComingSoonArt, SlotCell, SlotGrid } from './ComingSoon';
 import { SectionHeader } from './SectionHeader';
 import { useStoreText } from './useStoreText';
 
@@ -30,15 +31,16 @@ const EDITOR_COVER = 64;
 const RING_ROOM = layout.focusRingWidth + layout.focusRingOffset + SELECTED_BORDER;
 
 /**
- * "New arrivals": the newest series as a strip of small posters; the one picked shows large underneath with
- * its title, genre and Watch now.
+ * "New arrivals": the newest series as a strip of small posters, then "Coming soon" placeholders up to the
+ * strip's size; the series picked shows large underneath with its title, genre and Watch now. With no series
+ * yet, the strip alone.
  */
-export function NewArrivals({ items, tags }: { items: readonly SeriesCard[]; tags: readonly TagRow[] }) {
+export function NewArrivals({ items, tags }: { items: readonly Slot<SeriesCard>[]; tags: readonly TagRow[] }) {
   const { t } = useTranslation();
   const { isCompact } = useLayout();
   const [selected, setSelected] = useState(0);
-  const current = items[wrapIndex(selected, items.length)];
-  if (!current) return null;
+  const real = realItems(items);
+  const current = real[wrapIndex(selected, real.length)];
   const title = t('home:home.store.newArrivals');
   const web = Platform.OS === 'web';
 
@@ -53,19 +55,23 @@ export function NewArrivals({ items, tags }: { items: readonly SeriesCard[]; tag
           contentContainerStyle={styles.strip}
         >
           <View role={web ? 'list' : undefined} aria-label={title} style={styles.stripList}>
-            {items.map((s, i) => (
-              <View key={s.id} role={web ? 'listitem' : undefined}>
-                <Thumb
-                  series={s}
-                  selected={s.id === current.id}
-                  width={THUMB_WIDTH}
-                  onPress={() => setSelected(i)}
-                />
-              </View>
+            {items.map((slot) => (
+              <SlotCell key={slotKey(slot)} slot={slot}>
+                {isPlaceholder(slot) ? (
+                  <PlaceholderThumb placeholder={slot} />
+                ) : (
+                  <Thumb
+                    series={slot}
+                    selected={slot.id === current?.id}
+                    width={THUMB_WIDTH}
+                    onPress={() => setSelected(real.indexOf(slot))}
+                  />
+                )}
+              </SlotCell>
             ))}
           </View>
         </ScrollView>
-        <Preview key={current.id} series={current} tags={tags} />
+        {current ? <Preview key={current.id} series={current} tags={tags} /> : null}
       </View>
     </View>
   );
@@ -96,6 +102,15 @@ function Thumb({ series, selected, width, onPress }: { series: SeriesCard; selec
         ) : null}
       </Cover>
     </Pressable>
+  );
+}
+
+/** A strip place no series fills yet: the film frame with "Coming soon" and the hint on it. Not a button. */
+function PlaceholderThumb({ placeholder }: { placeholder: Placeholder }) {
+  return (
+    <ComingSoon announced={placeholder.announced} style={styles.thumb}>
+      <ComingSoonArt width={THUMB_WIDTH} ratio={COVER_RATIO} tone="panel" words="full" style={styles.thumbCover} />
+    </ComingSoon>
   );
 }
 
@@ -171,22 +186,44 @@ function Preview({ series, tags }: { series: SeriesCard; tags: readonly TagRow[]
   );
 }
 
-/** "Editors' choice": the Editor's Picks as a two-column list of cover, title and genre. */
-export function EditorsChoice({ items, tags }: { items: readonly SeriesCard[]; tags: readonly TagRow[] }) {
+/**
+ * "Editors' choice": the Editor's Picks as a two-column list of cover, title and genre, then "Coming soon"
+ * placeholders up to the list's size.
+ */
+export function EditorsChoice({ items, tags }: { items: readonly Slot<SeriesCard>[]; tags: readonly TagRow[] }) {
   const { t } = useTranslation();
+  const { isCompact } = useLayout();
   const title = t('home:home.store.editorsChoice');
   return (
     <View testID="home-editors-choice">
       <SectionHeader title={title} />
-      <ResponsiveGrid
-        items={items}
-        keyExtractor={(s) => s.id}
-        columns={{ compact: 1, medium: 2, wide: 2 }}
+      <SlotGrid
+        slots={items}
+        columns={isCompact ? 1 : 2}
         gap={space.lg}
-        accessibilityLabel={title}
-        renderItem={(s) => <EditorItem series={s} tags={tags} />}
+        label={title}
+        renderSlot={(slot) =>
+          isPlaceholder(slot) ? <PlaceholderEditor placeholder={slot} /> : <EditorItem series={slot} tags={tags} />}
       />
     </View>
+  );
+}
+
+/** A place no Editor's Pick fills yet: the film-frame cover, "Coming soon" and the hint. Not a link. */
+function PlaceholderEditor({ placeholder }: { placeholder: Placeholder }) {
+  const { t } = useTranslation();
+  return (
+    <ComingSoon announced={placeholder.announced} style={styles.editor}>
+      <ComingSoonArt width={EDITOR_COVER} ratio={POSTER_RATIO} style={styles.editorCover} />
+      <View style={styles.editorText}>
+        <Text variant="body" color="inkMuted" numberOfLines={2} style={styles.editorTitle}>
+          {t('home:home.store.comingSoon.title')}
+        </Text>
+        <Text variant="caption" color="inkMuted" numberOfLines={2}>
+          {t('home:home.store.comingSoon.hint')}
+        </Text>
+      </View>
+    </ComingSoon>
   );
 }
 

@@ -250,3 +250,63 @@ export function nextWindowStart(start: number, count: number, size: number = FEA
   if (!canSwitch(count, size)) return 0;
   return wrapIndex(start + Math.floor(size), count);
 }
+
+// ---- "Coming soon" placeholders --------------------------------------------------------------------------
+
+/**
+ * A "Coming soon" poster holding a place in a row the catalog can't fill yet (the sample catalog has a handful
+ * of series; a new live catalog has none). It names no series: no title, genre, label or link of its own.
+ * Only the first one in a row is `announced` to screen readers; the rest are hidden, so nobody hears
+ * "Coming soon" seven times in a row.
+ */
+export interface Placeholder {
+  placeholder: true;
+  /** Unique in its row: "placeholder-5" is the sixth place. */
+  key: string;
+  announced: boolean;
+}
+
+/** One place in a storefront row: a real series, or a placeholder after the real ones. */
+export type Slot<T> = T | Placeholder;
+
+export function isPlaceholder<T extends object>(slot: Slot<T>): slot is Placeholder {
+  return (slot as Partial<Placeholder>).placeholder === true;
+}
+
+/**
+ * The row's real items first (at most `size`), then placeholders up to `size`. A full row gets none, and the
+ * row is never longer than `size`.
+ */
+export function padWithPlaceholders<T extends object>(items: readonly T[], size: number): Slot<T>[] {
+  const k = Number.isFinite(size) ? Math.max(0, Math.floor(size)) : 0;
+  const real: Slot<T>[] = items.slice(0, k);
+  const pads = Array.from({ length: k - real.length }, (_, i): Placeholder => ({
+    placeholder: true,
+    key: `placeholder-${real.length + i}`,
+    announced: i === 0,
+  }));
+  return [...real, ...pads];
+}
+
+/** A slot's React key: the series id, or the placeholder's own key (they can't clash: ids are UUIDs or slugs). */
+export function slotKey(slot: Slot<Identified>): string {
+  return isPlaceholder(slot) ? slot.key : slot.id;
+}
+
+/** The real series in a row of slots, in order. */
+export function realItems<T extends object>(slots: readonly Slot<T>[]): T[] {
+  return slots.filter((s): s is T => !isPlaceholder(s));
+}
+
+export type HeroMode = 'loading' | 'slides' | 'invite' | 'demo';
+
+/**
+ * What the "Weekly pick" spot shows: the carousel whenever there is a series to feature (never padded with
+ * placeholders); an invitation to creators ("New series are on the way") when the catalog has none; the demo
+ * story when the catalog couldn't be reached (an invitation would claim to know it is empty).
+ */
+export function heroMode({ loading, failed, count }: { loading: boolean; failed: boolean; count: number }): HeroMode {
+  if (loading) return 'loading';
+  if (count > 0) return 'slides';
+  return failed ? 'demo' : 'invite';
+}

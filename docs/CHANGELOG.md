@@ -3,6 +3,8 @@
 Newest first. One entry per finished task, including what was tried and didn't work.
 
 ## 2026-11-04: WebNovel-style Home, free start without an account, 10 free episodes
+- "Coming soon" placeholder posters fill sparse storefront rows; an empty live catalog invites creators instead.
+- Without a Meta key the Worker answers `ai_paused` before holding coins (was: the job failed and refunded later).
 - Home rebuilt as a storefront after webnovel.com (structure only, ReelTale's own look): carousel, featured row,
   numbered rankings, tags, new arrivals, editors' choice, completed, banners, dark footer. Built by one agent,
   reviewed by another (carousel focus loss on arrow keys, poster sizes at 1024 px, AI badge overflow on phones,

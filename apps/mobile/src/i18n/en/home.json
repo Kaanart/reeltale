@@ -75,6 +75,16 @@
       "arrivalsPickA11y": "Show {{title}}",
       "editorsChoice": "Editors’ choice",
       "completedSeries": "Completed series",
+      "comingSoon": {
+        "title": "Coming soon",
+        "hint": "New series are on the way",
+        "a11y": "Coming soon: new series are on the way",
+        "invite": {
+          "title": "New series are on the way",
+          "body": "Post your short vertical series and be one of the first on the shelf.",
+          "cta": "Become a creator"
+        }
+      },
       "banners": {
         "a11y": "More from ReelTale",
         "series": {
