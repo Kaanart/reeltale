@@ -3,6 +3,12 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **Batch 3 DONE (committed, needs Kaan's `db push`, not deployed):** migration `20261104090100_free_episodes.sql`
+  (series default 10 free episodes; `studio_create_series` default 10), DB test. Sample series free 5 of their 6–10
+  episodes (`DEMO_FREE_EPISODES`), so unlocking still shows; watch/catalog tests moved to episode 6/7. DB 147, app 518.
+  Installed Anthropic's official `frontend-design` skill in `.claude/skills/` (security-checked: markdown only, Apache-2.0).
+- **Batch 2 RUNNING** as workflow `wf_146e5553-87c` (build + review of the WebNovel Home; its files are uncommitted
+  until it finishes). If this session dies: check `git status`, typecheck, tests, then commit and deploy.
 - **Batch 1 DONE, deployed (version 4b5eacbe):** the landing's "Start watching free" (with an 18+ line) reloads the tab
   into the sample catalog and goes straight to Home as the sample account (`enterWebDemo` / `takeWebDemoEntry` in
   lib/env.ts). Ribbon: "Sample catalog · watch free, no account needed" + "Sign in for AI stories" (`/welcome?demo=0`).

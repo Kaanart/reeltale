@@ -122,8 +122,12 @@ const SPECS: SeriesSpec[] = [
   },
 ];
 
-/** How many episodes are free at the start of every demo series (the catalog's minimum). */
-export const DEMO_FREE_EPISODES = 3;
+/**
+ * How many episodes are free at the start of every demo series. Real series default to 10 (migration
+ * 20261104090100); the sample series are only 6 to 10 episodes long, so they free 5 and keep a few locked to show
+ * unlocking with coins.
+ */
+export const DEMO_FREE_EPISODES = 5;
 
 export const demoSeries: readonly SeriesRow[] = SPECS.map((s) => ({
   id: id('5e', s.n),

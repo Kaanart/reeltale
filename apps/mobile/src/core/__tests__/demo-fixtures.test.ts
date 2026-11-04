@@ -47,7 +47,7 @@ test('about six series, covering every format, both maturities, Editor’s Picks
   }
 });
 
-test('6 to 10 episodes each, the first three free, prices 10–100 coins in steps of 5', () => {
+test('6 to 10 episodes each, the first five free, prices 10–100 coins in steps of 5', () => {
   const ids = new Set<string>();
   for (const s of demoSeries) {
     const eps = demoEpisodesOf(s.id);

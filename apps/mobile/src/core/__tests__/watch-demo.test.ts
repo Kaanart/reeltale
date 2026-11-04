@@ -41,7 +41,7 @@ function rejects(fn: () => unknown, code: string): unknown {
 beforeEach(() => resetDemoState());
 
 test('an episode opens its whole series, in order', () => {
-  const ep = episode('salt-and-static', 4);
+  const ep = episode('salt-and-static', 6);
   const found = demoWatchSeries(ep.id);
   assert.ok(found);
   assert.equal(found.series.slug, 'salt-and-static');
@@ -55,19 +55,19 @@ test('prices follow the SQL: free episodes, priced ones, the opt-in, and AI seri
   assert.equal(free.free, true);
   assert.equal(free.purchasable, true);
 
-  const priced = demoEpisodePrice(episode('salt-and-static', 4).id, adult);
+  const priced = demoEpisodePrice(episode('salt-and-static', 6).id, adult);
   assert.deepEqual(
     { free: priced.free, price: priced.price, base: priced.base_price, discount: priced.discount_pct, unlocked: priced.unlocked },
     { free: false, price: 20, base: 20, discount: 0, unlocked: false },
   );
 
-  const mature = demoEpisodePrice(episode('night-shift-at-the-wax-museum', 4).id, adult);
+  const mature = demoEpisodePrice(episode('night-shift-at-the-wax-museum', 6).id, adult);
   assert.equal(mature.purchasable, false);
   assert.equal(mature.reason, 'mature_opt_in_required');
-  assert.equal(demoEpisodePrice(episode('night-shift-at-the-wax-museum', 4).id, optedIn).price, 25);
+  assert.equal(demoEpisodePrice(episode('night-shift-at-the-wax-museum', 6).id, optedIn).price, 25);
 
   assert.equal(demoEpisodePrice(episode('neon-ronin', 5).id, adult).free, true, 'AI, not an Editor’s Pick');
-  assert.equal(demoEpisodePrice(episode('low-tide', 5).id, adult).free, false, 'AI and an Editor’s Pick');
+  assert.equal(demoEpisodePrice(episode('low-tide', 6).id, adult).free, false, 'AI and an Editor’s Pick');
 
   const unknown = demoEpisodePrice('00000000-0000-4000-8000-000000000000', adult);
   assert.equal(unknown.purchasable, false);
@@ -75,7 +75,7 @@ test('prices follow the SQL: free episodes, priced ones, the opt-in, and AI seri
 });
 
 test('unlocking spends the bonus coins that expire first, then marks the episode unlocked everywhere', () => {
-  const ep = episode('salt-and-static', 4);
+  const ep = episode('salt-and-static', 6);
   const before = demoWalletCell.get();
   const out = demoUnlock(ep.id, 20, adult);
   assert.equal(out.status, 'unlocked');
@@ -102,32 +102,32 @@ test('a price the sheet didn’t show is refused with price_changed and the real
 
 test('too few coins: insufficient_coins with the shortfall, and nothing is spent', () => {
   demoWalletCell.set((w) => ({ ...w, paid: 5, bonus: 0, expiring: [], balance: 5 }));
-  const err = rejects(() => demoUnlock(episode('salt-and-static', 4).id, 20, adult), 'insufficient_coins');
+  const err = rejects(() => demoUnlock(episode('salt-and-static', 6).id, 20, adult), 'insufficient_coins');
   assert.deepEqual(unlockFailure(err), { kind: 'insufficient', shortBy: 15 });
   assert.equal(demoWalletCell.get().balance, 5);
 });
 
 test('a refund debt blocks coin unlocks', () => {
   demoWalletCell.set((w) => ({ ...w, refund_debt: 30 }));
-  const err = rejects(() => demoUnlock(episode('salt-and-static', 4).id, 20, adult), 'refund_debt_outstanding');
+  const err = rejects(() => demoUnlock(episode('salt-and-static', 6).id, 20, adult), 'refund_debt_outstanding');
   assert.deepEqual(unlockFailure(err), { kind: 'debt', debt: 30 });
 });
 
 test('free and opted-out episodes are never charged', () => {
   const before = demoWalletCell.get().balance;
   assert.equal(demoUnlock(episode('salt-and-static', 1).id, 0, adult).status, 'free');
-  rejects(() => demoUnlock(episode('night-shift-at-the-wax-museum', 4).id, 25, adult), 'mature_opt_in_required');
+  rejects(() => demoUnlock(episode('night-shift-at-the-wax-museum', 6).id, 25, adult), 'mature_opt_in_required');
   assert.equal(demoWalletCell.get().balance, before);
 });
 
 test('the daily Free Pass unlocks one episode, then runs out', () => {
-  const first = episode('the-clockmakers-mice', 4);
+  const first = episode('the-clockmakers-mice', 6);
   const out = demoUseFreePass(first.id, adult);
   assert.deepEqual(out, { status: 'unlocked', balance: null, freePassesLeft: 0 });
   assert.equal(demoEpisodePrice(first.id, adult).unlocked, true);
   assert.equal(demoUseFreePass(first.id, adult).status, 'already_unlocked');
 
-  const err = rejects(() => demoUseFreePass(episode('the-clockmakers-mice', 5).id, adult), 'no_free_pass_left');
+  const err = rejects(() => demoUseFreePass(episode('the-clockmakers-mice', 7).id, adult), 'no_free_pass_left');
   assert.deepEqual(unlockFailure(err), { kind: 'no_free_pass' });
   assert.equal(demoUseFreePass(episode('the-clockmakers-mice', 1).id, adult).status, 'free', 'a free episode needs no pass');
 });

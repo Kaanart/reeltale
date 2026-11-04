@@ -361,23 +361,23 @@ test('the demo has something to show on every screen of the track, and it change
   assert.ok(!demoProgress().some((p) => p.episode_id === ep.id), 'sign-out puts the fixtures back');
 });
 
-test('demo prices: the first three episodes are free, later ones cost coins, unlocking is a memory cell', () => {
+test('demo prices: the first five episodes are free, later ones cost coins, unlocking is a memory cell', () => {
   resetDemoState();
   for (const s of demoSeries) {
     const eps = demoEpisodesOf(s.id);
     eps.forEach((e) => {
       const price = demoEpisodePrice(e.id);
       assert.ok(EpisodePriceSchema.safeParse(price).success);
-      if (e.number <= 3 || s.default_price_coins === null) {
+      if (e.number <= 5 || s.default_price_coins === null) {
         assert.equal(episodeState(price), 'free', `${s.slug} ${e.number}`);
-        assert.equal(freeByRule(s, e), e.number <= 3 || e.is_free || isFreeAiSeries(s));
+        assert.equal(freeByRule(s, e), e.number <= 5 || e.is_free || isFreeAiSeries(s));
       } else {
         assert.equal(episodeState(price), 'priced', `${s.slug} ${e.number}`);
         assert.ok(price.price >= 10 && price.price <= 100 && price.price % 5 === 0);
       }
     });
   }
-  const locked = demoEpisodesOf(demoSeries[0]!.id)[4]!;
+  const locked = demoEpisodesOf(demoSeries[0]!.id)[5]!;
   markDemoUnlocked(locked.id);
   markDemoUnlocked(locked.id);
   assert.equal(episodeState(demoEpisodePrice(locked.id)), 'unlocked');
