@@ -3,6 +3,9 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **Write-up drafted:** `docs/HACKATHON.md` rewritten to match the code (only models the code calls; no TTS, no
+  editor's report). Open items for Kaan at its end: how judges sign in for LIVE AI (Supabase's built-in mail only
+  reaches org members: one shared password account in the submission form, or Resend SMTP), video link, brand date.
 - **Batch 3 DONE (committed, needs Kaan's `db push`, not deployed):** migration `20261104090100_free_episodes.sql`
   (series default 10 free episodes; `studio_create_series` default 10), DB test. Sample series free 5 of their 6–10
   episodes (`DEMO_FREE_EPISODES`), so unlocking still shows; watch/catalog tests moved to episode 6/7. DB 147, app 518.
