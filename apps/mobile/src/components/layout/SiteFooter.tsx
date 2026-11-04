@@ -9,8 +9,9 @@ import { Text } from '../ui';
 import { focusRing, ShellLink } from './ShellLink';
 import { useLayout } from './useLayout';
 
-// The site footer: a dark band on the web at medium and wide widths only (renders nothing in the native apps
-// and on phone-sized windows, where Settings carries the legal links). PageContainer ends every page with it;
+// The site footer: a dark band at the end of every web page, phones included, so the imprint, the legal pages
+// and the notice form are always one scroll away (the native apps render nothing: Settings carries the legal
+// links there). PageContainer ends every page with it;
 // a screen that scrolls on its own (a FlashList) puts <SiteFooter /> as the last thing in its scroll content.
 //
 //   ReelTale   About -> /about (public page), Report illegal content -> /notice
@@ -33,12 +34,14 @@ const CREATE_PATH = '/create';
 /** The keyboard focus ring in the footer: light, so it shows on the dark band. */
 const FOOTER_FOCUS: ViewStyle = { ...focusRing, outlineColor: colors.footerInk };
 const COLUMN_WIDTH = 200;
+/** Two columns side by side on a 360 px phone. */
+const COLUMN_WIDTH_COMPACT = 150;
 const EXTERNAL_ICON = 12;
 
 export function SiteFooter() {
   const { t } = useTranslation();
-  const { hasTopNav, isWide, gutter } = useLayout();
-  if (!hasTopNav) return null;
+  const { isCompact, isWide, gutter } = useLayout();
+  if (Platform.OS !== 'web') return null;
   const frame = { paddingHorizontal: gutter, maxWidth: layout.contentMaxWidth + 2 * gutter };
 
   return (
@@ -53,17 +56,17 @@ export function SiteFooter() {
           </Text>
         </View>
 
-        <View role="navigation" aria-label={t('common:footer.a11y')} style={styles.columns}>
-          <FooterColumn title={t('common:footer.columns.site')}>
+        <View role="navigation" aria-label={t('common:footer.a11y')} style={[styles.columns, isCompact && styles.columnsCompact]}>
+          <FooterColumn compact={isCompact} title={t('common:footer.columns.site')}>
             <FooterLink href={ABOUT_PATH} label={t('common:footer.about')} />
             <FooterLink href={NOTICE_PATH} label={t('common:footer.notice')} />
           </FooterColumn>
-          <FooterColumn title={t('common:footer.columns.legal')}>
+          <FooterColumn compact={isCompact} title={t('common:footer.columns.legal')}>
             {LEGAL.map((doc) => (
               <FooterLink key={doc.slug} href={legalUrl(doc.slug)} label={t(doc.labelKey)} external />
             ))}
           </FooterColumn>
-          <FooterColumn title={t('common:footer.columns.creators')}>
+          <FooterColumn compact={isCompact} title={t('common:footer.columns.creators')}>
             <FooterLink href={CREATE_PATH} label={t('common:footer.becomeCreator')} />
           </FooterColumn>
         </View>
@@ -82,11 +85,11 @@ export function SiteFooter() {
   );
 }
 
-function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
+function FooterColumn({ title, compact, children }: { title: string; compact: boolean; children: ReactNode }) {
   // Each column is a small list under its own heading (web: an <h2>).
   const level = Platform.OS === 'web' ? ({ 'aria-level': 2 } as object) : null;
   return (
-    <View style={styles.column}>
+    <View style={[styles.column, compact && styles.columnCompact]}>
       <Text variant="bodySmall" color="footerInk" accessibilityRole="header" {...level} style={styles.columnTitle}>
         {title}
       </Text>
@@ -140,7 +143,9 @@ const styles = StyleSheet.create({
   brandWide: { maxWidth: COLUMN_WIDTH * 2 },
   wordmark: { fontFamily: fonts.serifBold },
   columns: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space.xxl, rowGap: space.xl },
+  columnsCompact: { columnGap: space.lg },
   column: { width: COLUMN_WIDTH, gap: space.sm },
+  columnCompact: { width: COLUMN_WIDTH_COMPACT },
   columnTitle: { fontFamily: fonts.sansBold },
   columnLinks: { gap: 0 },
   link: {

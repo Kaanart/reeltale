@@ -114,7 +114,7 @@ dozen; for long lists use FlashList with `numColumns={gridColumns(width, { minIt
 `TwoColumn` puts the side panel (360) beside the main column on wide windows (`from="medium"` for earlier)
 and stacks them below that (main first, `sideFirst` to flip).
 
-**Footer.** `SiteFooter` (web, medium/wide): About (`/about`), Terms, Privacy, Community guidelines, AI
+**Footer.** `SiteFooter` (web, every width; two link columns per row on phones): About (`/about`), Terms, Privacy, Community guidelines, AI
 policy (hosted pages, new tab), Report illegal content (`/notice`), the imprint and "For adults 18+".
 `PageContainer` adds it; a screen that scrolls itself puts `<SiteFooter />` last in its scroll content
 (FlashList: `ListFooterComponent={SiteFooter}`). The tab screens get it when they move to `PageContainer`.
