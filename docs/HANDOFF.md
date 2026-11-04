@@ -3,6 +3,12 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **Shared judge account (Kaan's choice):** `judge@reeltale.net` created via the admin API (legacy service_role key;
+  the new sb_secret key gets 401 on /auth/v1/admin), adult birthday + Terms done. Password, user id and access code
+  are in `~/.config/reeltale/secrets.env` (`JUDGE_PASSWORD`, `JUDGE_CODE`) and `~/.config/reeltale/judge_uid`.
+  The code row is in `prep/judge-access.sql` (not in git): Kaan runs `supabase db query --linked -f
+  prep/judge-access.sql`, then Claude redeems it for the judge with `svc.redeem_access_code` (1500 promo coins,
+  30 days of AI). The password goes into the submission form only.
 - **Write-up drafted:** `docs/HACKATHON.md` rewritten to match the code (only models the code calls; no TTS, no
   editor's report). Open items for Kaan at its end: how judges sign in for LIVE AI (Supabase's built-in mail only
   reaches org members: one shared password account in the submission form, or Resend SMTP), video link, brand date.
