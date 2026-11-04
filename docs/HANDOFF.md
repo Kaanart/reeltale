@@ -3,6 +3,9 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **RUNNING (3:30 PM EST):** workflow `wf_e06a21bb-73e` adds "Coming soon" placeholder posters to sparse Home rows
+  (and a creator-invite slide when the live catalog is empty). Uncommitted until it finishes; then typecheck, tests,
+  build, `wrangler deploy`, browser check, commit. Kaan submitted the Meta credit form; credits not applied yet.
 - **No Meta key yet (Kaan hasn't received it).** Deployed 69e184ff: without `META_API_KEY` the Worker refuses new
   scenes with 503 `ai_paused` before holding coins (app shows "AI stories are paused for now. No coins were taken.").
   When the key arrives: put it in secrets.env, pipe it to `wrangler secret put META_API_KEY`, run the smoke test.
