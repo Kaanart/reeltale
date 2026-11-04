@@ -39,7 +39,8 @@ aiRoutes.post('/stories', async (c) => {
   if (!body.success) return jsonError(c, 400, 'bad_request');
   let r: Started;
   try {
-    // Before coins are held or any model is called: a scene that couldn't be stored would be wasted.
+    // Before coins are held: without the Meta key or room to store it, the scene could only fail.
+    if (!c.env.META_API_KEY) return jsonError(c, 503, 'ai_paused');
     if (!(await r2HasRoom(c.env))) return jsonError(c, 503, 'storage_budget_exceeded');
     r = await serviceDb(c.env).rpc<Started>('ai_start_story', {
       p_user: c.get('userId'), p_premise: body.data.premise, p_tags: body.data.tags, p_mode: body.data.mode,
@@ -61,6 +62,7 @@ aiRoutes.post('/scenes/:sceneId/choose', async (c) => {
   if (!scene.success || !body.success) return jsonError(c, 400, 'bad_request');
   let r: Started;
   try {
+    if (!c.env.META_API_KEY) return jsonError(c, 503, 'ai_paused');
     if (!(await r2HasRoom(c.env))) return jsonError(c, 503, 'storage_budget_exceeded');
     r = await serviceDb(c.env).rpc<Started>('ai_choose', { p_user: c.get('userId'), p_parent_scene: scene.data, p_choice: body.data.choice });
   } catch (err) {

@@ -88,6 +88,7 @@ function env(over: { create?: (o: { id: string }) => Promise<unknown>; objects?:
     } as unknown as Workflow<{ jobId: string }>,
     APP_ENV: 'development', APP_ORIGIN: 'https://reeltale.net', MEDIA_ORIGIN: 'https://media.reeltale.net',
     SUPABASE_URL: SUPA, SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test', SUPABASE_SECRET_KEY: 'sb_secret_test',
+    META_API_KEY: 'meta_test',
     CF_ACCOUNT_ID: 'acc', STREAM_CUSTOMER_CODE: '', APPLE_TEAM_ID: 'T', IOS_BUNDLE_ID: 'b', ANDROID_PACKAGE: 'b',
     ANDROID_CERT_SHA256: '', ADMOB_PUBLISHER_ID: 'pub-1',
   } as Env;
@@ -216,4 +217,15 @@ test('the R2 meter: no new scene without room, and every asset read is reserved'
   const over = await call(e, `/api/ai/scenes/${SCENE}/assets/panel-1.webp`);
   assert.equal(over.status, 503);
   assert.deepEqual(await over.json(), { error: 'storage_budget_exceeded' });
+});
+
+test('without the Meta key, new scenes are refused before anything is held', async () => {
+  const { e, created } = env();
+  delete (e as { META_API_KEY?: string }).META_API_KEY;
+  rpc = () => ({ body: started });
+  const r = await call(e, '/api/ai/stories', { method: 'POST', body: { premise: PREMISE } });
+  assert.equal(r.status, 503);
+  assert.deepEqual(await r.json(), { error: 'ai_paused' });
+  assert.equal((await call(e, `/api/ai/scenes/${SCENE}/choose`, { method: 'POST', body: { choice: 'a' } })).status, 503);
+  assert.equal(rpcCalls.length + meter.length + created.length, 0);
 });

@@ -65,6 +65,8 @@ after an access check) and serves the site. Hard limits keep R2 and model spend 
 | before the event | Know-how from an earlier app (Feetmax): Apple sign-in nonce, age gate, webhook checks | Reimplemented; no code copied |
 
 ## Honest status
+- Live AI generation needs the Meta Model API key, which was not active at submission time. Until it is, the site
+  says "AI stories are paused for now" before any coins are held; the sample story shows the player and choices.
 - No filmed series yet: the catalog visitors see is sample data, labelled as such. Real creator uploads (Cloudflare
   Stream + the ingest Workflow with Spark safety checks) are built but have no content yet.
 - The native iOS/Android apps share the code but weren't submitted to the stores; the website is the entry.

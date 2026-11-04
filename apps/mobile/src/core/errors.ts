@@ -121,6 +121,8 @@ const CATALOG: Record<string, Entry> = {
   scene_not_continuable: e('scene_not_continuable'),
   scene_in_progress: e('scene_in_progress'),
   storage_budget_exceeded: e('storage_budget_exceeded'),
+  // AI switched off on the server (no Meta key yet): same message, nothing was taken.
+  ai_paused: e('storage_budget_exceeded'),
   generation_unavailable: e('generation_unavailable', 'retry', { retryable: true }),
 
   // Reports, blocks and editor tools.

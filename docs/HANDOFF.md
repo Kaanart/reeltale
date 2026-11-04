@@ -3,6 +3,10 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **No Meta key yet (Kaan hasn't received it).** Deployed 69e184ff: without `META_API_KEY` the Worker refuses new
+  scenes with 503 `ai_paused` before holding coins (app shows "AI stories are paused for now. No coins were taken.").
+  When the key arrives: put it in secrets.env, pipe it to `wrangler secret put META_API_KEY`, run the smoke test.
+  Video script: `docs/VIDEO.md` (records against the sample catalog + sample story; honest narration).
 - **Batch 2 DONE, deployed (version 49bd63cd):** Home is a WebNovel-style storefront (`features/catalog/storefront.ts`,
   `components/store/*`): Weekly pick carousel + Meet ReelTale, Weekly featured with Switch, Rankings (Trending/New/
   Completed, numbered), Continue watching + demo story, Popular tags, New arrivals + Editors' choice, Completed
