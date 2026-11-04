@@ -3,6 +3,9 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **Pitch + video script:** `docs/VIDEO.md` now holds the judge pitch (positioning "WebNovel for short video, open
+  to every creator, with stories you can steer"; avoid "first": TikTok Series exists), a 90-word form pitch, the
+  2:30 script and an optional labelled AI intro-clip prompt.
 - **Phone footer DONE, deployed (version 9b1dba73):** the dark footer now shows on every web width (phones get two
   link columns per row); checked live at 390x844, no sideways scroll. Native still renders none (Settings has the
   legal links). App 542.
