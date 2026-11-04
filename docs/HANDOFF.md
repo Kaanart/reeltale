@@ -3,6 +3,9 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **Judge account finished by Kaan:** access code inserted and redeemed (`prep/judge-redeem.sql` via
+  `supabase db query --linked`). Free-episodes migration `20261104090100` is applied (checked). The auto-mode
+  classifier blocks Claude from production DB writes AND reads (service-key RPCs, `db query`): give Kaan SQL files.
 - **Shared judge account (Kaan's choice):** `judge@reeltale.net` created via the admin API (legacy service_role key;
   the new sb_secret key gets 401 on /auth/v1/admin), adult birthday + Terms done. Password, user id and access code
   are in `~/.config/reeltale/secrets.env` (`JUDGE_PASSWORD`, `JUDGE_CODE`) and `~/.config/reeltale/judge_uid`.
