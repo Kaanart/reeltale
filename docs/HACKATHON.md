@@ -71,6 +71,11 @@ after an access check) and serves the site. Hard limits keep R2 and model spend 
   Stream + the ingest Workflow with Spark safety checks) are built but have no content yet.
 - The native iOS/Android apps share the code but weren't submitted to the stores; the website is the entry.
 
+## About the demo video
+The site clips in the video are real recordings of reeltale.net. The claymotion b-roll shots, the narration voice and
+the music were made with Higgsfield (third-party AI video and audio models); every AI shot is labelled
+"AI-generated" on screen. The pipeline diagram and end card were made by hand.
+
 ## What's next
 Creator uploads with real series, store launch, creator payouts, Meta video models as soon as there is an API.
 

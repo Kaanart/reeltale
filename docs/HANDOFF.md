@@ -3,6 +3,14 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **PITCH VIDEO RUNNING (~5:30 PM EST):** workflow `wf_b81168fd-a24` (script under
+  `~/.claude/projects/-Users-kaanuysal-claude-ReelTale/c34fe42a-c069-4963-886d-75f066fa2e9b/workflows/scripts/`).
+  Choices: Claymotion preset, warm female voice, soft music, burned-in captions, 16:9, ~2:30, 11 narration blocks
+  (text in the script; follows docs/VIDEO.md). Real site clips (free, headless Chrome) + 8 Seedance 2.0 Mini claymotion
+  shots + narration + music via Higgsfield, hard cap 95 of ~110 credits (budget log `prep/video/session/budget.md`).
+  Everything lands in `prep/video/` (git-ignored): `site/`, `session/` (manifest.json), `final/reeltale-demo.mp4`
+  + `.srt`. If this session dies: DON'T re-run the paid step blindly; read `prep/video/session/manifest.json` and
+  budget.md, then only assemble (free) from what exists. Higgsfield CLI is signed in (workspace "Private").
 - **Higgsfield set up (for the pitch video):** CLI `@higgsfield/cli` 1.2.2 installed globally (security-checked:
   postinstall downloads the `hf` binary from higgsfield-ai/cli releases with a SHA-256 check). Use the command
   `higgsfield`, NOT `hf` (on this Mac `hf` is Hugging Face's CLI from Anaconda). Skills `higgsfield-ai/skills`
