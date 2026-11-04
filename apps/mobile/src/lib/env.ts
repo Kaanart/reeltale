@@ -45,12 +45,35 @@ export const isDemo = config.demo;
 /** A live website tab in the demo by choice: it can leave again (DemoFrame). */
 export const isDemoSession = config.demoReason === 'session';
 
-/** Full page loads, so the config above is read again. Web only. */
+const DEMO_ENTER_KEY = 'reeltale.demo.enter';
+
+/**
+ * "Start watching free" on the live website: the visitor confirmed they're 18+, so the reloaded tab goes straight
+ * into the sample catalog (takeWebDemoEntry). Full page loads, so the config above is read again. Web only.
+ */
 export function enterWebDemo() {
+  try {
+    window.sessionStorage.setItem(DEMO_ENTER_KEY, '1');
+  } catch {
+    // Storage blocked: the visitor lands on the start page and presses the button there.
+  }
   window.location.assign('/?demo=1');
 }
-export function leaveWebDemo() {
-  window.location.assign('/?demo=0');
+
+/** Whether this tab was just sent into the demo by enterWebDemo. Read once. */
+export function takeWebDemoEntry(): boolean {
+  if (!isDemoSession) return false;
+  try {
+    const asked = window.sessionStorage.getItem(DEMO_ENTER_KEY) === '1';
+    window.sessionStorage.removeItem(DEMO_ENTER_KEY);
+    return asked;
+  } catch {
+    return false;
+  }
+}
+
+export function leaveWebDemo(to: '/' | '/welcome' = '/') {
+  window.location.assign(`${to}?demo=0`);
 }
 
 /**

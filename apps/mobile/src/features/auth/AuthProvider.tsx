@@ -15,7 +15,7 @@ import { DEMO_ADULT, demoSession, type DemoAccountState } from '../../demo/sessi
 import { demoDelay } from '../../demo/state';
 import { refreshSession } from '../../lib/api';
 import { rpc, select } from '../../lib/data';
-import { isDemo } from '../../lib/env';
+import { isDemo, isDemoSession, leaveWebDemo, takeWebDemoEntry } from '../../lib/env';
 import {
   gateFor, isAgeStatus, isRole, TERMS_VERSION,
   type AccountState, type AgeStatus, type Gate, type Role, type SessionState, type SignInMethod,
@@ -223,7 +223,12 @@ function DemoAuth({ children }: { children: ReactNode }) {
   const account = useSyncExternalStore(demoSession.subscribe, demoSession.get, demoSession.get);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
-  useEffect(() => { void demoSession.load(); }, []);
+  useEffect(() => {
+    void demoSession.load().then(() => {
+      // "Start watching free" on the live website: straight in, as the sample account.
+      if (takeWebDemoEntry() && !demoSession.get()) demoSession.set(DEMO_ADULT);
+    });
+  }, []);
 
   // A sign-in other than "Explore the demo" starts like a new account, so the birthday and Terms steps show.
   const startNew = useCallback((email: string, method: SignInMethod) => {
@@ -267,6 +272,8 @@ function DemoAuth({ children }: { children: ReactNode }) {
       demoSession.set(null);
       setPendingEmail(null);
       clearUserData();
+      // A live website tab leaves the sample catalog altogether.
+      if (isDemoSession) leaveWebDemo('/');
     },
     async setDateOfBirth(dob) {
       const check = checkDateOfBirth(dob);

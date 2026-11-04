@@ -2,6 +2,17 @@
 
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
+## Nov 4 (evening) checkpoints (newest first)
+- **Batch 1 DONE, deployed (version 4b5eacbe):** the landing's "Start watching free" (with an 18+ line) reloads the tab
+  into the sample catalog and goes straight to Home as the sample account (`enterWebDemo` / `takeWebDemoEntry` in
+  lib/env.ts). Ribbon: "Sample catalog · watch free, no account needed" + "Sign in for AI stories" (`/welcome?demo=0`).
+  Checked in the browser on reeltale.net. App tests 518.
+- Meta terms checked (credit terms, API ToS, AUP): fine to accept. Follow-ups after the deadline: make sure only
+  Standard (not Contributor) models are called, and that Meta image provenance metadata survives our pipeline.
+- **Next:** batch 2 = Home in the WebNovel layout (`prep/reference/webnovel/`), batch 3 = free episodes default 10
+  (new migration; sample series are only 6–10 episodes long, so keep a few locked there to show unlocking),
+  batch 4 = deploy, browser check, `docs/HACKATHON.md` + video script.
+
 ## Nov 4 (afternoon): NEXT SESSION, START HERE
 **Deadline: TODAY, Tue Nov 4, 9:00 PM Eastern (Kaan's Indianapolis time).** The Meta credit form closes then too
 (credits land within 2 business days, so they cover judging, not today; calls today bill Kaan's card, capped by

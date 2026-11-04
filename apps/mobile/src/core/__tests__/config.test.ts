@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_API_URL, isPublishableKey, isUsableApiUrl, resolveApiUrl, resolveConfig } from '../../lib/config.ts';
+import { DEFAULT_API_URL, isPublishableKey, isUsableApiUrl, resolveApiUrl, resolveConfig, webDemoChoice } from '../../lib/config.ts';
 
 const b64url = (o: unknown) => Buffer.from(JSON.stringify(o)).toString('base64url');
 const jwt = (payload: unknown) => `${b64url({ alg: 'HS256', typ: 'JWT' })}.${b64url(payload)}.c2lnbmF0dXJl`;
@@ -66,4 +66,16 @@ test('the web talks to its own origin; the apps to EXPO_PUBLIC_API_URL or reelta
   assert.equal(resolveApiUrl({ apiUrl: 'http://evil.example' }, ios), DEFAULT_API_URL);
   assert.equal(resolveApiUrl({ apiUrl: 'https://reeltale.net/api' }, ios), DEFAULT_API_URL);
   assert.equal(isUsableApiUrl('ftp://reeltale.net'), false);
+});
+
+test('the website demo switch: ?demo=1 on, ?demo=0 off, otherwise what the tab remembered; web only', () => {
+  assert.equal(webDemoChoice('?demo=1', false), true);
+  assert.equal(webDemoChoice('?x=2&demo=0', true), false);
+  assert.equal(webDemoChoice('', true), true);
+  assert.equal(webDemoChoice('?demo=yes', false), false);
+  const web = { os: 'web', webOrigin: 'https://reeltale.net' };
+  const live = { supabaseUrl: 'https://x.supabase.co', supabaseKey: 'sb_publishable_abc' };
+  assert.equal(resolveConfig(live, { ...web, webDemo: true }).demoReason, 'session');
+  assert.equal(resolveConfig(live, { ...web, webDemo: false }).demo, false);
+  assert.equal(resolveConfig(live, { os: 'ios', webDemo: true }).demo, false, 'never on native');
 });

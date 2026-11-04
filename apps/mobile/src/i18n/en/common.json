@@ -82,7 +82,8 @@
   "demo": {
     "badge": "Demo",
     "a11y": "Demo mode. Sample data only.",
-    "leave": "Leave the demo"
+    "sample": "Sample catalog · watch free, no account needed",
+    "leave": "Sign in for AI stories"
   },
   "shell": {
     "homeA11y": "ReelTale, Home",

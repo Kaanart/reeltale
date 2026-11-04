@@ -24,12 +24,12 @@ export function DemoFrame({ enabled, children }: { enabled: boolean; children: R
         accessibilityLabel={t('common:demo.a11y')}
       >
         <Text variant="caption" style={styles.label}>
-          {t('common:demo.badge')}
+          {t(isDemoSession ? 'common:demo.sample' : 'common:demo.badge')}
         </Text>
       </View>
       {isDemoSession ? (
-        // The live website's demo (chosen with "Explore the demo"): one click back to the real site.
-        <Pressable role="link" accessibilityLabel={t('common:demo.leave')} onPress={leaveWebDemo} style={styles.leave}>
+        // The live website's sample catalog: one click to the real sign-in (AI stories, coins).
+        <Pressable role="link" accessibilityLabel={t('common:demo.leave')} onPress={() => leaveWebDemo('/welcome')} style={styles.leave}>
           <Text variant="caption" style={styles.leaveText}>
             {t('common:demo.leave')}
           </Text>
