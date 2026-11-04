@@ -8,11 +8,10 @@ Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D
 `ai_daily_cap_micros` = $20/day; offer to lower it to $5 with one SQL line).
 
 Where things are:
-- **Live:** https://reeltale.net runs commit `1e772be` (deployed with local `npx wrangler deploy`, version 9aaf39fb).
-- **Pushed to GitHub but NOT deployed:** `abd735d` (R2 limits) and the website demo switch commit after it. Deploying
-  needs the R2 migration pushed first (the Worker calls `svc.r2_reserve` / `svc.r2_has_room`).
-- **Supabase:** migrations through `20261101090000` pushed + seeded, `supabase config push` done.
-  `20261104090000_r2_limits.sql` is pending (Kaan's `db push`).
+- **Live:** https://reeltale.net runs `fe81e08` (R2 limits + website demo switch), deployed with local
+  `npx wrangler deploy`, version 4ec2e4be. Health and `/?demo=1` return 200.
+- **Supabase:** all migrations through `20261104090000_r2_limits.sql` pushed (checked with `supabase migration list
+  --linked`), seeded, `supabase config push` done.
 - **Worker secrets:** `SUPABASE_SECRET_KEY`, `IP_HASH_SECRET` OK. `META_API_KEY` is set but EMPTY, and the secrets file's
   line is empty too. Check by length only: `awk -F= '/^META_API_KEY=/{print length($2)}' ~/.config/reeltale/secrets.env`.
 - **Website demo switch** (new, tested, not deployed): `/?demo=1` puts the tab in demo mode (sample catalog and a
@@ -21,9 +20,9 @@ Where things are:
   footage). Judges: demo link for the catalog, sign in for live AI stories.
 
 Next steps, in order:
-1. Kaan: `supabase db push --include-seed` (with `SUPABASE_DB_PASSWORD` from secrets.env), put the Meta key after
+1. Kaan: put the Meta key after
    `META_API_KEY=` (`open -e ~/.config/reeltale/secrets.env`), submit the Meta credit form (team id from dev.meta.ai).
-2. Claude: rebuild the web export in apps/mobile with the public values (the same values as `cf:build` in
+2. Claude (only needed again after code changes): rebuild the web export in apps/mobile with the public values (the same values as `cf:build` in
    apps/server/package.json: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY`, `CI=1 npx expo export --platform web
    --clear --output-dir dist`), then `cd apps/server && npx wrangler deploy`. Pipe the Meta key without printing it:
    `printf %s "$(grep '^META_API_KEY=' ~/.config/reeltale/secrets.env | cut -d= -f2-)" | npx wrangler secret put META_API_KEY`
