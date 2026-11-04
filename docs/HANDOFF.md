@@ -2,6 +2,45 @@
 
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
+## Nov 4 (afternoon): NEXT SESSION, START HERE
+**Deadline: TODAY, Tue Nov 4, 9:00 PM Eastern (Kaan's Indianapolis time).** The Meta credit form closes then too
+(credits land within 2 business days, so they cover judging, not today; calls today bill Kaan's card, capped by
+`ai_daily_cap_micros` = $20/day; offer to lower it to $5 with one SQL line).
+
+Where things are:
+- **Live:** https://reeltale.net runs commit `1e772be` (deployed with local `npx wrangler deploy`, version 9aaf39fb).
+- **Pushed to GitHub but NOT deployed:** `abd735d` (R2 limits) and the website demo switch commit after it. Deploying
+  needs the R2 migration pushed first (the Worker calls `svc.r2_reserve` / `svc.r2_has_room`).
+- **Supabase:** migrations through `20261101090000` pushed + seeded, `supabase config push` done.
+  `20261104090000_r2_limits.sql` is pending (Kaan's `db push`).
+- **Worker secrets:** `SUPABASE_SECRET_KEY`, `IP_HASH_SECRET` OK. `META_API_KEY` is set but EMPTY, and the secrets file's
+  line is empty too. Check by length only: `awk -F= '/^META_API_KEY=/{print length($2)}' ~/.config/reeltale/secrets.env`.
+- **Website demo switch** (new, tested, not deployed): `/?demo=1` puts the tab in demo mode (sample catalog and a
+  sample AI story, nothing sent anywhere); the landing's second button "Explore the demo" does that; the ribbon has
+  "Leave the demo" (`/?demo=0`). Needed because signed-in users see an EMPTY catalog (no series in the database, no
+  footage). Judges: demo link for the catalog, sign in for live AI stories.
+
+Next steps, in order:
+1. Kaan: `supabase db push --include-seed` (with `SUPABASE_DB_PASSWORD` from secrets.env), put the Meta key after
+   `META_API_KEY=` (`open -e ~/.config/reeltale/secrets.env`), submit the Meta credit form (team id from dev.meta.ai).
+2. Claude: rebuild the web export in apps/mobile with the public values (the same values as `cf:build` in
+   apps/server/package.json: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY`, `CI=1 npx expo export --platform web
+   --clear --output-dir dist`), then `cd apps/server && npx wrangler deploy`. Pipe the Meta key without printing it:
+   `printf %s "$(grep '^META_API_KEY=' ~/.config/reeltale/secrets.env | cut -d= -f2-)" | npx wrangler secret put META_API_KEY`
+   (check that it's non-empty first). Then `node apps/server/scripts/meta-smoke.ts <scratch dir>` (about $0.10).
+3. Check live: `/?demo=1` → Explore the demo → catalog, watch, story; Leave the demo; Kaan signs in by email code
+   (Supabase's default mail only reaches org members: fine for him) and starts a real AI story.
+4. Judge accounts (RUNBOOK step 9): password users with auto-confirm + an access code row. Production DB writes
+   from Claude may be refused by the auto-mode classifier: give Kaan the command or SQL.
+5. `docs/HACKATHON.md`: write-up (Meta usage table, judge walkthrough, access paths) + a 2–3 min video script; Kaan
+   records. Submission: video, write-up, repo (make it PUBLIC: GitHub → Settings → visibility), site + `/?demo=1`.
+
+Classifier notes: Claude's `supabase db push` was refused as a production deploy; `wrangler deploy`,
+`wrangler secret put`, `git push` and `supabase projects/orgs create` went through.
+Known gaps: per-track adversarial reviews never ran; live mode not yet tested end to end (sign-in, AI, voice);
+Turnstile not set (the /notice form shows the support e-mail); the Cloudflare Web Analytics beacon is blocked by
+our CSP (harmless; Kaan can switch it off on the zone).
+
 ## Nov 4: go-live in progress (deadline TODAY, 9:00 PM Eastern)
 - **Website done:** the four tracks (catalog, watch, story + voice choice, landing + /about + /notice) finished on the
   resumed run `wf_e796e842-ee0`. App/core/Worker tsc clean; core, Worker (166) and DB tests pass. Their adversarial

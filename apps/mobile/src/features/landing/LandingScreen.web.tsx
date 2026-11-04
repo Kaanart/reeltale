@@ -15,6 +15,7 @@ import { Heading } from './components/Heading';
 import { BASE_W, HeroVisual } from './components/HeroVisual';
 import { PublicPageEnd } from './components/PublicLinks';
 import { useMetaDescription } from './components/useMetaDescription';
+import { enterWebDemo } from '../../lib/env';
 import { aiSteps, heroActions, landingRedirect, MODEL_NAMES, type AiStep, type HeroAction } from './logic/landing';
 
 // The landing page at '/' (web only; LandingScreen.tsx is the native stand-in that opens sign-in). Visitors
@@ -198,8 +199,14 @@ function Actions({ primary, secondary, onDemo, centered = false, testPrefix }: {
   const { t } = useTranslation();
   const { isCompact } = useLayout();
   const render = (action: HeroAction, variant: 'primary' | 'secondary') =>
-    action.kind === 'demo' ? (
-      <CtaButton label={t('landing:cta.demo')} onPress={onDemo} variant={variant} block={isCompact} testID={`${testPrefix}-demo`} />
+    action.kind === 'demo' || action.kind === 'demoSite' ? (
+      <CtaButton
+        label={t('landing:cta.demo')}
+        onPress={action.kind === 'demo' ? onDemo : enterWebDemo}
+        variant={variant}
+        block={isCompact}
+        testID={`${testPrefix}-demo`}
+      />
     ) : (
       <CtaLink href={action.href} label={t(action.labelKey)} variant={variant} block={isCompact} testID={`${testPrefix}-${variant}`} />
     );
@@ -210,7 +217,7 @@ function Actions({ primary, secondary, onDemo, centered = false, testPrefix }: {
         {render(primary, 'primary')}
         {render(secondary, 'secondary')}
       </View>
-      {primary.kind === 'demo' ? (
+      {primary.kind === 'demo' || secondary.kind === 'demoSite' ? (
         <Text variant="caption" color="inkMuted" align={centered ? 'center' : undefined}>
           {t('landing:cta.demoHint')}
         </Text>

@@ -2,6 +2,11 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: "Explore the demo" on the live website
+- Signed-in users see an empty catalog (no footage, no series in the database), so judges need the sample catalog:
+  `/?demo=1` switches the tab into demo mode (sessionStorage `reeltale.demo`, `webDemoChoice` in lib/config.ts),
+  the live landing's second button is "Explore the demo", and the demo ribbon gets "Leave the demo". App tests 517.
+
 ## 2026-11-04: R2 limits, first deploy
 - Hard monthly R2 meter in Postgres (`svc.r2_reserve`, `svc.r2_has_room`), reserved before every R2 call in the
   scene and ingest workflows and the AI asset routes; new scenes refused with `storage_budget_exceeded` (503) before

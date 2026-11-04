@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text } from '../../../components/ui';
+import { isDemoSession, leaveWebDemo } from '../../../lib/env';
 import { colors, fonts, space } from '../../../theme/tokens';
 
 // Demo mode only: a slim "Demo" ribbon across the top of every screen, so nobody mistakes fixtures for
@@ -26,6 +27,14 @@ export function DemoFrame({ enabled, children }: { enabled: boolean; children: R
           {t('common:demo.badge')}
         </Text>
       </View>
+      {isDemoSession ? (
+        // The live website's demo (chosen with "Explore the demo"): one click back to the real site.
+        <Pressable role="link" accessibilityLabel={t('common:demo.leave')} onPress={leaveWebDemo} style={styles.leave}>
+          <Text variant="caption" style={styles.leaveText}>
+            {t('common:demo.leave')}
+          </Text>
+        </Pressable>
+      ) : null}
       <SafeAreaInsetsContext.Provider value={{ ...insets, top: 0 }}>
         <View style={styles.fill}>{children}</View>
       </SafeAreaInsetsContext.Provider>
@@ -44,4 +53,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.warn,
   },
   label: { fontFamily: fonts.sansBold, color: colors.ink },
+  leave: { alignItems: 'center', paddingVertical: space.xs, backgroundColor: colors.warn },
+  leaveText: { color: colors.ink, textDecorationLine: 'underline' },
 });

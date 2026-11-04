@@ -39,6 +39,8 @@ export function nativeStartPath(gate: SettledGate | null): string {
 export type HeroAction =
   /** Demo builds: straight into the demo account (AuthActions.enterDemo). */
   | { kind: 'demo' }
+  /** The live website: reload this tab into the demo (lib/env enterWebDemo). */
+  | { kind: 'demoSite' }
   /** A link to the sign-in screens. */
   | { kind: 'link'; href: string; labelKey: string };
 
@@ -54,7 +56,8 @@ export interface HeroActions {
 export function heroActions(isDemo: boolean): HeroActions {
   const signIn: HeroAction = { kind: 'link', href: GATE_PATHS.signedOut, labelKey: 'landing:cta.signIn' };
   if (isDemo) return { primary: { kind: 'demo' }, secondary: signIn };
-  return { primary: { kind: 'link', href: GATE_PATHS.signedOut, labelKey: 'landing:cta.start' }, secondary: signIn };
+  // Signing in is also in the top bar, so the second button offers the demo (judges, curious visitors).
+  return { primary: { kind: 'link', href: GATE_PATHS.signedOut, labelKey: 'landing:cta.start' }, secondary: { kind: 'demoSite' } };
 }
 
 // ---- How an AI scene is made -----------------------------------------------------------------------------

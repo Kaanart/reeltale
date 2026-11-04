@@ -81,7 +81,8 @@
   },
   "demo": {
     "badge": "Demo",
-    "a11y": "Demo mode. Sample data only."
+    "a11y": "Demo mode. Sample data only.",
+    "leave": "Leave the demo"
   },
   "shell": {
     "homeA11y": "ReelTale, Home",

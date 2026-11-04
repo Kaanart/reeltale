@@ -10,7 +10,20 @@
 // Demo mode also switches on by itself when Supabase isn't configured (see config.ts).
 
 import { Platform } from 'react-native';
-import { resolveConfig, type AppConfig } from './config';
+import { DEMO_SESSION_KEY, resolveConfig, webDemoChoice, type AppConfig } from './config';
+
+/** The website's "Explore the demo" switch for this tab (storage can be blocked: then it's off). */
+function webDemo(): boolean {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return false;
+  try {
+    const on = webDemoChoice(window.location.search, window.sessionStorage.getItem(DEMO_SESSION_KEY) === '1');
+    if (on) window.sessionStorage.setItem(DEMO_SESSION_KEY, '1');
+    else window.sessionStorage.removeItem(DEMO_SESSION_KEY);
+    return on;
+  } catch {
+    return false;
+  }
+}
 
 // Expo inlines EXPO_PUBLIC_* at build time only for direct `process.env.NAME` reads, so no destructuring.
 export const config: AppConfig = resolveConfig(
@@ -23,10 +36,22 @@ export const config: AppConfig = resolveConfig(
   {
     os: Platform.OS,
     webOrigin: Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : null,
+    webDemo: webDemo(),
   },
 );
 
 export const isDemo = config.demo;
+
+/** A live website tab in the demo by choice: it can leave again (DemoFrame). */
+export const isDemoSession = config.demoReason === 'session';
+
+/** Full page loads, so the config above is read again. Web only. */
+export function enterWebDemo() {
+  window.location.assign('/?demo=1');
+}
+export function leaveWebDemo() {
+  window.location.assign('/?demo=0');
+}
 
 /**
  * Where the public media bucket is served (covers, posters, previews). The database stores keys such as

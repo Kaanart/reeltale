@@ -34,7 +34,7 @@ test('the demo build offers the demo account first; the live build starts the no
   });
   assert.deepEqual(heroActions(false), {
     primary: { kind: 'link', href: '/welcome', labelKey: 'landing:cta.start' },
-    secondary: { kind: 'link', href: '/welcome', labelKey: 'landing:cta.signIn' },
+    secondary: { kind: 'demoSite' },
   });
 });
 

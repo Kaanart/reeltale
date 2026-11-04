@@ -3,6 +3,7 @@
 //
 // Demo mode (local fixtures, no network) is on when EXPO_PUBLIC_DEMO is '1', and also whenever
 // Supabase isn't configured or its key isn't a publishable one: the app then never talks to anything.
+// On the live website a visitor can also choose it ("Explore the demo": ?demo=1, kept for that tab).
 
 import { createApiClient } from '../core/api.ts';
 
@@ -19,10 +20,23 @@ export interface PlatformInfo {
   os: string;
   /** window.location.origin on the web; null elsewhere. */
   webOrigin?: string | null;
+  /** Web only: the visitor chose "Explore the demo" in this tab (see webDemoChoice). */
+  webDemo?: boolean;
 }
 
-/** Why demo mode is on: asked for, Supabase missing, or a key the app must not hold. */
-export type DemoReason = 'flag' | 'not_configured' | 'invalid_key';
+/** sessionStorage key that keeps a tab in the website's demo. */
+export const DEMO_SESSION_KEY = 'reeltale.demo';
+
+/** The website's demo switch: ?demo=1 turns it on for the tab, ?demo=0 off, otherwise what the tab remembered. */
+export function webDemoChoice(search: string, remembered: boolean): boolean {
+  const q = new URLSearchParams(search).get('demo');
+  if (q === '1') return true;
+  if (q === '0') return false;
+  return remembered;
+}
+
+/** Why demo mode is on: built in, chosen by a website visitor, Supabase missing, or a key the app must not hold. */
+export type DemoReason = 'flag' | 'session' | 'not_configured' | 'invalid_key';
 
 export interface AppConfig {
   supabaseUrl: string | null;
@@ -92,6 +106,7 @@ export function resolveConfig(raw: RawEnv, platform: PlatformInfo): AppConfig {
 
   let demoReason: DemoReason | null = null;
   if (raw.demo?.trim() === '1') demoReason = 'flag';
+  else if (platform.os === 'web' && platform.webDemo === true) demoReason = 'session';
   else if (!url || !key) demoReason = 'not_configured';
   else if (!isPublishableKey(key)) demoReason = 'invalid_key';
 
