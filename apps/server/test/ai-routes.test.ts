@@ -18,6 +18,10 @@ let bearer: string;
 const realFetch = globalThis.fetch;
 let rpcCalls: { fn: string; args: Record<string, unknown>; profile: string }[] = [];
 let rpc: (fn: string, args: Record<string, unknown>) => { status?: number; body: unknown } = () => ({ body: null });
+// The R2 meter (src/lib/r2.ts) is answered here and kept out of rpcCalls.
+let meter: string[] = [];
+let r2Room = true;
+let r2Over = false;
 
 before(async () => {
   const kp = await generateKeyPair('ES256');
@@ -32,6 +36,15 @@ before(async () => {
     const m = url.match(/^https:\/\/ai-routes\.supabase\.co\/rest\/v1\/rpc\/(\w+)$/);
     if (!m) throw new Error(`unexpected fetch ${url}`);
     const args = JSON.parse(String(init?.body)) as Record<string, unknown>;
+    if (m[1] === 'r2_has_room') {
+      meter.push('room');
+      return Response.json(r2Room);
+    }
+    if (m[1] === 'r2_reserve') {
+      meter.push(`${args.p_class}:${args.p_bytes}`);
+      if (r2Over) return Response.json({ message: 'storage_budget_exceeded', code: '54000' }, { status: 400 });
+      return new Response(null, { status: 204 });
+    }
     rpcCalls.push({ fn: m[1]!, args, profile: (init?.headers as Record<string, string>)['Content-Profile']! });
     const r = rpc(m[1]!, args);
     return new Response(JSON.stringify(r.body), { status: r.status ?? 200 });
@@ -42,6 +55,9 @@ after(() => {
 });
 beforeEach(() => {
   rpcCalls = [];
+  meter = [];
+  r2Room = true;
+  r2Over = false;
 });
 
 function bucket(objects: Record<string, string>) {
@@ -178,4 +194,26 @@ test('a start retried with the same request id is passed through and not launche
   assert.equal(rpcCalls[0]?.args.p_request_id, rid);
   assert.equal(created.length, 0);
   assert.equal((await call(e, '/api/ai/stories', { method: 'POST', body: { premise: PREMISE, request_id: 'nope' } })).status, 400);
+});
+
+test('the R2 meter: no new scene without room, and every asset read is reserved', async () => {
+  const { e, created } = env({ objects: { [`ai/${STORY}/${SCENE}/manifest.json`]: '{}', [`ai/${STORY}/${SCENE}/panel-1.webp`]: 'img' } });
+  rpc = () => ({ body: started });
+  r2Room = false;
+  const r = await call(e, '/api/ai/stories', { method: 'POST', body: { premise: PREMISE } });
+  assert.equal(r.status, 503);
+  assert.deepEqual(await r.json(), { error: 'storage_budget_exceeded' });
+  assert.equal((await call(e, `/api/ai/scenes/${SCENE}/choose`, { method: 'POST', body: { choice: 'a' } })).status, 503);
+  assert.equal(rpcCalls.length, 0, 'no coins held, nothing started');
+  assert.equal(created.length, 0);
+
+  rpc = () => ({ body: { allowed: true, manifest_key: `ai/${STORY}/${SCENE}/manifest.json` } });
+  meter = [];
+  assert.equal((await call(e, `/api/ai/scenes/${SCENE}/manifest`)).status, 200);
+  assert.equal((await call(e, `/api/ai/scenes/${SCENE}/assets/panel-1.webp`)).status, 200);
+  assert.deepEqual(meter, ['b:0', 'b:0']);
+  r2Over = true;
+  const over = await call(e, `/api/ai/scenes/${SCENE}/assets/panel-1.webp`);
+  assert.equal(over.status, 503);
+  assert.deepEqual(await over.json(), { error: 'storage_budget_exceeded' });
 });

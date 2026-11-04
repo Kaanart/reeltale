@@ -120,6 +120,7 @@ const CATALOG: Record<string, Entry> = {
   invalid_choice: e('invalid_choice'),
   scene_not_continuable: e('scene_not_continuable'),
   scene_in_progress: e('scene_in_progress'),
+  storage_budget_exceeded: e('storage_budget_exceeded'),
   generation_unavailable: e('generation_unavailable', 'retry', { retryable: true }),
 
   // Reports, blocks and editor tools.

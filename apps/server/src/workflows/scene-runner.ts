@@ -47,7 +47,7 @@ export const CHEAP: StepConfig = { retries: { limit: 3, delay: '2 seconds', back
 
 // Codes that are safe to store on the job (users can read ai_jobs.error_code). Anything else is logged
 // and stored as generation_failed, so provider or database messages never reach the client.
-const KNOWN_CODES = new Set(['job_budget_exceeded', 'daily_budget_exceeded', 'job_not_running', 'meta_not_configured', 'story_not_planned']);
+const KNOWN_CODES = new Set(['job_budget_exceeded', 'daily_budget_exceeded', 'storage_budget_exceeded', 'job_not_running', 'meta_not_configured', 'story_not_planned']);
 
 /** Decide whether an error from a step should stop the job, and with which code. */
 function stopCode(e: unknown): string | null {

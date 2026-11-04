@@ -52,6 +52,7 @@
   "invalid_choice": "That choice isn’t available.",
   "scene_not_continuable": "The story can’t go on from this scene.",
   "scene_in_progress": "Your next scene is already being made.",
+  "storage_budget_exceeded": "AI stories are paused for now. No coins were taken. Please try again later.",
   "generation_unavailable": "We couldn’t start your scene. Your coins will be returned. Please try again.",
   "target_not_found": "We couldn’t find what you’re reporting. It may already be gone.",
   "invalid_reason": "Pick a reason for your report.",

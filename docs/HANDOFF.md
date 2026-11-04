@@ -9,7 +9,13 @@ Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D
 - **Supabase:** org `Euragnos` (Free plan; upgrade to Pro later), project `reeltale`, ref `ildqgaekqsawgsveclkv`,
   Frankfurt. DB password in `~/.config/reeltale/secrets.env` (`SUPABASE_DB_PASSWORD`). Repo linked.
   `supabase/config.toml` added (exposes `svc`, access-token hook, site URL, password min 12) for `supabase config push`.
-- **Worker secrets set:** `SUPABASE_SECRET_KEY`, `META_API_KEY`, `IP_HASH_SECRET` (also in secrets.env). Not set:
+- **Live:** https://reeltale.net deployed from local (`wrangler deploy`, version 9aaf39fb), db pushed + seeded, config
+  pushed, R2 buckets exist. Health, CSP and auth on /api/ai checked with curl.
+- **R2 limits** (`20261104090000_r2_limits.sql`, `src/lib/r2.ts`): every R2 read/write reserved in Postgres first,
+  refused at 80% of the free tier (800k class A, 8M class B a month, 8 GB stored); new scenes check room first.
+  Needs Kaan's `db push` BEFORE the next Worker deploy.
+- **Worker secrets set:** `SUPABASE_SECRET_KEY`, `IP_HASH_SECRET` (also in secrets.env). `META_API_KEY` was uploaded
+  EMPTY (the secrets file's value is empty; my check masked it): AI is off until Kaan fills it and it is re-put. Not set:
   `TURNSTILE_SECRET` (the /notice form then shows the support e-mail), Stream/RevenueCat (not needed for judging).
   Public Supabase URL + publishable key are in `wrangler.jsonc` and baked into `cf:build`, so Workers Builds needs no
   variables.

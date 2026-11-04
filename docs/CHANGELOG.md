@@ -2,6 +2,14 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: R2 limits, first deploy
+- Hard monthly R2 meter in Postgres (`svc.r2_reserve`, `svc.r2_has_room`), reserved before every R2 call in the
+  scene and ingest workflows and the AI asset routes; new scenes refused with `storage_budget_exceeded` (503) before
+  coins are held. Caps in `pricing_config` at 80% of the free tier. Tests: DB 3 new, Worker 1 new.
+- First production deploy from local `wrangler deploy` (Workers Builds isn't connected).
+- Didn't work: the `META_API_KEY` Worker secret was piped from an empty line in secrets.env (a masked check read it
+  as set); the Meta smoke test caught it.
+
 ## 2026-11-04: website for judging, first go-live steps
 - Web shell (top nav on web >= 768 px, layout primitives, footer, page titles, public `/`, `/about`, `/notice`,
   `accentStrong` for text on accent) and four tracks: catalog on desktop (hero, shelves, Discover filter sidebar,

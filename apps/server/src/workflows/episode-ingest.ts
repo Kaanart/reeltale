@@ -8,6 +8,7 @@ import {
 import { NonRetryableError } from 'cloudflare:workflows';
 import type { Env } from '../env.ts';
 import { serviceDb } from '../lib/db.ts';
+import { reserveRead, reserveWrite } from '../lib/r2.ts';
 import { signPlaybackToken } from '../lib/stream.ts';
 import {
   captionState, captionVtt, deleteVideo, fetchImage, generateCaptions, thumbnailUrl, type StreamApi,
@@ -44,6 +45,7 @@ export function ingestIO(env: Env): IngestIO {
       await deleteVideo(api(), assetId);
     },
     async putPublic(key, bytes, contentType) {
+      await reserveWrite(env, bytes);
       await env.MEDIA.put(key, bytes, { httpMetadata: { contentType, cacheControl: IMMUTABLE } });
     },
     async deletePublic(keys) {
@@ -51,9 +53,11 @@ export function ingestIO(env: Env): IngestIO {
     },
     // Review frames are creator media, kept only for the review: the private bucket, deleted afterwards.
     async putPrivate(key, bytes, contentType) {
+      await reserveWrite(env, bytes);
       await env.AI_ASSETS.put(key, bytes, { httpMetadata: { contentType } });
     },
     async getPrivate(key) {
+      await reserveRead(env);
       const obj = await env.AI_ASSETS.get(key);
       if (!obj) throw new Error(`missing frame ${key}`);
       return new Uint8Array(await obj.arrayBuffer());

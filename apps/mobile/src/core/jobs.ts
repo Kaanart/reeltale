@@ -48,7 +48,7 @@ export const JOB_KEYS: readonly string[] = [
 /** The message for a failed job's error_code. Blocked scenes are refunded like failed ones. */
 export function jobFailureKey(errorCode: string | null | undefined): string {
   if (errorCode && errorCode.startsWith('blocked')) return 'ai:failure.blocked';
-  if (errorCode === 'daily_budget_exceeded') return 'ai:failure.paused';
+  if (errorCode === 'daily_budget_exceeded' || errorCode === 'storage_budget_exceeded') return 'ai:failure.paused';
   return 'ai:failure.failed';
 }
 

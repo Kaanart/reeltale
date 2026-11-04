@@ -56,7 +56,7 @@ const CLIENT_SAFE_DB_ERRORS = new Set([
   'code_used_up', 'upload_not_allowed', 'upload_consent_required', 'ai_access_required', 'rate_limited',
   'episode_not_ready', 'series_not_found', 'invalid_date_of_birth', 'date_of_birth_already_set',
   'ai_consent_required', 'mode_unavailable', 'invalid_choice', 'scene_not_found', 'scene_not_continuable',
-  'scene_in_progress',
+  'scene_in_progress', 'storage_budget_exceeded',
   // Trust & safety (notice form, editor tools)
   'not_found', 'report_not_found', 'report_mismatch', 'not_eligible', 'conflict_of_interest', 'not_an_editor',
   'invalid_ground', 'invalid_statement', 'invalid_decision', 'invalid_status', 'invalid_version', 'invalid_target',
@@ -69,6 +69,7 @@ function statusFor(error: string): number {
   if (error === 'not_an_editor' || error === 'conflict_of_interest') return 403;
   if (error === 'not_found' || error.endsWith('_not_found')) return 404;
   if (error === 'rate_limited') return 429;
+  if (error === 'storage_budget_exceeded') return 503;
   if (error.startsWith('invalid_') || error === 'mode_unavailable') return 400;
   return 409;
 }

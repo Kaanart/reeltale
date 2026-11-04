@@ -6,6 +6,7 @@ import { NonRetryableError } from 'cloudflare:workflows';
 import { PROMPT_VERSION } from '@reeltale/shared';
 import type { Env } from '../env.ts';
 import { serviceDb } from '../lib/db.ts';
+import { reserveRead, reserveWrite } from '../lib/r2.ts';
 import { sha256Hex } from '../lib/crypto.ts';
 import { createMetaClient } from '../ai/meta.ts';
 import type { SceneDeps } from '../ai/scene.ts';
@@ -22,10 +23,12 @@ export function workerIO(env: Env): RunnerIO {
   return {
     rpc: (fn, args) => db.rpc(fn, args),
     async getText(key) {
+      await reserveRead(env);
       const obj = await env.AI_ASSETS.get(key);
       return obj ? obj.text() : null;
     },
     async putText(key, text, contentType) {
+      await reserveWrite(env, text);
       await env.AI_ASSETS.put(key, text, { httpMetadata: { contentType } });
     },
     deps(jobId, endUserId): SceneDeps {
@@ -33,9 +36,11 @@ export function workerIO(env: Env): RunnerIO {
       return {
         meta: createMetaClient({ apiKey: env.META_API_KEY, endUserId }),
         async put(key, bytes, contentType) {
+          await reserveWrite(env, bytes);
           await env.AI_ASSETS.put(key, bytes, { httpMetadata: { contentType } });
         },
         async get(key) {
+          await reserveRead(env);
           const obj = await env.AI_ASSETS.get(key);
           if (!obj) throw new Error(`missing asset ${key}`);
           return new Uint8Array(await obj.arrayBuffer());

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { AppContext } from '../env.ts';
 import { serviceDb } from '../lib/db.ts';
 import { dbErrorResponse, jsonError } from '../lib/http.ts';
+import { r2HasRoom, reserveRead } from '../lib/r2.ts';
 
 export const aiRoutes = new Hono<AppContext>();
 
@@ -38,6 +39,8 @@ aiRoutes.post('/stories', async (c) => {
   if (!body.success) return jsonError(c, 400, 'bad_request');
   let r: Started;
   try {
+    // Before coins are held or any model is called: a scene that couldn't be stored would be wasted.
+    if (!(await r2HasRoom(c.env))) return jsonError(c, 503, 'storage_budget_exceeded');
     r = await serviceDb(c.env).rpc<Started>('ai_start_story', {
       p_user: c.get('userId'), p_premise: body.data.premise, p_tags: body.data.tags, p_mode: body.data.mode,
       p_request_id: body.data.request_id ?? null,
@@ -58,6 +61,7 @@ aiRoutes.post('/scenes/:sceneId/choose', async (c) => {
   if (!scene.success || !body.success) return jsonError(c, 400, 'bad_request');
   let r: Started;
   try {
+    if (!(await r2HasRoom(c.env))) return jsonError(c, 503, 'storage_budget_exceeded');
     r = await serviceDb(c.env).rpc<Started>('ai_choose', { p_user: c.get('userId'), p_parent_scene: scene.data, p_choice: body.data.choice });
   } catch (err) {
     return dbErrorResponse(c, err);
@@ -80,6 +84,11 @@ aiRoutes.get('/scenes/:sceneId/manifest', async (c) => {
     return dbErrorResponse(c, err);
   }
   if (!access.allowed || !access.manifest_key) return jsonError(c, 404, 'not_available');
+  try {
+    await reserveRead(c.env);
+  } catch (err) {
+    return dbErrorResponse(c, err);
+  }
   const obj = await c.env.AI_ASSETS.get(access.manifest_key);
   if (!obj) return jsonError(c, 404, 'not_available');
   c.header('Cache-Control', 'private, max-age=300');
@@ -101,6 +110,11 @@ aiRoutes.get('/scenes/:sceneId/assets/:file', async (c) => {
   if (!access.allowed || !access.manifest_key) return jsonError(c, 404, 'not_available');
   // manifest_key is ai/<story>/<scene>/manifest.json; assets sit next to it.
   const key = access.manifest_key.replace(/manifest\.json$/, file);
+  try {
+    await reserveRead(c.env);
+  } catch (err) {
+    return dbErrorResponse(c, err);
+  }
   const obj = await c.env.AI_ASSETS.get(key);
   if (!obj) return jsonError(c, 404, 'not_available');
   c.header('Cache-Control', 'private, max-age=86400, immutable');
