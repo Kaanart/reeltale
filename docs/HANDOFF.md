@@ -3,6 +3,12 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **Higgsfield set up (for the pitch video):** CLI `@higgsfield/cli` 1.2.2 installed globally (security-checked:
+  postinstall downloads the `hf` binary from higgsfield-ai/cli releases with a SHA-256 check). Use the command
+  `higgsfield`, NOT `hf` (on this Mac `hf` is Hugging Face's CLI from Anaconda). Skills `higgsfield-ai/skills`
+  (9, incl. video-explainer, faceless-video, generate) installed user-level in `~/.claude/skills` (checked: no
+  secrets access, network only to Higgsfield GitHub/Google Fonts). Kaan signs in with `higgsfield auth login`,
+  then `higgsfield workspace set <id>` if asked. Plan: hybrid video (labelled AI b-roll + real site clips + captions).
 - **Pitch + video script:** `docs/VIDEO.md` now holds the judge pitch (positioning "WebNovel for short video, open
   to every creator, with stories you can steer"; avoid "first": TikTok Series exists), a 90-word form pitch, the
   2:30 script and an optional labelled AI intro-clip prompt.
