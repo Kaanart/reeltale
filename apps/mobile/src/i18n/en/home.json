@@ -5,7 +5,8 @@
     "demo": {
       "title": "Try the demo story",
       "body": "Pick what happens next in a short story made with AI.",
-      "cta": "Start the demo"
+      "cta": "Start the demo",
+      "detail": "Your choices steer it. Each new scene is written and drawn with AI."
     },
     "continueWatching": "Continue watching",
     "progress": "{{percent}}% watched",
@@ -21,7 +22,17 @@
     "empty": "Nothing to show yet. Check back soon.",
     "seeAllA11y": "See all {{title}}",
     "continueA11y": "Continue {{title}}, {{episode}}, {{progress}}",
-    "cardMeta": "{{format}} · {{status}}"
+    "cardMeta": "{{format}} · {{status}}",
+    "hero": {
+      "details": "Details",
+      "detailsA11y": "Details of {{title}}",
+      "playA11y": "Play {{title}}, episode {{number}}",
+      "continueA11y": "Continue {{title}}, episode {{number}}"
+    },
+    "shelf": {
+      "previousA11y": "Previous in {{title}}",
+      "nextA11y": "Next in {{title}}"
+    }
   },
   "discover": {
     "title": "Discover",
@@ -46,7 +57,11 @@
       "editorsPicks": "Editor’s Picks",
       "aiStories": "AI Stories"
     },
-    "resultMeta": "{{format}} · {{episodes}}"
+    "resultMeta": "{{format}} · {{episodes}}",
+    "rankingsA11y": "Browse",
+    "resultsA11y": "Results",
+    "resultsFor": "Results for “{{query}}”",
+    "showMore": "Show more"
   },
   "library": {
     "title": "Library",

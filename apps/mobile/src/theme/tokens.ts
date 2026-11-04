@@ -9,6 +9,13 @@ export const colors = {
   line: '#E7E1D8',
   accent: '#E8553D',
   accentPressed: '#C8432E',
+  // The brand accent is decoration only: white on it is 3.6:1. Text-bearing accent surfaces (primary buttons,
+  // selected chips) and accent-coloured text use accentStrong: white on it is 5.5:1, on bg 5.3:1 (same hue).
+  // Checked in src/core/__tests__/contrast.test.ts.
+  accentStrong: '#BF3722',
+  accentStrongPressed: '#A42713',
+  /** Text and icons on accentStrong. */
+  onAccent: '#FFFFFF',
   coin: '#F2B33D',
   ai: '#5B5BD6',
   success: '#2F9E6E',
@@ -27,6 +34,36 @@ export const space = {
   lg: 16,
   xl: 24,
   xxl: 32,
+  xxxl: 48,
+} as const;
+
+// Web layout (src/components/layout, README "Web layout"). Window width decides the size class:
+// compact < medium (768) <= medium < wide (1100) <= wide.
+export const breakpoints = {
+  medium: 768,
+  wide: 1100,
+} as const;
+
+export const layout = {
+  /** Widest a page's content column gets (PageContainer width="content"). */
+  contentMaxWidth: 1200,
+  /** Long text and single-column screens (series page, settings). */
+  readingMaxWidth: 760,
+  /** Forms and small panels. */
+  narrowMaxWidth: 560,
+  /** Side gutters per size class. */
+  gutterCompact: 16,
+  gutterMedium: 24,
+  gutterWide: 32,
+  /** The web top navigation bar. */
+  navHeight: 64,
+  /** TwoColumn's side panel. */
+  sidePanelWidth: 360,
+  /** Keyboard focus ring on web. */
+  focusRingWidth: 2,
+  focusRingOffset: 2,
+  /** Smallest touch / click target. */
+  minTarget: 44,
 } as const;
 
 export const radius = {
@@ -82,6 +119,8 @@ export const type: Record<TypeVariant, TextToken> = {
 export const theme = {
   colors,
   space,
+  breakpoints,
+  layout,
   radius,
   motion,
   fonts,

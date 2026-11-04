@@ -14,7 +14,7 @@ const HIT_SLOP = { top: 10, bottom: 10, left: 4, right: 4 } as const;
 
 export function TagChip({ label, selected = false, onPress }: TagChipProps) {
   const text = (
-    <Text variant="caption" color={selected ? 'surface' : 'inkMuted'} numberOfLines={1} style={styles.label}>
+    <Text variant="caption" color={selected ? 'onAccent' : 'inkMuted'} numberOfLines={1} style={styles.label}>
       {label}
     </Text>
   );
@@ -44,7 +44,8 @@ const styles = StyleSheet.create({
     paddingVertical: space.xs,
     borderRadius: radius.chip,
   },
-  selected: { backgroundColor: colors.accent },
+  // White caption text on it: accentStrong (5.5:1), not the brand accent (3.6:1).
+  selected: { backgroundColor: colors.accentStrong },
   unselected: { backgroundColor: colors.surfaceAlt },
   pressed: { opacity: 0.7 },
   label: { fontFamily: fonts.sansMedium },

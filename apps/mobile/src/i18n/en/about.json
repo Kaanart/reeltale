@@ -1,0 +1,29 @@
+{
+  "pageTitle": "About",
+  "title": "About ReelTale",
+  "description": "Who makes ReelTale, why it exists, and how to reach us.",
+  "lead": "ReelTale is a home for short, serialized stories: vertical episodes in live action and stop-motion, and living comics made with AI that you steer with your choices.",
+  "who": {
+    "title": "Who makes it",
+    "body": "ReelTale is made by Euragnos B.V., a company in the Netherlands."
+  },
+  "hackathon": {
+    "title": "Built for the Meta hackathon",
+    "body": "We built ReelTale for the Meta Global AI Developer Hackathon in 2026. Its AI stories are made with Meta’s Muse models and SAM 3.1."
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "Questions, feedback or press? Email us:"
+  },
+  "legal": {
+    "title": "Legal",
+    "a11y": "Legal pages",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "community": "Community guidelines",
+    "aiPolicy": "AI policy",
+    "notice": "Report illegal content"
+  },
+  "adults": "ReelTale is for adults 18+.",
+  "home": "Back to ReelTale"
+}

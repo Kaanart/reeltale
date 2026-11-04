@@ -5,28 +5,29 @@ import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { NAV_ITEMS, useLayout } from '../../components/layout';
 import { colors, fonts, type as typeScale } from '../../theme/tokens';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-// The five tabs. Titles come from common:nav.*; each icon is outlined when idle and filled when active.
-const TABS: { name: string; title: string; icon: IconName; activeIcon: IconName }[] = [
-  { name: 'index', title: 'common:nav.home', icon: 'home-outline', activeIcon: 'home' },
-  { name: 'discover', title: 'common:nav.discover', icon: 'compass-outline', activeIcon: 'compass' },
-  { name: 'create', title: 'common:nav.create', icon: 'add-circle-outline', activeIcon: 'add-circle' },
-  { name: 'library', title: 'common:nav.library', icon: 'library-outline', activeIcon: 'library' },
-  { name: 'me', title: 'common:nav.me', icon: 'person-circle-outline', activeIcon: 'person-circle' },
-];
+// The five tabs (NAV_ITEMS in components/layout/logic.ts). Titles come from common:nav.*; each icon is
+// outlined when idle and filled when active. On the web at medium and wide widths the top bar (SiteShell)
+// replaces the bottom tab bar; phones and the native apps keep it. Page titles of the tabs come from the
+// shell (the tab's name) until a tab screen sets its own with usePageTitle().
 
 const ICON_SIZE = 24;
 // Room for a 24pt icon and a 16pt-line label (the default 49pt clips Inter labels), plus the home indicator.
 const TAB_BAR_HEIGHT = 56;
 
+const hiddenTabBar = () => null;
+
 export default function TabsLayout() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { hasTopNav } = useLayout();
   return (
     <Tabs
+      tabBar={hasTopNav ? hiddenTabBar : undefined}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.ink,
@@ -36,16 +37,16 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.bg },
       }}
     >
-      {TABS.map((tab) => (
+      {NAV_ITEMS.map((tab) => (
         <Tabs.Screen
-          key={tab.name}
-          name={tab.name}
+          key={tab.route}
+          name={tab.route}
           options={{
-            title: t(tab.title),
+            title: t(tab.labelKey),
             // The web would otherwise read the icon glyph too; native keeps React Navigation's "Me, tab, 5 of 5".
-            ...(Platform.OS === 'web' ? { tabBarAccessibilityLabel: t(tab.title) } : {}),
+            ...(Platform.OS === 'web' ? { tabBarAccessibilityLabel: t(tab.labelKey) } : {}),
             tabBarIcon: ({ focused, color }) => (
-              <Ionicons name={focused ? tab.activeIcon : tab.icon} size={ICON_SIZE} color={color} />
+              <Ionicons name={(focused ? tab.activeIcon : tab.icon) as IconName} size={ICON_SIZE} color={color} />
             ),
           }}
         />

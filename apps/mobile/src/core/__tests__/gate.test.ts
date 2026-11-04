@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { GATE_PATHS, gateFor, isAuthGate, redirectFor, stickyGate, termsAccepted, TERMS_VERSION, type Gate } from '../../lib/gate.ts';
+import {
+  GATE_PATHS, gateFor, isAuthGate, isPublicWebPath, pathOfSegments, PUBLIC_WEB_PATHS, redirectFor, stickyGate, termsAccepted,
+  TERMS_VERSION, type Gate,
+} from '../../lib/gate.ts';
 
 const ok = (ageStatus: 'unknown' | 'adult' | 'blocked', tosVersion: string | null = null) =>
   ({ status: 'ok', row: { ageStatus, tosVersion } }) as const;
@@ -60,4 +63,65 @@ test('feature routes outside the guarded groups send anyone not through the gate
   assert.equal(redirectFor('signedOut', ['(tabs)', 'discover']), null);
   assert.equal(redirectFor('signedOut', ['+not-found']), null);
   assert.equal(redirectFor('signedOut', []), null);
+});
+
+// ---- Public web pages (lib/gate.ts PUBLIC_WEB_PATHS) -------------------------------------------------------
+
+const NOT_THROUGH: Gate[] = ['signedOut', 'age', 'blocked', 'terms'];
+
+test('the public web pages are exactly /, /about and /notice', () => {
+  assert.deepEqual([...PUBLIC_WEB_PATHS], ['/', '/about', '/notice']);
+  for (const path of ['/', '/about', '/notice', '/about/', '/notice?x=1', '/about#top', '']) {
+    assert.equal(isPublicWebPath(path), true, path);
+  }
+  // Exact paths only: no sub-paths, look-alikes or other routes.
+  for (const path of ['/about/team', '/notice/123', '/aboutus', '/abo', '/series/about', '/wallet', '/discover', '/me', '/watch/1', '/redeem']) {
+    assert.equal(isPublicWebPath(path), false, path);
+  }
+});
+
+test('route segments map to their URL path without groups', () => {
+  assert.equal(pathOfSegments([]), '/');
+  assert.equal(pathOfSegments(['about']), '/about');
+  assert.equal(pathOfSegments(['(public)', 'about']), '/about');
+  assert.equal(pathOfSegments(['(public)']), '/');
+  assert.equal(pathOfSegments(['about', 'index']), '/about');
+  assert.equal(pathOfSegments(['series', '[slug]']), '/series/[slug]');
+});
+
+test('on the web, visitors and accounts not through the gate may open the public pages', () => {
+  for (const gate of NOT_THROUGH) {
+    assert.equal(redirectFor(gate, ['about'], { web: true }), null, `${gate} /about`);
+    assert.equal(redirectFor(gate, ['notice'], { web: true }), null, `${gate} /notice`);
+    assert.equal(redirectFor(gate, ['(public)', 'notice'], { web: true }), null, `${gate} /(public)/notice`);
+  }
+});
+
+test('the public list never opens anything else: every other route still goes to the gate screen', () => {
+  const featureRoutes: string[][] = [
+    ['series', '[slug]'], ['watch', '[episodeId]'], ['wallet'], ['settings'], ['story', 'new'], ['story', '[id]'],
+    ['report'], ['redeem'], ['vip'], ['about', 'team'], ['notice', '[id]'], ['(public)', 'wallet'],
+  ];
+  for (const gate of NOT_THROUGH) {
+    for (const segments of featureRoutes) {
+      assert.equal(redirectFor(gate, segments, { web: true }), GATE_PATHS[gate as keyof typeof GATE_PATHS], `${gate} ${segments.join('/')}`);
+    }
+  }
+});
+
+test('the native apps have no public pages: /about and /notice stay behind the gate there', () => {
+  for (const gate of NOT_THROUGH) {
+    const expected = GATE_PATHS[gate as keyof typeof GATE_PATHS];
+    assert.equal(redirectFor(gate, ['about']), expected, `${gate} default`);
+    assert.equal(redirectFor(gate, ['notice'], { web: false }), expected, `${gate} web: false`);
+  }
+});
+
+test('signed-in adults are never redirected (they land on the tabs at /), public page or not', () => {
+  for (const segments of [['about'], ['notice'], ['wallet'], ['(tabs)'], []]) {
+    assert.equal(redirectFor('ready', segments, { web: true }), null);
+    assert.equal(redirectFor('ready', segments), null);
+  }
+  // '/' itself: (tabs) is guarded by Stack.Protected, so redirectFor leaves it to the layout for every gate.
+  assert.equal(redirectFor('signedOut', ['(tabs)'], { web: true }), null);
 });

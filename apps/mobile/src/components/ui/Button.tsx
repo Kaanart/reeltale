@@ -22,11 +22,12 @@ export interface ButtonProps {
 
 const MIN_TARGET = 44;
 const HEIGHT: Record<ButtonSize, number> = { md: 48, sm: 36 };
-// The tokens have no "on accent" colour, so white text reuses colors.surface.
+// Text on the accent uses accentStrong behind it (white is 5.5:1 there; on the brand accent only 3.6:1), and
+// the ghost label is accentStrong on the page (5.3:1). src/core/__tests__/contrast.test.ts checks both.
 const LABEL_COLOR: Record<ButtonVariant, ColorName> = {
-  primary: 'surface',
+  primary: 'onAccent',
   secondary: 'ink',
-  ghost: 'accent',
+  ghost: 'accentStrong',
 };
 
 export function Button({
@@ -94,11 +95,11 @@ const styles = StyleSheet.create({
   },
   md: { height: HEIGHT.md },
   sm: { height: HEIGHT.sm, paddingHorizontal: space.md },
-  primary: { backgroundColor: colors.accent },
+  primary: { backgroundColor: colors.accentStrong },
   secondary: { backgroundColor: colors.surface, borderColor: colors.line },
   ghost: { backgroundColor: 'transparent' },
   fullWidth: { width: '100%' },
-  primaryPressed: { backgroundColor: colors.accentPressed },
+  primaryPressed: { backgroundColor: colors.accentStrongPressed },
   pressed: { opacity: 0.6 },
   disabled: { opacity: 0.5 },
   leading: { marginRight: space.sm },

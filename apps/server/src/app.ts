@@ -17,6 +17,7 @@ import { revenueCatWebhook } from './webhooks/revenuecat.ts';
 import { streamWebhook, sweepIngest } from './webhooks/stream.ts';
 import { userRoutes } from './routes/user.ts';
 import { aiRoutes } from './routes/ai.ts';
+import { voiceRoutes } from './routes/voice.ts';
 import { editorRoutes } from './routes/editor.ts';
 import { reportNotice } from './routes/report.ts';
 import { reviewBatch } from './moderation/review.ts';
@@ -59,6 +60,7 @@ app.use('/api/*', userRateLimit);
 app.use('/api/ai/*', aiRateLimit);
 app.route('/api', userRoutes);
 app.route('/api/ai', aiRoutes);
+app.route('/api/ai', voiceRoutes);
 app.route('/api/editor', editorRoutes);
 app.all('/api/*', (c) => jsonError(c, 404, 'not_found'));
 

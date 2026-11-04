@@ -9,6 +9,15 @@
     "cta": "Start writing",
     "priceDetail": "to begin, then {{scene}} for each new scene"
   },
+  "how": {
+    "title": "How it works",
+    "stepA11y": "Step {{number}}: {{text}}",
+    "write": "Write how your story begins, in a sentence or two.",
+    "plan": "Muse Wonder plans the story and Muse Image draws your characters.",
+    "scene": "Muse Spark writes each scene, Muse Image draws the panels, and SAM 3.1 frames each shot.",
+    "choose": "Choose what happens next: click, press 1, 2 or 3, or say it with Muse Voice Transcribe.",
+    "models": "Every step uses AI models from Meta."
+  },
   "stories": {
     "title": "Your stories",
     "untitled": "Untitled story",
@@ -49,7 +58,8 @@
       "body": "To turn your voice into text, we send the recording to an AI model from Meta.",
       "accept": "Allow",
       "decline": "Not now",
-      "manage": "You can change this any time in Settings."
+      "manage": "You can change this any time in Settings.",
+      "detail": "Only what you record after pressing the microphone is sent, and only to pick your choice. We don’t store the recording."
     }
   }
 }

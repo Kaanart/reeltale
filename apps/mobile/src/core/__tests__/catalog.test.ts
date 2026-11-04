@@ -461,7 +461,10 @@ test('nothing in the catalog sells anything or shows real money', () => {
 test('series made with AI always carry the AI badge wherever a series is drawn', () => {
   // Every place that draws a series cover also draws the badge for AI series.
   const drawers = OWN_FILES.filter((f) => /<Cover\b/.test(readFileSync(f, 'utf8'))).map((f) => f.slice(src.length + 'features/catalog/'.length));
-  assert.deepEqual(drawers.sort(), ['components/ContinueCard.tsx', 'components/SeriesRow.tsx', 'components/SeriesTile.tsx', 'screens/SeriesScreen.tsx']);
+  assert.deepEqual(drawers.sort(), [
+    'components/ContinueCard.tsx', 'components/FeaturedHero.tsx', 'components/SeriesRow.tsx', 'components/SeriesTile.tsx',
+    'screens/SeriesScreen.tsx', 'screens/SeriesWide.tsx',
+  ]);
   for (const f of drawers) {
     const text = readFileSync(join(src, 'features/catalog', f), 'utf8');
     assert.match(text, /<AIBadge/, f);

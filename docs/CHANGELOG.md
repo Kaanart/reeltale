@@ -2,6 +2,18 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: website for judging, first go-live steps
+- Web shell (top nav on web >= 768 px, layout primitives, footer, page titles, public `/`, `/about`, `/notice`,
+  `accentStrong` for text on accent) and four tracks: catalog on desktop (hero, shelves, Discover filter sidebar,
+  two-column series page), watch on desktop (9:16 player + side panel, unlock dialog), AI story on desktop + voice
+  choice (web mic → 16 kHz WAV → `POST /api/ai/transcribe` → Muse Voice Transcribe, `svc.voice_allowed`, migration
+  `20261101090000_voice.sql`), landing + About + DSA notice form (Turnstile).
+- Didn't work: the first run of the four tracks died on the session limit mid-way; the resume told each engineer to
+  finish the partial files. The per-track adversarial reviews died on the next limit and were not re-run.
+- Go-live: Supabase org/project created and linked from the CLI, Worker secrets piped from the CLI and secrets file
+  (never printed), public Supabase values in `wrangler.jsonc` and `cf:build`, `supabase/config.toml` for the dashboard
+  settings. `supabase db push` from Claude was refused by the auto-mode classifier (production): Kaan runs it.
+
 ## 2026-10-30: the app's screens
 - Built by a workflow: one foundation agent (clients, encrypted native session store, auth with the 18+ gate and
   Terms, gated routes, tabs, demo mode with fixtures and generated images), then catalog, watch, AI story and me tracks

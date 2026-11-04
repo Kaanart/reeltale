@@ -8,11 +8,12 @@
 //   scenes        what the player shows for a scene row and its latest job
 //   choices       what each of the three choices costs or leads to, and whether new ones can be asked for
 //   stories       how the Create tab lists the reader's stories
-//   playback      which text is up at a moment of the scene clock, and where "skip" jumps to
+//   playback      which text is up at a moment of the scene clock, and where "skip" and "previous" jump to
+//   keyboard      the player's keys on the web: Space, the arrows, 1 2 3
 
 import type { Choice, StoryManifest, Wallet } from '@reeltale/shared';
 import { AI_MAX_TAGS, AI_PREMISE_MAX, AI_PREMISE_MIN, type ChoiceId, type Started } from '../../core/api.ts';
-import type { ComicTimeline, RevealStep } from '../../core/comic.ts';
+import { panelIndexAt, type ComicTimeline, type RevealStep } from '../../core/comic.ts';
 import { describeJob, jobFailureKey, type JobView } from '../../core/jobs.ts';
 import type { TagRow } from '../../lib/types.ts';
 import type { AiConsentRow, AiJobRow, AiSceneRow, AiStoryRow } from './types.ts';
@@ -360,6 +361,17 @@ export function chooseOutcome(started: Pick<Started, 'status'>): 'open' | 'block
 }
 
 /**
+ * Can this choice be taken now? A path that couldn't be drawn never; one that costs a scene (new, or a failed one
+ * tried again) only while new scenes can be asked for (`newDisabled` false: consent given, the story still takes
+ * choices, the price known). The same rule for a tap, a key (1, 2, 3) and a spoken choice.
+ */
+export function choiceTakeable(choice: Pick<ChoiceView, 'state'>, newDisabled: boolean): boolean {
+  if (choice.state === 'blocked') return false;
+  const costs = choice.state === 'new' || choice.state === 'failed';
+  return !(costs && newDisabled);
+}
+
+/**
  * Can new scenes still be asked for? Only while the story is active: once an ending is reached the story
  * is completed and svc.ai_choose refuses every new path (scenes already made still open). Unknown (not
  * loaded yet) counts as open, and the server decides.
@@ -445,6 +457,78 @@ export function withLoadFailures<S extends { failed: boolean }>(sources: readonl
 export function skipTarget(timeline: ComicTimeline, positionMs: number): number {
   const next = timeline.panels.find((p) => p.startMs > positionMs);
   return next ? next.startMs : timeline.totalMs;
+}
+
+/** "Previous panel" within this long of a panel's start goes to the panel before; later, back to its own start. */
+export const PREVIOUS_RESTARTS_MS = 1500;
+
+/** Where "previous panel" (the left arrow) jumps: the start of this panel, or of the one before when just started. */
+export function previousTarget(timeline: ComicTimeline, positionMs: number): number {
+  if (timeline.panels.length === 0) return 0;
+  const i = panelIndexAt(timeline, positionMs);
+  const start = timeline.panels[i]!.startMs;
+  if (positionMs - start > PREVIOUS_RESTARTS_MS) return start;
+  return timeline.panels[Math.max(0, i - 1)]!.startMs;
+}
+
+/** The start of panel `index` (0-based) on the scene clock, clamped to the panels there are. */
+export function panelStartMs(timeline: ComicTimeline, index: number): number {
+  const last = timeline.panels.length - 1;
+  if (last < 0) return 0;
+  return timeline.panels[Math.min(last, Math.max(0, Math.floor(index)))]!.startMs;
+}
+
+// ---- Keyboard (web) --------------------------------------------------------------------------------------
+
+/** A keydown, as much of it as the player needs (useKeyboardShortcuts.web.ts builds it from the DOM event). */
+export interface KeyPress {
+  key: string;
+  ctrlKey: boolean;
+  metaKey: boolean;
+  altKey: boolean;
+  repeat: boolean;
+  /** The focused element: tag name (upper case), ARIA role, and whether it takes typing. Null: nothing focused. */
+  target: { tag: string; role: string | null; editable: boolean } | null;
+  /** A dialog is open ("How this scene was made"): it has the keyboard. */
+  inDialog: boolean;
+}
+
+export type PlayerShortcut =
+  | { action: 'toggle' }
+  | { action: 'previous' }
+  | { action: 'next' }
+  | { action: 'choose'; index: number };
+
+const TYPING_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+const TYPING_ROLES = new Set(['textbox', 'combobox', 'searchbox', 'slider', 'spinbutton']);
+const CONTROL_TAGS = new Set(['BUTTON', 'A', 'SUMMARY']);
+const CONTROL_ROLES = new Set(['button', 'link', 'checkbox', 'switch', 'radio', 'tab', 'menuitem', 'option']);
+
+/**
+ * The story player's keys: Space plays or pauses, the left and right arrows step through the panels, 1, 2 and 3
+ * take a choice. Nothing happens while the reader types, holds a modifier (browser shortcuts), or has a dialog
+ * open; Space on a focused button or link is left to that control (it presses it).
+ */
+export function playerShortcut(k: KeyPress): PlayerShortcut | null {
+  if (k.ctrlKey || k.metaKey || k.altKey || k.inDialog) return null;
+  const t = k.target;
+  if (t && (t.editable || TYPING_TAGS.has(t.tag) || (t.role !== null && TYPING_ROLES.has(t.role)))) return null;
+  switch (k.key) {
+    case ' ':
+    case 'Spacebar':
+      if (k.repeat || (t && (CONTROL_TAGS.has(t.tag) || (t.role !== null && CONTROL_ROLES.has(t.role))))) return null;
+      return { action: 'toggle' };
+    case 'ArrowLeft':
+      return { action: 'previous' };
+    case 'ArrowRight':
+      return { action: 'next' };
+    case '1':
+    case '2':
+    case '3':
+      return k.repeat ? null : { action: 'choose', index: Number(k.key) - 1 };
+    default:
+      return null;
+  }
 }
 
 /** The scene clock: `base` ms played before the current run, which started at `startedAt` (same clock as `now`). */

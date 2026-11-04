@@ -2,6 +2,10 @@
 // the visible page and its neighbours check the price and, only if the episode may be watched, ask for a
 // playback URL and mount a player (the neighbours paused); further pages show the poster or nothing.
 // A locked episode never asks for playback: it shows the poster and the way to the unlock sheet.
+//
+// Pausing is held by the screen (one paused episode at most), so a keyboard shortcut can pause too. On a wide
+// browser window (`theater`) the sound and caption buttons live in the side panel instead of on the video,
+// and the video keeps only the AI label and the progress bar; the page reports what it can control upward.
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,7 +13,7 @@ import { Image, type ImageSource } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View, type AccessibilityActionEvent } from 'react-native';
+import { Platform, Pressable, StyleSheet, View, type AccessibilityActionEvent } from 'react-native';
 
 import { AIBadge, Text } from '../../../components/ui';
 import { describeError, errorCodeOf } from '../../../core/errors';
@@ -28,6 +32,7 @@ import { IconButton } from './IconButton';
 import { DemoNotice, LoadingPanel, LockedPanel, MessagePanel } from './PagePanels';
 import { ProgressBar } from './ProgressBar';
 import { VideoSurface } from './VideoSurface';
+import type { ActiveControls } from './WatchPanel';
 
 const PLAY_ICON_SIZE = 64;
 const SETTINGS_ROUTE = '/settings' as string as Href;
@@ -43,6 +48,8 @@ export interface EpisodePageProps {
   inFront: boolean;
   muted: boolean;
   captions: boolean;
+  /** The viewer paused this episode (the screen forgets it when another page becomes visible). */
+  paused: boolean;
   /** Seconds to resume from (logic/progress.ts resumePosition). */
   startAt: number;
   /** The episode the screen was opened on: offer the unlock sheet once if it's locked. */
@@ -52,8 +59,13 @@ export interface EpisodePageProps {
   /** Room the screen's top bar takes, so the demo notice sits below it. */
   topInset: number;
   bottomInset: number;
+  /** A wide browser window: controls are in the side panel, the video carries less. */
+  theater?: boolean;
   onToggleMute: () => void;
   onToggleCaptions: () => void;
+  onSetPaused: (episodeId: string, paused: boolean) => void;
+  /** The visible page says what can be controlled now (the side panel's buttons follow it). */
+  onActiveControls?: (episodeId: string, controls: ActiveControls) => void;
   onAutoplayMuted: () => void;
   onUnlock: (episode: EpisodeRow) => void;
   onEnded: (episode: EpisodeRow) => void;
@@ -74,8 +86,9 @@ function posterOf(episode: EpisodeRow, series: SeriesRow): ImageSource | number 
 }
 
 function LivePage({
-  episode, series, role, height, columnWidth, inFront, muted, captions, startAt, offerUnlock, hasNext, hasPrevious,
-  topInset, bottomInset, onToggleMute, onToggleCaptions, onAutoplayMuted, onUnlock, onEnded, onStep,
+  episode, series, role, height, columnWidth, inFront, muted, captions, paused, startAt, offerUnlock, hasNext, hasPrevious,
+  topInset, bottomInset, theater = false, onToggleMute, onToggleCaptions, onSetPaused, onActiveControls, onAutoplayMuted,
+  onUnlock, onEnded, onStep,
 }: EpisodePageProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -91,7 +104,6 @@ function LivePage({
   const playbackQ = usePlayback(episode.id, near && mayRequestPlayback(view));
   const source = playbackQ.data ?? null;
 
-  const [paused, setPaused] = useState(false);
   const [ready, setReady] = useState(false);
   const [load, setLoad] = useState<LoadState>('ok');
   const [captionsAvailable, setCaptionsAvailable] = useState(false);
@@ -100,9 +112,14 @@ function LivePage({
 
   const playing = active && inFront && !paused && load !== 'failed';
 
-  // Swiping away and back plays again rather than staying paused.
+  // In a browser only the visible page can be reached. Tab onto a neighbour's Unlock button would scroll the
+  // pager to it and change the episode; `inert` (a DOM property) takes it out of the tab order and hides it
+  // from screen readers until it is the visible page.
+  const pageRef = useRef<View>(null);
   useEffect(() => {
-    if (!active) setPaused(false);
+    if (Platform.OS !== 'web') return;
+    const node = pageRef.current as unknown as { inert?: boolean } | null;
+    if (node) node.inert = !active;
   }, [active]);
 
   // Pausing (by the user, a swipe, or the screen going behind another) saves the position at once.
@@ -143,9 +160,9 @@ function LivePage({
   // The end: save, show the play button (a tap replays), and let the screen offer the next episode.
   const onEnd = useCallback(() => {
     flush();
-    setPaused(true);
+    onSetPaused(episode.id, true);
     onEnded(episode);
-  }, [flush, onEnded, episode]);
+  }, [flush, onSetPaused, onEnded, episode]);
 
   // A stream that fails is usually an expired link: fetch a new one once, then give up with a retry button.
   const onError = useCallback(() => {
@@ -203,13 +220,19 @@ function LivePage({
 
   const canControl = access === 'play' && source !== null && load !== 'failed';
   const controls = canControl && active;
+
+  // The visible page tells the screen what its side panel can offer.
+  useEffect(() => {
+    if (active) onActiveControls?.(episode.id, { canControl, captionsAvailable: canControl && captionsAvailable });
+  }, [active, canControl, captionsAvailable, episode.id, onActiveControls]);
+
   const actions = [
     ...(hasNext ? [{ name: 'next', label: t('watch:next.label') }] : []),
     ...(hasPrevious ? [{ name: 'previous', label: t('watch:previous') }] : []),
   ];
 
   return (
-    <View style={[styles.page, { height }]}>
+    <View ref={pageRef} style={[styles.page, { height }]}>
       <View style={[styles.column, { width: columnWidth }]}>
         {showPlayer && source ? (
           <VideoSurface
@@ -242,7 +265,7 @@ function LivePage({
         {controls ? (
           <Pressable
             style={styles.fill}
-            onPress={() => setPaused((p) => !p)}
+            onPress={() => onSetPaused(episode.id, !paused)}
             accessibilityRole="button"
             accessibilityLabel={paused ? t('watch:play') : t('watch:pause')}
             accessibilityActions={actions}
@@ -266,25 +289,32 @@ function LivePage({
         ) : null}
 
         <View style={[styles.bottom, { paddingBottom: bottomInset + space.md }]} pointerEvents="box-none">
-          <View style={styles.infoCard} pointerEvents="none">
-            {ai ? (
-              <View style={styles.aiBadge}>
-                <AIBadge size="sm" />
-              </View>
-            ) : null}
-            <Text variant="subheading" color="surface" numberOfLines={2}>
-              {episode.title}
-            </Text>
-            <Text variant="bodySmall" color="surface">
-              {t('common:episode.number', { number: episode.number })}
-            </Text>
-            {controls ? (
-              <View style={styles.progress}>
-                <ProgressBar position={time.position} duration={time.duration} label={t('watch:scrubber')} />
-              </View>
-            ) : null}
-          </View>
-          {controls ? (
+          {/* In the theatre the panel names the episode: the video keeps its AI label and the progress. */}
+          {!theater || ai || controls ? (
+            <View style={[styles.infoCard, theater && controls && styles.infoCardTheater]} pointerEvents="none">
+              {ai ? (
+                <View style={[styles.aiBadge, theater && !controls && styles.aiBadgeAlone]}>
+                  <AIBadge size="sm" />
+                </View>
+              ) : null}
+              {theater ? null : (
+                <>
+                  <Text variant="subheading" color="surface" numberOfLines={2}>
+                    {episode.title}
+                  </Text>
+                  <Text variant="bodySmall" color="surface">
+                    {t('common:episode.number', { number: episode.number })}
+                  </Text>
+                </>
+              )}
+              {controls ? (
+                <View style={[styles.progress, theater && styles.progressTheater]}>
+                  <ProgressBar position={time.position} duration={time.duration} label={t('watch:scrubber')} />
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+          {controls && !theater ? (
             <View style={styles.rail}>
               <IconButton
                 icon={muted ? 'volume-mute' : 'volume-high'}
@@ -336,8 +366,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     backgroundColor: colors.scrim,
   },
+  infoCardTheater: { flexGrow: 1, marginRight: 0 },
   aiBadge: { marginBottom: space.xs },
+  aiBadgeAlone: { marginBottom: 0 },
   progress: { marginTop: space.sm, minWidth: PROGRESS_MIN_WIDTH },
+  progressTheater: { marginTop: 0 },
   rail: { marginLeft: 'auto', alignItems: 'center' },
   railGap: { height: space.md },
 });

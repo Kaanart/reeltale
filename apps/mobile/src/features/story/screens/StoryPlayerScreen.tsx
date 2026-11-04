@@ -1,20 +1,22 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PageContainer, useLayout, usePageTitle } from '../../../components/layout';
 import { AIBadge, Button, Skeleton, Text } from '../../../components/ui';
 import { describeError } from '../../../core/errors';
 import { isDemo } from '../../../lib/data';
-import { colors, space } from '../../../theme/tokens';
+import { colors, layout, space } from '../../../theme/tokens';
 import { TextLink, useUserId } from '../../auth';
 import { reportHref } from '../../me';
 import { ComicPlayer } from '../components/ComicPlayer';
 import { HowMadeSheet } from '../components/HowMadeSheet';
 import { JobProgress } from '../components/JobProgress';
+import { PageHead } from '../components/PageHead';
 import { SceneChoices } from '../components/SceneChoices';
 import { SceneFailure } from '../components/SceneFailure';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -32,6 +34,11 @@ import {
 // couldn't be made says the coins came back and what to do next. Without `scene` it opens the scene made
 // last. The AI label is always on screen, "How this scene was made" shows the manifest's provenance, and
 // a finished scene can be reported (the Me track's /report route, target ai_scene).
+//
+// Two layouts. Phones and the apps: the story's own header bar, then one column. A laptop-sized browser window
+// (the site's top bar is showing): a page whose head (back, story title, AI label, "How this scene was made"
+// as a dialog) sits in the side column beside a large comic stage, with the narration, the choices and a
+// transcript of the panels below it (ComicPlayer layout 'split'). Keys there: Space, the arrows, 1 2 3.
 
 const MAX_WIDTH = 560;
 const ICON = 24;
@@ -53,6 +60,9 @@ export function StoryPlayerScreen() {
   const storyId = asUuid(params.id);
   const sceneParam = asUuid(params.scene);
   const [infoOpen, setInfoOpen] = useState(false);
+  const { hasTopNav } = useLayout();
+  // Not the story's title: it was written from the reader's own words, and browsers keep titles in their history.
+  usePageTitle(t('story:player.pageTitle'));
 
   const story = useStory(storyId);
   const latest = useLatestSceneId(storyId, !sceneParam);
@@ -114,7 +124,7 @@ export function StoryPlayerScreen() {
   };
 
   const loadError = (!storyId && 'not_found') || latestError || sceneError || (sceneParam === null && latest.data === null && 'not_found');
-  let body: React.ReactNode;
+  let body: ReactNode = null;
   if (loadError) {
     const info = describeError(loadError);
     body = (
@@ -151,15 +161,79 @@ export function StoryPlayerScreen() {
     );
   } else if (!manifest.data) {
     body = <Loading label={t('story:player.loading')} />;
-  } else {
-    body = (
+  }
+
+  const ready = !loadError && view?.phase === 'ready' && !!manifest.data && !!storyId && !!sceneId;
+  const player = (playerLayout: 'stacked' | 'split', header?: ReactNode, footer?: ReactNode) => (
+    manifest.data && storyId && sceneId ? (
       <ComicPlayer
         key={sceneId}
         sceneId={sceneId}
         manifest={manifest.data}
         showAfterAtOnce={(children.data?.length ?? 0) > 0}
         after={<SceneChoices storyId={storyId} sceneId={sceneId} manifest={manifest.data} storyStatus={story.data?.story.status ?? null} />}
+        layout={playerLayout}
+        header={header}
+        footer={footer}
       />
+    ) : null
+  );
+  const demoNote = isDemo && story.data?.sample ? (
+    <Text variant="bodySmall" color="inkMuted" style={styles.note}>
+      {t('story:player.demoSample')}
+    </Text>
+  ) : null;
+  const sceneNumber = scene ? (
+    <Text variant="caption" color="inkMuted" style={styles.sceneNumber}>
+      {t('story:player.scene', { number: scene.depth })}
+    </Text>
+  ) : null;
+  const report = ready && sceneId ? (
+    <View style={styles.report}>
+      <TextLink
+        label={t('story:player.reportScene')}
+        onPress={() => router.push(reportHref('ai_scene', sceneId))}
+        testID="story-report"
+      />
+    </View>
+  ) : null;
+  const howMade = <HowMadeSheet visible={infoOpen} onClose={() => setInfoOpen(false)} manifest={manifest.data ?? null} />;
+
+  if (hasTopNav) {
+    const head = (
+      <PageHead
+        title={title}
+        onBack={goBack}
+        variant={ready ? 'subheading' : 'title'}
+        right={(
+          <>
+            <AIBadge onPress={() => setInfoOpen(true)} testID="story-ai-badge" />
+            <Button
+              label={t('story:player.info')}
+              onPress={() => setInfoOpen(true)}
+              variant="secondary"
+              size="sm"
+              icon={<Ionicons name="information-circle-outline" size={ICON - space.xs} color={colors.ink} />}
+              testID="story-info"
+            />
+          </>
+        )}
+      >
+        {demoNote}
+        {sceneNumber}
+      </PageHead>
+    );
+    return (
+      <PageContainer testID="story-page">
+        <Stack.Screen options={{ title }} />
+        {ready ? player('split', head, report) : (
+          <View style={styles.deskColumn}>
+            {head}
+            <View style={styles.deskBody}>{body}</View>
+          </View>
+        )}
+        {howMade}
+      </PageContainer>
     );
   }
 
@@ -188,29 +262,13 @@ export function StoryPlayerScreen() {
       />
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.column}>
-          {isDemo && story.data?.sample ? (
-            <Text variant="bodySmall" color="inkMuted" style={styles.note}>
-              {t('story:player.demoSample')}
-            </Text>
-          ) : null}
-          {scene ? (
-            <Text variant="caption" color="inkMuted" style={styles.sceneNumber}>
-              {t('story:player.scene', { number: scene.depth })}
-            </Text>
-          ) : null}
-          {body}
-          {manifest.data && sceneId && view?.phase === 'ready' ? (
-            <View style={styles.report}>
-              <TextLink
-                label={t('story:player.reportScene')}
-                onPress={() => router.push(reportHref('ai_scene', sceneId))}
-                testID="story-report"
-              />
-            </View>
-          ) : null}
+          {demoNote}
+          {sceneNumber}
+          {ready ? player('stacked') : body}
+          {report}
         </View>
       </ScrollView>
-      <HowMadeSheet visible={infoOpen} onClose={() => setInfoOpen(false)} manifest={manifest.data ?? null} />
+      {howMade}
     </SafeAreaView>
   );
 }
@@ -231,6 +289,8 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   scroll: { flexGrow: 1, paddingHorizontal: space.lg, paddingVertical: space.lg },
   column: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
+  deskColumn: { width: '100%', maxWidth: layout.readingMaxWidth, alignSelf: 'center' },
+  deskBody: { marginTop: space.xl, width: '100%', maxWidth: MAX_WIDTH },
   note: { marginBottom: space.md },
   sceneNumber: { marginBottom: space.xs },
   message: { gap: space.md, alignItems: 'flex-start' },

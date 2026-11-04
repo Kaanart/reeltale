@@ -35,8 +35,8 @@ function resolves(key: string): boolean {
 
 test('there is one namespace per area of the app, and nothing else', () => {
   assert.deepEqual(Object.keys(namespaces), [
-    'age', 'ai', 'auth', 'common', 'create', 'editor', 'errors', 'home', 'profile', 'redeem', 'report', 'series',
-    'settings', 'story', 'studio', 'unlock', 'vip', 'wallet', 'watch',
+    'about', 'age', 'ai', 'auth', 'common', 'create', 'editor', 'errors', 'home', 'landing', 'notice', 'profile', 'redeem',
+    'report', 'series', 'settings', 'story', 'studio', 'unlock', 'vip', 'wallet', 'watch',
   ]);
   assert.ok(leaves.length > 700);
 });
@@ -177,14 +177,24 @@ test('typing DELETE is the confirmation, and the word is a string the screen com
 // ---- Rules for what the native apps may say ----------------------------------------------------------
 
 // App Store 3.1.1: no access codes, promo codes or pointers to buying elsewhere in the native apps. Strings are shared by every
-// platform, so only the `redeem` namespace (the web-only screen) may use this wording.
+// platform, so only the web-only namespaces may use this wording: `redeem` (the redeem screen) and the public web pages
+// (`landing`, `about`, `notice`). src/lib/i18n.ts loads them on the web only.
 const NOT_IN_NATIVE = /access code|promo|redeem|voucher|coupon|gift code|invite code|referral code|reeltale\.net|website|\bweb\b|\bbrowser\b|elsewhere|cheaper|discount code|license key/i;
+const WEB_ONLY_NAMESPACES = ['redeem', 'landing', 'about', 'notice'];
 
-test('only the web-only redeem namespace talks about codes and the website', () => {
-  const hits = leaves.filter((l) => l.ns !== 'redeem' && NOT_IN_NATIVE.test(l.text)).map((l) => `${l.ns}:${l.path}: ${l.text}`);
+test('only the web-only namespaces talk about codes and the website', () => {
+  const hits = leaves.filter((l) => !WEB_ONLY_NAMESPACES.includes(l.ns) && NOT_IN_NATIVE.test(l.text)).map((l) => `${l.ns}:${l.path}: ${l.text}`);
   assert.deepEqual(hits, []);
   // The check can fail: the web namespace does use the wording.
   assert.ok(leaves.some((l) => l.ns === 'redeem' && NOT_IN_NATIVE.test(l.text)));
+  // And the web-only namespaces really are web-only: i18n.ts registers them inside the web branch and nowhere else.
+  const setup = readFileSync(new URL('../../lib/i18n.ts', import.meta.url), 'utf8');
+  const webBranch = /Platform\.OS === 'web' \? \{([^}]*)\}/.exec(setup)?.[1] ?? '';
+  const always = setup.replace(/Platform\.OS === 'web' \? \{[^}]*\}/, '');
+  for (const ns of WEB_ONLY_NAMESPACES) {
+    assert.match(webBranch, new RegExp(`\\b${ns}\\b`), `${ns} is loaded on the web`);
+    assert.doesNotMatch(/const resources = \{([^\n]*)/.exec(always)?.[1] ?? '', new RegExp(`\\b${ns}\\b`), `${ns} is not loaded in the apps`);
+  }
 });
 
 test('error messages for codes are in the web-only namespace, so native screens cannot show them', () => {

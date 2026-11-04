@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "title": "Short series and living comics",
+    "description": "Watch short vertical series in live action and stop-motion, and steer living comics made with AI. For adults 18+."
+  },
+  "hero": {
+    "eyebrow": "Short vertical series · Living AI comics",
+    "title": "Stories you watch. Stories you steer.",
+    "lead": "ReelTale is a home for serialized short stories: vertical episodes in live action and stop-motion, a minute or two each, and living comics made with AI where you choose what happens next.",
+    "adults": "For adults 18+. You’ll confirm your date of birth when you sign up.",
+    "visualA11y": "Examples: a live-action series, a stop-motion series, and a living comic made with AI that ends with a choice."
+  },
+  "cta": {
+    "a11y": "Get started",
+    "demo": "Explore the demo",
+    "demoHint": "Sample stories on this device. No sign-up needed.",
+    "start": "Get started",
+    "signIn": "Sign in",
+    "code": "Have an access code?",
+    "codeHint": "Sign in first, then open your wallet and choose “Redeem an access code”."
+  },
+  "sample": {
+    "question": "What does Mara do?",
+    "caption": "At her feet: a bottle sealed with wax, and her own name on the label.",
+    "choiceA": "Open the bottle",
+    "choiceB": "Follow the stranger"
+  },
+  "formats": {
+    "title": "Three ways to tell a story",
+    "a11y": "Kinds of stories",
+    "liveAction": {
+      "title": "Live-action series",
+      "body": "Short episodes shot on camera and made for your phone, a minute or two each. Every series starts with free episodes."
+    },
+    "stopMotion": {
+      "title": "Stop-motion series",
+      "body": "Puppets, clay and cut paper, moved a frame at a time into short episodes you can watch in a coffee break."
+    },
+    "aiComics": {
+      "title": "Living comics",
+      "body": "Describe an idea and pick a few tags. A story is drawn for you with AI, panel by panel, and at the end of every scene you choose what happens next."
+    }
+  },
+  "how": {
+    "title": "How it works",
+    "a11y": "Three steps",
+    "steps": {
+      "watch": {
+        "title": "Watch the first episodes free",
+        "body": "Every series starts with free episodes. Swipe or scroll to the next one."
+      },
+      "unlock": {
+        "title": "Unlock the next ones",
+        "body": "Use coins, or the Free Pass you get every day. An episode you unlock stays unlocked."
+      },
+      "create": {
+        "title": "Start your own story",
+        "body": "Write a premise and a living comic is made for you with AI. Starting a story and each choice use coins; if a scene can’t be made, they’re refunded."
+      }
+    }
+  },
+  "ai": {
+    "title": "Made with AI, and always labelled",
+    "body": "Everything made with AI on ReelTale carries an AI label, like this one. Each scene also comes with “How this scene was made”: every step, and the model that did it.",
+    "safety": "Your idea is checked before anything is made. If a scene can’t be made safely, it stops there and your coins are refunded.",
+    "stepsTitle": "How a scene is made",
+    "stepsA11y": "The steps that make one scene",
+    "stepNumber": "Step {{number}}",
+    "yourTurn": "Your turn",
+    "modelA11y": "Model: {{model}}",
+    "steps": {
+      "check": {
+        "title": "Check the idea",
+        "body": "Your premise is read against our rules before anything is planned."
+      },
+      "plan": {
+        "title": "Plan the story",
+        "body": "The characters, the world, and where the story is heading."
+      },
+      "cast": {
+        "title": "Draw the cast",
+        "body": "A character sheet for everyone in the story, so faces and outfits stay the same in every panel."
+      },
+      "script": {
+        "title": "Write the scene",
+        "body": "Captions, dialogue, and the choices you get at the end."
+      },
+      "panels": {
+        "title": "Draw the panels",
+        "body": "Each panel is drawn from the script and the character sheets."
+      },
+      "review": {
+        "title": "Check the pictures",
+        "body": "The panels are checked against the script and the rules. A flawed panel is redrawn once; an unsafe scene is stopped."
+      },
+      "framing": {
+        "title": "Frame the shots",
+        "body": "The subject of each panel is found, so the camera can move to it. That’s what makes the comic come alive."
+      },
+      "voice": {
+        "title": "Say your choice",
+        "body": "Rather talk than tap? Say your choice out loud and it’s turned into text. The recording isn’t kept."
+      }
+    }
+  },
+  "adults": {
+    "mark": "18+",
+    "title": "For adults 18+",
+    "body": "ReelTale is for adults only. We ask for your date of birth when you sign up, and you can’t change it later. Series with mature themes stay hidden until you turn them on in Settings."
+  },
+  "closing": {
+    "title": "Take a look around",
+    "body": "Start with a free episode, or with a story of your own."
+  }
+}

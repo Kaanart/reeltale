@@ -111,6 +111,12 @@ const ENDINGS: Record<'a' | 'b' | 'c', DemoSceneTemplate> = {
 export const DEMO_BLOCKED_PATH = 'c';
 
 /**
+ * Demo mode's "Say your choice": the microphone records on the device only, nothing is sent, and this comes back
+ * as the transcript. It names choice b, which every demo scene with choices can take.
+ */
+export const DEMO_VOICE_TRANSCRIPT = 'The second one, please.';
+
+/**
  * The scene a path of choices leads to ('' is the opening, 'ab' is choice a then b), 'blocked' for the
  * path that can't be drawn, or null when there is no scene (past an ending).
  */

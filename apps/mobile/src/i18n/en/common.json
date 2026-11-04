@@ -82,5 +82,26 @@
   "demo": {
     "badge": "Demo",
     "a11y": "Demo mode. Sample data only."
+  },
+  "shell": {
+    "homeA11y": "ReelTale, Home",
+    "signIn": "Sign in",
+    "wallet": "Wallet",
+    "balance_one": "{{count, number}}",
+    "balance_other": "{{count, number}}",
+    "walletBalance_one": "Wallet: {{count, number}} coin",
+    "walletBalance_other": "Wallet: {{count, number}} coins"
+  },
+  "footer": {
+    "a11y": "Site links",
+    "about": "About",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "community": "Community guidelines",
+    "aiPolicy": "AI policy",
+    "notice": "Report illegal content",
+    "imprint": "ReelTale is made by Euragnos B.V., the Netherlands",
+    "adultsOnly": "For adults 18+",
+    "newTab": "{{label}} (opens in a new tab)"
   }
 }

@@ -2,14 +2,15 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
+import { focusRing, useInteraction } from '../../../components/layout';
 import { Text } from '../../../components/ui';
 import type { ChoiceId } from '../../../core/api';
 import { colors, fonts, radius, space } from '../../../theme/tokens';
-import type { ChoiceView } from '../logic';
+import { choiceTakeable, type ChoiceView } from '../logic';
 
 // The three choices at the end of a scene. Each says what tapping it does before it is tapped: open a
 // scene already made (free), wait for one being made, cost coins for a new one, or (calmly) that this
-// path can't be drawn.
+// path can't be drawn. On the web each card has a hover state and the keyboard focus ring.
 export interface ChoiceListProps {
   choices: readonly ChoiceView[];
   /** The choice being sent. */
@@ -41,55 +42,75 @@ export function ChoiceList({ choices, pending, newDisabled, onChoose }: ChoiceLi
       <Text variant="heading" accessibilityRole="header" style={styles.title}>
         {t('story:choices.title')}
       </Text>
-      {choices.map((c) => {
-        const costs = c.state === 'new' || c.state === 'failed';
-        const disabled = c.state === 'blocked' || pending !== null || (costs && newDisabled);
-        const busy = pending === c.id;
-        const info = meta(c);
-        return (
-          <Pressable
-            key={c.id}
-            onPress={() => onChoose(c)}
-            disabled={disabled}
-            accessibilityRole="button"
-            accessibilityLabel={[c.label, c.hint, info].filter((s) => s.trim() !== '').join('. ')}
-            accessibilityState={{ disabled, busy }}
-            style={({ pressed }) => [
-              styles.card,
-              c.state === 'blocked' && styles.blocked,
-              pressed && !disabled && styles.pressed,
-              disabled && c.state !== 'blocked' && !busy && styles.dim,
-            ]}
-            testID={`story-choice-${c.id}`}
-          >
-            <View style={[styles.letter, c.state === 'blocked' && styles.letterBlocked]}>
-              <Text variant="bodySmall" color={c.state === 'blocked' ? 'inkMuted' : 'surface'} style={styles.letterText}>
-                {c.id.toUpperCase()}
-              </Text>
-            </View>
-            <View style={styles.texts}>
-              <Text variant="subheading" color={c.state === 'blocked' ? 'inkMuted' : 'ink'}>
-                {c.label}
-              </Text>
-              {c.hint.trim() !== '' ? (
-                <Text variant="bodySmall" color="inkMuted">
-                  {c.hint}
-                </Text>
-              ) : null}
-              <View style={styles.meta}>
-                {costs ? <View style={styles.coin} /> : null}
-                {c.state === 'ready' ? <Ionicons name="checkmark-circle" size={ICON} color={colors.success} style={styles.metaIcon} /> : null}
-                {c.state === 'blocked' ? <Ionicons name="shield-checkmark-outline" size={ICON} color={colors.inkMuted} style={styles.metaIcon} /> : null}
-                <Text variant="caption" color={c.state === 'blocked' ? 'inkMuted' : 'ink'} style={styles.metaText}>
-                  {info}
-                </Text>
-              </View>
-            </View>
-            {busy ? <ActivityIndicator color={colors.ink} /> : null}
-          </Pressable>
-        );
-      })}
+      {choices.map((c) => (
+        <ChoiceCard
+          key={c.id}
+          choice={c}
+          info={meta(c)}
+          disabled={pending !== null || !choiceTakeable(c, newDisabled)}
+          busy={pending === c.id}
+          onPress={() => onChoose(c)}
+        />
+      ))}
     </View>
+  );
+}
+
+interface ChoiceCardProps {
+  choice: ChoiceView;
+  /** What taking it does: ready, being made, its cost, or that the path can't be drawn. */
+  info: string;
+  disabled: boolean;
+  busy: boolean;
+  onPress: () => void;
+}
+
+function ChoiceCard({ choice: c, info, disabled, busy, onPress }: ChoiceCardProps) {
+  const { hovered, focusVisible, handlers } = useInteraction();
+  const costs = c.state === 'new' || c.state === 'failed';
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={[c.label, c.hint, info].filter((s) => s.trim() !== '').join('. ')}
+      accessibilityState={{ disabled, busy }}
+      {...handlers}
+      style={({ pressed }) => [
+        styles.card,
+        c.state === 'blocked' && styles.blocked,
+        hovered && !disabled && styles.hovered,
+        pressed && !disabled && styles.pressed,
+        disabled && c.state !== 'blocked' && !busy && styles.dim,
+        focusVisible && focusRing,
+      ]}
+      testID={`story-choice-${c.id}`}
+    >
+      <View style={[styles.letter, c.state === 'blocked' && styles.letterBlocked]}>
+        <Text variant="bodySmall" color={c.state === 'blocked' ? 'inkMuted' : 'surface'} style={styles.letterText}>
+          {c.id.toUpperCase()}
+        </Text>
+      </View>
+      <View style={styles.texts}>
+        <Text variant="subheading" color={c.state === 'blocked' ? 'inkMuted' : 'ink'}>
+          {c.label}
+        </Text>
+        {c.hint.trim() !== '' ? (
+          <Text variant="bodySmall" color="inkMuted">
+            {c.hint}
+          </Text>
+        ) : null}
+        <View style={styles.meta}>
+          {costs ? <View style={styles.coin} /> : null}
+          {c.state === 'ready' ? <Ionicons name="checkmark-circle" size={ICON} color={colors.success} style={styles.metaIcon} /> : null}
+          {c.state === 'blocked' ? <Ionicons name="shield-checkmark-outline" size={ICON} color={colors.inkMuted} style={styles.metaIcon} /> : null}
+          <Text variant="caption" color={c.state === 'blocked' ? 'inkMuted' : 'ink'} style={styles.metaText}>
+            {info}
+          </Text>
+        </View>
+      </View>
+      {busy ? <ActivityIndicator color={colors.ink} /> : null}
+    </Pressable>
   );
 }
 
@@ -108,6 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   blocked: { backgroundColor: colors.surfaceAlt, borderStyle: 'dashed' },
+  hovered: { borderColor: colors.ink },
   pressed: { opacity: 0.7 },
   dim: { opacity: 0.5 },
   letter: {

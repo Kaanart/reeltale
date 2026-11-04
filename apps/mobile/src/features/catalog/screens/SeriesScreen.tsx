@@ -1,27 +1,28 @@
 import { FlashList } from '@shopify/flash-list';
-import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useLayout, usePageTitle } from '../../../components/layout';
 import { AIBadge, Button, Sheet, Skeleton, TagChip, Text } from '../../../components/ui';
-import { userKey } from '../../../lib/keys';
 import type { SeriesRow } from '../../../lib/types';
 import { colors, fonts, space } from '../../../theme/tokens';
-import { useAuth, useUserId } from '../../auth';
+import { useAuth } from '../../auth';
+import { headingLevel } from '../components/a11y';
 import { Cover } from '../components/Cover';
 import { DecorativeIcon } from '../components/DecorativeIcon';
 import { EpisodeRow } from '../components/EpisodeRow';
+import { IconButton } from '../components/IconButton';
 import { MaturityMarker } from '../components/MaturityMarker';
 import { EmptyState, ErrorState } from '../components/States';
 import { useSeriesText } from '../components/useSeriesText';
-import {
-  useCreator, useEpisodes, useIsFollowing, useRefreshOnFocus, useSeries, useSeriesProgress, useTags, useToggleFollow,
-} from '../hooks';
-import { isAiSeries, isFreeAiSeries, pickResume, SYNOPSIS_FOLD_LENGTH, tagLabel, tagsOfSeries, type EpisodeItem } from '../logic';
+import { useSeries } from '../hooks';
+import { isAiSeries, isFreeAiSeries, SYNOPSIS_FOLD_LENGTH, tagLabel } from '../logic';
 import { routes } from '../routes';
+import { useGoBack, useSeriesPage } from './seriesPage';
+import { SeriesWide, SeriesWideFrame } from './SeriesWide';
 
 const GUTTER = space.lg;
 const MAX_WIDTH = 760;
@@ -32,6 +33,28 @@ export function SeriesScreen() {
   const params = useLocalSearchParams<{ slug?: string | string[] }>();
   const slug = (Array.isArray(params.slug) ? params.slug[0] : params.slug) ?? '';
   const series = useSeries(slug);
+  const { hasTopNav } = useLayout();
+  // The series' own (reviewed, public) title in the browser tab.
+  usePageTitle(series.data?.title);
+
+  if (hasTopNav) {
+    if (series.isPending) return <SeriesWideFrame state="loading" />;
+    if (series.isError) {
+      return (
+        <SeriesWideFrame state="error">
+          <ErrorState error={series.error} onRetry={() => void series.refetch()} />
+        </SeriesWideFrame>
+      );
+    }
+    if (!series.data) {
+      return (
+        <SeriesWideFrame state="error">
+          <Unavailable />
+        </SeriesWideFrame>
+      );
+    }
+    return <SeriesWide series={series.data} />;
+  }
 
   if (series.isPending) {
     return (
@@ -59,27 +82,15 @@ export function SeriesScreen() {
 
 // ---- Frame and the states without a series ------------------------------------------------------------------
 
-function useGoBack() {
-  const router = useRouter();
-  // A link opened straight into this page has nothing to go back to: Home is the way out.
-  return useCallback(() => (router.canGoBack() ? router.back() : router.replace(routes.home)), [router]);
-}
-
 function TopBar({ onMore }: { onMore?: () => void }) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const goBack = useGoBack();
   return (
     <View style={[styles.topBar, { paddingTop: insets.top }]}>
-      <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel={t('common:actions.back')} style={styles.iconButton}>
-        <DecorativeIcon name="chevron-back" size={26} />
-      </Pressable>
+      <IconButton icon="chevron-back" size={26} label={t('common:actions.back')} onPress={goBack} />
       <View style={styles.flex} />
-      {onMore ? (
-        <Pressable onPress={onMore} accessibilityRole="button" accessibilityLabel={t('series:more')} style={styles.iconButton}>
-          <DecorativeIcon name="ellipsis-horizontal" size={24} />
-        </Pressable>
-      ) : null}
+      {onMore ? <IconButton icon="ellipsis-horizontal" label={t('series:more')} onPress={onMore} /> : null}
     </View>
   );
 }
@@ -113,7 +124,7 @@ function SeriesSkeleton() {
 }
 
 /** No such series for this reader: gone, hidden, or (RLS can't tell us which) mature while the opt-in is off. */
-function Unavailable() {
+export function Unavailable() {
   const { t } = useTranslation();
   const router = useRouter();
   const { matureOptIn } = useAuth();
@@ -140,43 +151,14 @@ function Unavailable() {
 
 function SeriesLoaded({ series }: { series: SeriesRow }) {
   const { t, i18n } = useTranslation();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const userId = useUserId();
   const describe = useSeriesText();
-
-  const episodes = useEpisodes(series.id);
-  const creator = useCreator(series.creator_id);
-  const tags = useTags();
-  const following = useIsFollowing(series.id);
-  const toggleFollow = useToggleFollow(series.id);
+  const page = useSeriesPage(series);
+  const {
+    episodes, episodeList, resume, following, toggleFollow, isFollowing, onFollow, openEpisode, creatorName, seriesTags,
+  } = page;
+  const ai = isAiSeries(series);
   const [moreOpen, setMoreOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
-
-  const episodeList = useMemo<EpisodeItem[]>(() => episodes.data ?? [], [episodes.data]);
-  const episodeIds = useMemo(() => episodeList.map((e) => e.id), [episodeList]);
-  const progress = useSeriesProgress(series.id, episodeIds);
-  const resume = useMemo(() => pickResume(episodeList, progress.data ?? []), [episodeList, progress.data]);
-
-  // Back from watching: prices (a new unlock) and "Continue" have changed.
-  useRefreshOnFocus(() =>
-    Promise.all([
-      queryClient.invalidateQueries({ queryKey: userKey(userId, 'catalog', 'price') }),
-      queryClient.invalidateQueries({ queryKey: userKey(userId, 'catalog', 'progress', series.id) }),
-    ]),
-  );
-
-  const openEpisode = useCallback((episode: EpisodeItem) => router.push(routes.watch(episode.id)), [router]);
-
-  const isFollowing = following.data === true;
-  const onFollow = () => {
-    toggleFollow.reset();
-    toggleFollow.mutate(!isFollowing);
-  };
-
-  const ai = isAiSeries(series);
-  const creatorName = creator.data?.display_name || (creator.data?.handle ? `@${creator.data.handle}` : null);
-  const seriesTags = tagsOfSeries(series.tag_ids, tags.data ?? []);
   const foldable = series.synopsis.length > SYNOPSIS_FOLD_LENGTH;
 
   const header = (
@@ -216,7 +198,7 @@ function SeriesLoaded({ series }: { series: SeriesRow }) {
                 : undefined
             }
             disabled={!resume}
-            onPress={() => resume && router.push(routes.watch(resume.episodeId))}
+            onPress={page.play}
             fullWidth
           />
         </View>
@@ -243,7 +225,7 @@ function SeriesLoaded({ series }: { series: SeriesRow }) {
 
       {series.synopsis ? (
         <View style={styles.block}>
-          <Text variant="subheading" accessibilityRole="header">
+          <Text variant="subheading" accessibilityRole="header" {...headingLevel(2)}>
             {t('series:synopsis')}
           </Text>
           <Text numberOfLines={expanded || !foldable ? undefined : SYNOPSIS_LINES} style={styles.synopsis}>
@@ -253,7 +235,7 @@ function SeriesLoaded({ series }: { series: SeriesRow }) {
             <Pressable
               onPress={() => setExpanded((v) => !v)}
               accessibilityRole="button"
-              accessibilityState={{ expanded }}
+              aria-expanded={expanded}
               style={styles.fold}
             >
               <Text variant="bodySmall" style={styles.foldLabel}>
@@ -266,7 +248,7 @@ function SeriesLoaded({ series }: { series: SeriesRow }) {
 
       {seriesTags.length > 0 ? (
         <View style={styles.block}>
-          <Text variant="subheading" accessibilityRole="header">
+          <Text variant="subheading" accessibilityRole="header" {...headingLevel(2)}>
             {t('series:tags')}
           </Text>
           <View style={styles.tags}>
@@ -278,7 +260,7 @@ function SeriesLoaded({ series }: { series: SeriesRow }) {
       ) : null}
 
       <View style={[styles.block, styles.episodesHeader]}>
-        <Text variant="heading" accessibilityRole="header" style={styles.flex}>
+        <Text variant="heading" accessibilityRole="header" {...headingLevel(2)} style={styles.flex}>
           {t('series:episodes')}
         </Text>
         {episodeList.length > 0 ? (
@@ -318,7 +300,7 @@ function SeriesLoaded({ series }: { series: SeriesRow }) {
           variant="secondary"
           onPress={() => {
             setMoreOpen(false);
-            router.push(routes.reportSeries(series.id, series.creator_id));
+            page.report();
           }}
         />
       </Sheet>
@@ -331,7 +313,6 @@ const styles = StyleSheet.create({
   page: { flex: 1, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   flex: { flex: 1 },
   topBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.sm },
-  iconButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   list: { paddingHorizontal: GUTTER, paddingBottom: space.xxl },
   hero: { flexDirection: 'row', gap: space.lg, paddingTop: space.sm },
   heroText: { flex: 1, gap: space.xs },

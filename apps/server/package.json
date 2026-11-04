@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "cf:build": "cd ../.. && npm ci && npm run web:export --workspace @reeltale/mobile",
+    "cf:build": "cd ../.. && npm ci && EXPO_PUBLIC_SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL:-https://ildqgaekqsawgsveclkv.supabase.co} EXPO_PUBLIC_SUPABASE_KEY=${EXPO_PUBLIC_SUPABASE_KEY:-sb_publishable_eg8PCZZ5UKziHRSDTPFsQg_xPLJxxvD} npm run web:export --workspace @reeltale/mobile",
     "dev": "wrangler dev",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "node --test test/*.test.ts"

@@ -53,5 +53,26 @@
   "demo": {
     "notice": "Demo playback: a placeholder clip, not the real episode",
     "unavailable": "Demo playback isn’t available on this device. Here’s the poster instead."
+  },
+  "panel": {
+    "a11y": "Episode details and controls",
+    "meta": "{{format}} · {{episodes}}",
+    "follow": "Follow",
+    "following": "Following",
+    "nowPlaying": "Now playing",
+    "episodes": "Episodes",
+    "playing": "Playing",
+    "onScreen": "On screen",
+    "own": "Your episode",
+    "unavailable": "Not available",
+    "report": "Report this episode"
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "switch": "Previous or next episode",
+    "playPause": "Play or pause",
+    "mute": "Sound on or off",
+    "captions": "Captions on or off",
+    "space": "Space"
   }
 }

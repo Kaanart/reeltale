@@ -1,6 +1,8 @@
+import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { focusRing, useInteraction } from '../../../components/layout';
 import { CoinPrice, LockBadge, Skeleton, Text } from '../../../components/ui';
 import { colors, fonts, space } from '../../../theme/tokens';
 import { useEpisodePrice } from '../hooks';
@@ -13,6 +15,8 @@ export interface EpisodeRowProps {
   series: Pick<SeriesRow, 'status' | 'free_episode_count' | 'format' | 'editors_pick'>;
   episode: EpisodeItem;
   onPress: (episode: EpisodeItem) => void;
+  /** To move the keyboard focus here (the wide series page, after Show more). */
+  ref?: Ref<View>;
 }
 
 /**
@@ -20,10 +24,11 @@ export interface EpisodeRowProps {
  * that are free by the series' own rule skip that request. Nothing here can buy anything: a tap opens the
  * watch screen, which shows the unlock sheet.
  */
-export function EpisodeRow({ series, episode, onPress }: EpisodeRowProps) {
+export function EpisodeRow({ series, episode, onPress, ref }: EpisodeRowProps) {
   const { t } = useTranslation();
   const obviouslyFree = freeByRule(series, episode);
   const priceQuery = useEpisodePrice(episode.id, !obviouslyFree);
+  const { hovered, focusVisible, handlers } = useInteraction();
   const price = priceQuery.data;
   const state: EpisodeState | null = obviouslyFree ? 'free' : price ? episodeState(price) : null;
 
@@ -40,16 +45,18 @@ export function EpisodeRow({ series, episode, onPress }: EpisodeRowProps) {
 
   return (
     <Pressable
+      ref={ref}
+      {...handlers}
       onPress={() => onPress(episode)}
       accessibilityRole="button"
       accessibilityLabel={label}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.row, hovered && styles.hovered, pressed && styles.pressed, focusVisible && focusRing]}
     >
       <Text variant="subheading" color="inkMuted" style={styles.number} accessible={false}>
         {episode.number}
       </Text>
       <View style={styles.main}>
-        <Text numberOfLines={2} style={styles.title}>
+        <Text numberOfLines={2} style={[styles.title, hovered && styles.titleHover]}>
           {title}
         </Text>
         {episode.duration_s ? (
@@ -94,13 +101,19 @@ const styles = StyleSheet.create({
     gap: space.md,
     minHeight: MIN_HEIGHT,
     paddingVertical: space.sm,
+    // The hover background reaches a little past the text, which stays lined up with the page.
+    paddingHorizontal: space.sm,
+    marginHorizontal: -space.sm,
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
   },
+  // Muted text on surfaceAlt stays above 4.5:1.
+  hovered: { backgroundColor: colors.surfaceAlt },
   pressed: { opacity: 0.7 },
   number: { width: 28, textAlign: 'center' },
   main: { flex: 1 },
   title: { fontFamily: fonts.sansMedium },
+  titleHover: { textDecorationLine: 'underline' },
   state: { alignItems: 'flex-end', justifyContent: 'center' },
   priced: { alignItems: 'flex-end', gap: space.xs },
 });

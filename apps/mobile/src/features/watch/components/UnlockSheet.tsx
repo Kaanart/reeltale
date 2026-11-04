@@ -2,7 +2,8 @@
 // one), the wallet, and two explicit actions: "Unlock for N coins" (unlock_episode with the price shown)
 // and "Use Free Pass". It never unlocks on its own. When coins are short, or a refund left a debt, it
 // points to the wallet screen; it shows no money prices and sells nothing itself (coins and VIP are store
-// purchases, App Store 3.1.1 / Play billing).
+// purchases, App Store 3.1.1 / Play billing). On a phone it slides up from the bottom; on a wider browser
+// window it is a centred dialog (components/Dialog.tsx: Escape closes it, focus stays inside and goes back).
 
 import { useRouter, type Href } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -16,6 +17,7 @@ import { DEFAULT_PRICING, unlockPrice } from '../../../core/pricing';
 import type { EpisodeRow, SeriesRow } from '../../../lib/types';
 import { colors, radius, space, type as typeScale } from '../../../theme/tokens';
 import { TextLink } from '../../auth';
+import { Dialog } from './Dialog';
 import { useEpisodePrice, useFreePass, usePricingConfig, useUnlockEpisode, useUnlockWallet } from '../hooks';
 import { isAiContent, watchAccessView } from '../logic/access';
 import { unlockFailure, unlockSheetView, type UnlockFailure } from '../logic/unlock';
@@ -27,12 +29,14 @@ export interface UnlockSheetProps {
   onClose: () => void;
   /** The episode can be watched now (unlocked here, or it turned out to be free or already unlocked). */
   onUnlocked: (episodeId: string) => void;
+  /** A bottom sheet (phones, the apps) or a centred dialog (wider browser windows). */
+  presentation?: 'sheet' | 'dialog';
 }
 
 const WALLET_ROUTE = '/wallet' as string as Href;
 const VIP_ROUTE = '/vip' as string as Href;
 
-export function UnlockSheet({ episode, series, onClose, onUnlocked }: UnlockSheetProps) {
+export function UnlockSheet({ episode, series, onClose, onUnlocked, presentation = 'sheet' }: UnlockSheetProps) {
   const { t } = useTranslation();
   // Keep the last episode while the sheet slides away. Updated during render, not in an effect: the body must
   // never render the previous episode with `open` (an episode unlocked a moment ago is "playable" and would
@@ -40,13 +44,14 @@ export function UnlockSheet({ episode, series, onClose, onUnlocked }: UnlockShee
   const [shown, setShown] = useState<EpisodeRow | null>(episode);
   if (episode && episode.id !== shown?.id) setShown(episode);
   const body = episode ?? shown;
+  const Frame = presentation === 'dialog' ? Dialog : Sheet;
 
   return (
-    <Sheet visible={!!episode} onClose={onClose} title={t('unlock:title')}>
+    <Frame visible={!!episode} onClose={onClose} title={t('unlock:title')}>
       {body ? (
         <UnlockBody key={body.id} episode={body} series={series} open={!!episode} onClose={onClose} onUnlocked={onUnlocked} />
       ) : null}
-    </Sheet>
+    </Frame>
   );
 }
 

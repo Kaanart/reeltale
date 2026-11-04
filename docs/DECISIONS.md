@@ -3,6 +3,13 @@
 The full product and architecture plan is `prep/BLUEPRINT.md` (approved Oct 22, not in git). This file records
 decisions made since, newest first, with the reason. Change a decision by adding a new entry, not by editing an old one.
 
+## 2026-11-01
+- **Web first for the hackathon (Kaan).** The native apps likely won't be ready by Nov 4, so the submission is the
+  website at reeltale.net (the Expo web build served by the Worker). Work from here prioritises what judges see on the
+  web: desktop layout, the live backend (Supabase + Worker + Meta models), demo content, judge access codes, and the
+  write-up. The iOS/Android builds, store submissions, in-app purchases and native-only features move after the
+  hackathon. The code stays one Expo codebase, so nothing built for the web is thrown away.
+
 ## 2026-10-27
 - **Sandbox purchases only work for allowlisted testers** (`svc.set_sandbox_tester`): App Review, demo and judge accounts,
   our own devices. Everyone else on public TestFlight gets nothing from sandbox purchases. Judges use web access codes

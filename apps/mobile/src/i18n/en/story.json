@@ -59,6 +59,12 @@
       "consentFirst": "Allow AI above to begin.",
       "fixOpening": "Write your opening first."
     },
+    "summary": {
+      "opening": "Opening",
+      "ai": "AI allowed",
+      "allowed": "Yes",
+      "notYet": "Not yet"
+    },
     "starting": {
       "title": "Making your story",
       "body": "This can take a little while. You can leave this screen and come back, and your story keeps going."
@@ -94,7 +100,17 @@
     "makingScene": "Making your next scene",
     "panel": "Panel {{current}} of {{total}}",
     "reportScene": "Report this scene",
-    "demoSample": "Demo: every story plays the same sample scenes, whatever you write. Nothing is sent anywhere."
+    "demoSample": "Demo: every story plays the same sample scenes, whatever you write. Nothing is sent anywhere.",
+    "transcript": "Transcript",
+    "transcriptPanel": "Panel {{number}}",
+    "goToPanel": "Go to panel {{number}}",
+    "previousPanel": "Previous panel",
+    "nextPanel": "Next panel",
+    "keysHint": "Keys: Space plays or pauses, ← and → change the panel, 1, 2 and 3 choose.",
+    "choicesAfter": "The choices appear when the scene ends.",
+    "skipToChoices": "Skip to the choices",
+    "stageA11y": "Comic panel {{current}} of {{total}}",
+    "pageTitle": "AI story"
   },
   "choices": {
     "title": "What happens next?",
@@ -208,5 +224,30 @@
     "published": "Your story is published.",
     "share": "Share",
     "needsReview": "Your story will appear after a quick safety check."
+  },
+  "voice": {
+    "hint": "Say a letter (“B”), a number (“the second one”), or words from a choice.",
+    "starting": "Starting the microphone…",
+    "listening": "Listening…",
+    "secondsLeft_one": "{{count}} second left",
+    "secondsLeft_other": "{{count}} seconds left",
+    "stop": "Done",
+    "transcribing": "Turning your voice into text…",
+    "choosing": "Taking {{letter}}: {{label}}",
+    "nothingHeard": "We didn’t catch anything. Try again a little closer to your microphone.",
+    "unavailableChoice": "{{letter}} can’t be taken right now. Pick another choice.",
+    "blockedChoice": "{{letter}} is a path that can’t be drawn. Pick another choice.",
+    "privacy": "Your recording goes to Muse Voice Transcribe from Meta to be turned into text. We don’t store the recording.",
+    "demoNote": "Demo: your recording stays on this device, nothing is sent, and a sample answer is used.",
+    "consentGiven": "Voice input is on. Press the microphone and say your choice.",
+    "errors": {
+      "notSupported": "Voice input doesn’t work here. Pick a choice instead.",
+      "permission": "Microphone access is blocked. Allow the microphone for ReelTale, then try again.",
+      "noMicrophone": "We couldn’t find a microphone.",
+      "busy": "Another app is using your microphone. Close it and try again.",
+      "failed": "The recording didn’t work. Try again, or pick a choice.",
+      "unreadable": "We couldn’t use that recording. Try again.",
+      "unavailable": "Voice input isn’t available right now. Pick a choice instead."
+    }
   }
 }

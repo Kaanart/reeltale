@@ -2,6 +2,40 @@
 
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
+## Nov 4: go-live in progress (deadline TODAY, 9:00 PM Eastern)
+- **Website done:** the four tracks (catalog, watch, story + voice choice, landing + /about + /notice) finished on the
+  resumed run `wf_e796e842-ee0`. App/core/Worker tsc clean; core, Worker (166) and DB tests pass. Their adversarial
+  reviews did NOT run (session limit). Unverified: live mode against the real backend, Safari/Firefox, real mic.
+- **Supabase:** org `Euragnos` (Free plan; upgrade to Pro later), project `reeltale`, ref `ildqgaekqsawgsveclkv`,
+  Frankfurt. DB password in `~/.config/reeltale/secrets.env` (`SUPABASE_DB_PASSWORD`). Repo linked.
+  `supabase/config.toml` added (exposes `svc`, access-token hook, site URL, password min 12) for `supabase config push`.
+- **Worker secrets set:** `SUPABASE_SECRET_KEY`, `META_API_KEY`, `IP_HASH_SECRET` (also in secrets.env). Not set:
+  `TURNSTILE_SECRET` (the /notice form then shows the support e-mail), Stream/RevenueCat (not needed for judging).
+  Public Supabase URL + publishable key are in `wrangler.jsonc` and baked into `cf:build`, so Workers Builds needs no
+  variables.
+- **Waiting on Kaan:** `supabase db push --include-seed` and `supabase config push` (the auto-mode classifier blocks
+  Claude from pushing to the live DB), and enabling R2 in the Cloudflare dashboard (wrangler: error 10042).
+- **Then Claude:** create R2 buckets `reeltale-ai` / `reeltale-media` (`--jurisdiction eu`), `wrangler deploy` from
+  `apps/server` (the repo had never been pushed, so Workers Builds isn't wired; deploy is local), judge accounts +
+  access code, Meta smoke test, golden-path story, `docs/HACKATHON.md`.
+
+## Nov 1: WEB FIRST (Kaan's decision; see DECISIONS.md)
+- Commits: `eb14b88` (app). Not pushed.
+- **Go-live checklist for Kaan: `docs/RUNBOOK.md` → "Go live for judging"** (Supabase project + db push, dashboard
+  settings, wrangler login, R2 buckets, secrets, Workers Builds EXPO_PUBLIC_* variables, then the first push).
+- **Nov 1 status:** the web shell is DONE (uncommitted): top nav on web >= 768 px, layout primitives in
+  `components/layout`, footer, page titles, public web paths `/`, `/about`, `/notice`, `accentStrong` #BF3722 for
+  text-on-accent (resolves the contrast design call). The four website tracks (catalog, watch, story + voice,
+  landing + notice) **did not run** (session limit); resume run `wf_e796e842-ee0` when Kaan wants to spend the tokens.
+  Footage isn't ready: judging = live AI stories + demo mode; no Stream setup. Deadline: **Tue Nov 4, 9:00 PM EST**.
+- **Website workflow**, run `wf_e796e842-ee0`, script
+  `~/.claude/projects/-Users-kaanuysal-claude-ReelTale/c34fe42a-c069-4963-886d-75f066fa2e9b/workflows/scripts/reeltale-website-wf_e796e842-ee0.js`
+  (task specs inside): web shell (desktop top nav, layout primitives, footer, page titles, public routes `/`, `/about`,
+  `/notice`, accessible accent), then catalog / watch / story + voice choice (Muse Voice Transcribe, new
+  `POST /api/ai/transcribe`, migration `20261101090000_voice.sql`) / landing + DSA notice form, each reviewed. If a
+  session died mid-run: resume with the run id (same session) or check `git status`, typecheck, demo export, and
+  finish the incomplete track from the specs (new session).
+
 ## Oct 29 (evening): app scaffold + real install
 - Commits: `f14651b` (backend), `4b58fa5` (ingest, trust & safety, rate limits, FX, app core). Not pushed.
 - **Real `npm install` done** (754 packages, 877 MB; the scratchpad symlink is gone). `package-lock.json` exists now,

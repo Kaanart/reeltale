@@ -4,7 +4,8 @@
 //   Terms not accepted -> (auth)/terms, otherwise (tabs) and every feature route.
 // (auth) and (tabs) are switched with Stack.Protected. Feature routes added later (series/[id], watch/…)
 // need no entry here: they are guarded by the redirect below, which sends anyone not through the gate
-// to the right (auth) screen.
+// to the right (auth) screen. On the web, the few public pages (lib/gate.ts PUBLIC_WEB_PATHS) are open to
+// everyone, and SiteShell (components/layout) adds the top bar and the browser tab title.
 
 import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
 import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
@@ -18,10 +19,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { SiteShell } from '../components/layout';
 import { AuthProvider, useAuth } from '../features/auth';
 import { DemoFrame } from '../features/auth/components/DemoFrame';
 import { AccountErrorOverlay, LoadingOverlay } from '../features/auth/components/GateOverlays';
@@ -79,14 +81,16 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
   const ready = settled === 'ready';
   return (
     <>
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
-        <Stack.Protected guard={!ready}>
-          <Stack.Screen name="(auth)" />
-        </Stack.Protected>
-        <Stack.Protected guard={ready}>
-          <Stack.Screen name="(tabs)" />
-        </Stack.Protected>
-      </Stack>
+      <SiteShell gate={settled}>
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+          <Stack.Protected guard={!ready}>
+            <Stack.Screen name="(auth)" />
+          </Stack.Protected>
+          <Stack.Protected guard={ready}>
+            <Stack.Screen name="(tabs)" />
+          </Stack.Protected>
+        </Stack>
+      </SiteShell>
       <FeatureRouteGuard />
       {gate === 'loading' ? <LoadingOverlay /> : null}
       {gate === 'error' ? <AccountErrorOverlay /> : null}
@@ -99,7 +103,7 @@ function FeatureRouteGuard() {
   const { gate } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-  const target = redirectFor(gate, segments);
+  const target = redirectFor(gate, segments, { web: Platform.OS === 'web' });
 
   useEffect(() => {
     if (target) router.replace(target as Href);

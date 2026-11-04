@@ -8,7 +8,8 @@ export const BASE_SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-  'Permissions-Policy': 'geolocation=(), payment=(), usb=()',
+  // The microphone only for our own pages ("Say your choice" in the story player); never for embedded frames.
+  'Permissions-Policy': 'geolocation=(), payment=(), usb=(), microphone=(self)',
   'Cross-Origin-Opener-Policy': 'same-origin',
 };
 

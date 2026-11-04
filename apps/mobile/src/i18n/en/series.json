@@ -50,5 +50,11 @@
     "confirm": "Block"
   },
   "continueFrom": "Continue episode {{number}}",
-  "noEpisodes": "No episodes yet."
+  "noEpisodes": "No episodes yet.",
+  "metaLine": "{{meta}} · {{episodes}}",
+  "aboutA11y": "About this story",
+  "reportA11y": "Report {{title}}",
+  "tagLinkA11y": "More {{tag}} stories",
+  "showMoreEpisodes_one": "Show {{count}} more episode",
+  "showMoreEpisodes_other": "Show {{count}} more episodes"
 }

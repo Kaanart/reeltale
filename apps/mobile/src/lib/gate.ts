@@ -4,6 +4,9 @@
 // Order, as in the blueprint: signed out -> date of birth -> (blocked) -> Terms -> the app.
 // The database is the real gate (RLS and the Worker check age_status / the age_ok claim); this only
 // decides which screen to show.
+//
+// The website has a short, explicit list of public pages (PUBLIC_WEB_PATHS) that anyone may open without
+// an account. Everything else stays behind the gate, and the native apps have no public pages at all.
 
 /** The Terms version the app asks for (prep/legal/terms-of-service-draft.md, "Last updated"). public.accept_terms wants YYYY-MM-DD. */
 export const TERMS_VERSION = '2026-10-22';
@@ -85,13 +88,48 @@ const GUARDED_GROUPS = new Set(['(auth)', '(tabs)']);
 const OPEN_ROUTES = new Set(['+not-found', '_sitemap']);
 
 /**
+ * Web pages anyone may open, signed in or not, at exactly these paths (no sub-paths):
+ *   '/'        the landing page for visitors (until it exists, the (auth) welcome screen); Home for adults
+ *   '/about'   what ReelTale is
+ *   '/notice'  reporting illegal content (EU DSA Art. 16: it must work without an account)
+ * They show no personal data. Adding a path here makes it public on the web: keep the list short.
+ */
+export const PUBLIC_WEB_PATHS: readonly string[] = ['/', '/about', '/notice'];
+
+/** A URL path without query, hash or trailing slash ('/' stays '/'). */
+export function normalizePath(pathname: string): string {
+  const path = (pathname.split(/[?#]/)[0] ?? '').trim();
+  const withSlash = path.startsWith('/') ? path : `/${path}`;
+  const trimmed = withSlash.replace(/\/+$/, '');
+  return trimmed === '' ? '/' : trimmed;
+}
+
+/** Is this URL path one of the public web pages? Exact match only ('/about/x' is not public). */
+export function isPublicWebPath(pathname: string): boolean {
+  return PUBLIC_WEB_PATHS.includes(normalizePath(pathname));
+}
+
+/** The URL path of Expo Router segments, without (group) segments: ['(public)', 'about'] -> '/about'. */
+export function pathOfSegments(segments: readonly string[]): string {
+  const parts = segments.filter((s) => !(s.startsWith('(') && s.endsWith(')')) && s !== 'index');
+  return `/${parts.join('/')}`;
+}
+
+export interface RedirectOptions {
+  /** The website: PUBLIC_WEB_PATHS are open to everyone. Native apps leave it false. */
+  web?: boolean;
+}
+
+/**
  * Feature routes outside the guarded groups (series/[id], watch/…, wallet …) are not listed in the root
  * layout, so Stack.Protected can't hide them. This sends anyone who isn't through the gate to the right
- * (auth) screen instead. Returns null when no redirect is needed.
+ * (auth) screen instead. Returns null when no redirect is needed. On the web, the public pages
+ * (PUBLIC_WEB_PATHS) are left alone for every gate.
  */
-export function redirectFor(gate: Gate, segments: readonly string[]): string | null {
+export function redirectFor(gate: Gate, segments: readonly string[], options: RedirectOptions = {}): string | null {
   if (gate === 'loading' || gate === 'error' || gate === 'ready') return null;
   const first = segments[0];
   if (first === undefined || GUARDED_GROUPS.has(first) || OPEN_ROUTES.has(first)) return null;
+  if (options.web === true && isPublicWebPath(pathOfSegments(segments))) return null;
   return GATE_PATHS[gate];
 }
