@@ -23,6 +23,23 @@ export const colors = {
   danger: '#D64545',
   playerBg: '#000000',
   scrim: 'rgba(0,0,0,0.55)',
+  // Home's storefront and the site footer (web). Contrast checked in src/core/__tests__/storefront.test.ts.
+  /** The site footer: a dark band at the end of every web page, with footerInk / footerInkMuted text. */
+  footerBg: '#2B211C',
+  footerInk: '#F6F1EA',
+  footerInkMuted: '#CDC2B5',
+  /** The film strip around the Weekly pick poster (its sprocket holes are bg). */
+  film: '#2B211C',
+  /** Ranking numbers 02 and 03 (01 is accentStrong): text, 4.5:1 or more on bg, surface and surfaceAlt. */
+  rankAmber: '#975700',
+  rankTeal: '#1C7262',
+  /** The "Browse all series" promo banner, with onAccent text (the other two banners use accentStrong and ai). */
+  bannerTeal: '#1E5F5A',
+  /**
+   * Decorative shapes on the promo banners. Darker than the banner, so the white text that runs over them
+   * keeps (and gains) contrast; a light shape would drop it below 4.5:1.
+   */
+  bannerShape: 'rgba(0,0,0,0.14)',
 } as const;
 
 export type ColorName = keyof typeof colors;

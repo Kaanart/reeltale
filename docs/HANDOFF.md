@@ -3,6 +3,12 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **Batch 2 DONE, deployed (version 49bd63cd):** Home is a WebNovel-style storefront (`features/catalog/storefront.ts`,
+  `components/store/*`): Weekly pick carousel + Meet ReelTale, Weekly featured with Switch, Rankings (Trending/New/
+  Completed, numbered), Continue watching + demo story, Popular tags, New arrivals + Editors' choice, Completed
+  series, promo banners, dark footer. Reviewed (7 findings proved and fixed). Checked live at 1440x900: all sections
+  render, no console errors except Cloudflare's analytics beacon (blocked by our CSP). App tests 537.
+  Open (low): footer hidden below 768 px on the web; on the live backend Home makes one episodes query per ranking row.
 - **Judge account finished by Kaan:** access code inserted and redeemed (`prep/judge-redeem.sql` via
   `supabase db query --linked`). Free-episodes migration `20261104090100` is applied (checked). The auto-mode
   classifier blocks Claude from production DB writes AND reads (service-key RPCs, `db query`): give Kaan SQL files.

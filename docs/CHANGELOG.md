@@ -2,6 +2,18 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: WebNovel-style Home, free start without an account, 10 free episodes
+- Home rebuilt as a storefront after webnovel.com (structure only, ReelTale's own look): carousel, featured row,
+  numbered rankings, tags, new arrivals, editors' choice, completed, banners, dark footer. Built by one agent,
+  reviewed by another (carousel focus loss on arrow keys, poster sizes at 1024 px, AI badge overflow on phones,
+  banner text contrast, duplicate demo card on an empty live catalog: all fixed).
+- "Start watching free" (18+ confirmation) opens the sample catalog in one click; the ribbon offers sign-in.
+- New series free their first 10 episodes (migration 20261104090100); sample series free 5.
+- Shared judge account with coins and AI access (no judge accounts per person).
+- Didn't work: Claude's production DB writes and reads (service-key RPCs, `supabase db query`) are refused by the
+  auto-mode classifier; Kaan ran the SQL files. The Supabase admin API refuses the new sb_secret key (401); the
+  legacy service_role key worked.
+
 ## 2026-11-04: "Explore the demo" on the live website
 - Signed-in users see an empty catalog (no footage, no series in the database), so judges need the sample catalog:
   `/?demo=1` switches the tab into demo mode (sessionStorage `reeltale.demo`, `webDemoChoice` in lib/config.ts),

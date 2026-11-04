@@ -1,74 +1,90 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RefreshControl, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { RefreshControl, StyleSheet, View } from 'react-native';
 
-import { columnWidth, PageContainer, useLayout } from '../../../components/layout';
-import { Skeleton, Text } from '../../../components/ui';
+import { columnWidth, PageContainer, TwoColumn, useLayout, usePageTitle } from '../../../components/layout';
+import { Text } from '../../../components/ui';
+import type { TagRow } from '../../../lib/types';
 import { space } from '../../../theme/tokens';
 import { CONTINUE_CARD_WIDTH, ContinueCard } from '../components/ContinueCard';
 import { DemoStoryCard } from '../components/DemoStoryCard';
-import { FeaturedHero } from '../components/FeaturedHero';
 import { IconButton } from '../components/IconButton';
-import { Shelf, SHELF_CARD_WIDTH } from '../components/Shelf';
-import { SeriesTile, tileHeight } from '../components/SeriesTile';
+import { SeeAllLink } from '../components/SeeAllLink';
+import { Shelf } from '../components/Shelf';
 import { EmptyState, ErrorState } from '../components/States';
+import { MeetReelTale } from '../components/store/MeetReelTale';
+import { EditorsChoice, NewArrivals } from '../components/store/NewArrivals';
+import { POSTER_GAP, PosterRow, PosterRowSkeleton } from '../components/store/PosterCard';
+import { PromoBanners } from '../components/store/PromoBanners';
+import { Rankings, type RankingList } from '../components/store/Rankings';
+import { HeaderButton, SectionHeader, useSectionGap } from '../components/store/SectionHeader';
+import { TagCloud } from '../components/store/TagCloud';
+import { WeeklyPick, WeeklyPickSkeleton } from '../components/store/WeeklyPick';
 import { useHistory, useRefreshOnFocus, useSeriesCards, useTags } from '../hooks';
-import {
-  CONTINUE_MAX_CARDS, CONTINUE_MIN_CARD_WIDTH, featuredSeries, HERO_SIDE_WIDTH, heroCoverWidth, pairShelves, SHELF_GAP,
-  shelfLayout,
-} from '../layout';
-import {
-  buildHomeShelves, continueWatching, SHELF_SIZE, tagLabel, type HistoryEntry, type Ranking, type SeriesCard,
-} from '../logic';
+import { CONTINUE_MAX_CARDS, CONTINUE_MIN_CARD_WIDTH } from '../layout';
+import { continueWatching, SHELF_SIZE, type HistoryEntry } from '../logic';
 import { routes } from '../routes';
+import {
+  buildStorefront, canSwitch, FEATURED_PAGE, nextWindowStart, popularTags, posterColumns, rotatingWindow,
+} from '../storefront';
 
-/** How many recent series Home cuts Trending, New and the genre shelves from. */
+/** How many recent series Home cuts Weekly featured, the rankings, New arrivals and the tags from. */
 const POOL_SIZE = 60;
 const CONTINUE_LIMIT = 10;
 const HEADER_HEIGHT = 56;
-const SKELETON_TITLE_WIDTH = 160;
+/** "Meet ReelTale" beside the carousel, and the demo story beside "Continue watching" (wide windows). */
+const SIDE_WIDTH = 380;
+/** "Editors' choice" beside "New arrivals" (wide windows). */
+const EDITORS_WIDTH = 440;
+const NO_TAGS: readonly TagRow[] = [];
 
-interface HomeRow {
-  key: string;
-  title: string;
-  items: readonly SeriesCard[];
-  ranking?: Ranking;
-  tagId?: number;
-}
-
-const seriesKey = (s: SeriesCard) => s.id;
-const rowCount = (row: HomeRow) => row.items.length;
 const entryKey = (e: HistoryEntry) => e.episode.id;
-const renderTile = (s: SeriesCard, width: number) => <SeriesTile series={s} width={width} />;
 const renderContinue = (e: HistoryEntry, width: number) => <ContinueCard entry={e} width={width} />;
 
-// Home. Phones and the apps: the wordmark and search, the demo story, then rows of covers that scroll
-// sideways. The website on a laptop (the top bar carries the wordmark and search): the featured Editor's Pick
-// beside the demo story, then the same rows with as many covers as fit and Previous / Next buttons; short
-// rows share a line, two side by side (pairShelves), with their covers on the same grid as the full rows.
+// Home, as a storefront (the website's front page; phones and the apps stack the same sections):
+//   Weekly pick carousel  |  Meet ReelTale
+//   Weekly featured (eight posters, Switch)
+//   Rankings: Trending, New, Completed (numbered 01-05)
+//   Continue watching (when there is history)  |  Try the demo story
+//   Popular tags
+//   New arrivals (strip + large preview)  |  Editors' choice
+//   Completed series
+//   Promo banners: Browse all series, Become a creator, Make a story with AI
+// and the site footer (PageContainer). Everything comes from the catalog's own lists (storefront.ts): no
+// ratings, view counts or prices.
 
 export function HomeScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
-  const { hasTopNav, isWide, width: windowWidth } = useLayout();
+  const { hasTopNav, isWide, isCompact, width } = useLayout();
+  const gap = useSectionGap();
+  usePageTitle(t('common:nav.home'));
 
-  // Trending, New and the genre shelves are cut from one list; the other three rows are their own filters.
   const pool = useSeriesCards({ ranking: 'trending', limit: POOL_SIZE });
   const completed = useSeriesCards({ ranking: 'completed', limit: SHELF_SIZE });
   const picks = useSeriesCards({ ranking: 'editorsPicks', limit: SHELF_SIZE });
-  const ai = useSeriesCards({ ranking: 'aiStories', limit: SHELF_SIZE });
   const tags = useTags();
   const history = useHistory();
 
-  const shelves = useMemo(() => buildHomeShelves(pool.data ?? [], tags.data ?? [], new Date()), [pool.data, tags.data]);
+  const tagRows = tags.data ?? NO_TAGS;
+  const store = useMemo(
+    () => buildStorefront({ pool: pool.data ?? [], picks: picks.data ?? [], completed: completed.data ?? [] }),
+    [pool.data, picks.data, completed.data],
+  );
+  const popular = useMemo(() => popularTags(tagRows, pool.data ?? []), [tagRows, pool.data]);
   const resume = useMemo(() => continueWatching(history.data ?? [], CONTINUE_LIMIT), [history.data]);
-  const featured = useMemo(() => featuredSeries(picks.data ?? []), [picks.data]);
+  // One row of posters: as many as fit across the page column (phones: a row that scrolls sideways).
+  const posterCols = posterColumns(columnWidth(width), POSTER_GAP);
+  const featuredPage = isCompact ? FEATURED_PAGE : posterCols;
+  const [featuredStart, setFeaturedStart] = useState(0);
+  const featured = rotatingWindow(store.featured, featuredStart, featuredPage);
+  const completedRow = store.completed.slice(0, featuredPage);
 
   const [refreshing, setRefreshing] = useState(false);
   const refetchAll = useCallback(
-    () => Promise.all([pool.refetch(), completed.refetch(), picks.refetch(), ai.refetch(), tags.refetch(), history.refetch()]),
-    [pool, completed, picks, ai, tags, history],
+    () => Promise.all([pool.refetch(), completed.refetch(), picks.refetch(), tags.refetch(), history.refetch()]),
+    [pool, completed, picks, tags, history],
   );
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -83,30 +99,39 @@ export function HomeScreen() {
 
   const startDemo = useCallback(() => router.push(routes.storyNew), [router]);
 
-  const rows: HomeRow[] = [
-    { key: 'trending', title: t('home:home.trending'), items: shelves.trending, ranking: 'trending' },
-    { key: 'new', title: t('home:home.new'), items: shelves.fresh, ranking: 'new' },
-    { key: 'completed', title: t('home:home.completed'), items: completed.data ?? [], ranking: 'completed' },
-    { key: 'picks', title: t('home:home.editorsPicks'), items: picks.data ?? [], ranking: 'editorsPicks' },
-    { key: 'ai', title: t('home:home.aiStories'), items: ai.data ?? [], ranking: 'aiStories' },
-    ...shelves.genres.map((g) => ({
-      key: `genre-${g.tag.id}`, title: tagLabel(g.tag, i18n.language), items: g.items, tagId: g.tag.id,
-    })),
-  ];
-  const visibleRows = rows.filter((row) => row.items.length > 0);
-  // Phones and the apps: one shelf per row. Wider: how many covers a full row shows decides what can pair. The
-  // rows measure themselves, as each shelf does: a scroll bar that takes up room (Windows, or a Mac set to
-  // always show them) makes the column narrower than the window says, and the halves would then hold fewer.
-  const [rowsWidth, setRowsWidth] = useState(0);
-  const onRowsLayout = useCallback((e: LayoutChangeEvent) => {
-    const w = Math.floor(e.nativeEvent.layout.width);
-    setRowsWidth((prev) => (prev === w ? prev : w));
-  }, []);
-  const perView = hasTopNav ? shelfLayout(rowsWidth > 0 ? rowsWidth : columnWidth(windowWidth)).perView : 0;
-  const groups = pairShelves(visibleRows, rowCount, perView);
-
   const loading = pool.isPending;
   const failed = pool.isError && !pool.data;
+  const empty = !loading && !failed && store.featured.length === 0;
+
+  const rankings: RankingList[] = [
+    { ranking: 'trending', title: t('home:home.trending'), items: store.rankings.trending },
+    { ranking: 'new', title: t('home:home.new'), items: store.rankings.fresh },
+    { ranking: 'completed', title: t('home:home.completed'), items: store.rankings.completed },
+  ];
+
+  // With nothing to feature (an empty or unreachable catalog) the demo story takes the carousel's place, and
+  // is not offered a second time further down.
+  const heroLoading = loading || picks.isPending;
+  const heroIsDemo = !heroLoading && store.hero.length === 0;
+  const hero = heroLoading
+    ? <WeeklyPickSkeleton />
+    : heroIsDemo
+      ? <DemoStoryCard onStart={startDemo} variant="hero" />
+      : <WeeklyPick series={store.hero} tags={tagRows} />;
+  const continueShelf = (
+    <Shelf
+      title={t('home:home.continueWatching')}
+      items={resume}
+      keyExtractor={entryKey}
+      renderItem={renderContinue}
+      compactCardWidth={CONTINUE_CARD_WIDTH}
+      minCardWidth={CONTINUE_MIN_CARD_WIDTH}
+      maxCards={CONTINUE_MAX_CARDS}
+    />
+  );
+
+  const arrivals = store.arrivals.length > 0 ? <NewArrivals items={store.arrivals} tags={tagRows} /> : null;
+  const editors = store.editors.length > 0 ? <EditorsChoice items={store.editors} tags={tagRows} /> : null;
 
   return (
     <PageContainer
@@ -125,111 +150,107 @@ export function HomeScreen() {
         </View>
       )}
 
-      {!hasTopNav ? (
-        <DemoStoryCard onStart={startDemo} />
-      ) : isWide ? (
-        <View style={styles.heroRow}>
-          <View style={styles.heroMain}>
-            {featured ? <FeaturedHero series={featured} /> : picks.isPending ? <HeroSkeleton /> : <DemoStoryCard onStart={startDemo} />}
-          </View>
-          {featured || picks.isPending ? (
-            <View style={styles.heroSide}>
-              <DemoStoryCard onStart={startDemo} variant="hero" />
-            </View>
-          ) : null}
-        </View>
+      <TwoColumn main={hero} side={<MeetReelTale />} sideWidth={SIDE_WIDTH} gap={space.xxl} />
+
+      {failed ? (
+        <Section gap={gap}>
+          <ErrorState error={pool.error} onRetry={() => void refetchAll()} />
+        </Section>
+      ) : empty ? (
+        <Section gap={gap}>
+          <EmptyState title={t('home:home.empty')} />
+        </Section>
       ) : (
-        <View style={styles.heroStack}>
-          {featured ? <FeaturedHero series={featured} /> : picks.isPending ? <HeroSkeleton /> : null}
-          <DemoStoryCard onStart={startDemo} />
-        </View>
+        <>
+          <Section gap={gap} testID="home-weekly-featured">
+            <SectionHeader
+              title={t('home:home.store.weeklyFeatured')}
+              action={
+                canSwitch(store.featured.length, featuredPage) ? (
+                  <HeaderButton
+                    label={t('home:home.store.switch')}
+                    accessibilityLabel={t('home:home.store.switchA11y')}
+                    icon="shuffle"
+                    onPress={() => setFeaturedStart((s) => nextWindowStart(s, store.featured.length, featuredPage))}
+                  />
+                ) : null
+              }
+            />
+            {loading ? (
+              <PosterRowSkeleton columns={posterCols} />
+            ) : (
+              <PosterRow items={featured} tags={tagRows} label={t('home:home.store.weeklyFeatured')} columns={posterCols} />
+            )}
+          </Section>
+          {loading ? null : (
+            <Section gap={gap}>
+              <Rankings lists={rankings} tags={tagRows} />
+            </Section>
+          )}
+        </>
       )}
 
+      {/* The Continue watching shelf brings its own top margin. */}
       {resume.length > 0 ? (
-        <Shelf
-          title={t('home:home.continueWatching')}
-          items={resume}
-          keyExtractor={entryKey}
-          renderItem={renderContinue}
-          compactCardWidth={CONTINUE_CARD_WIDTH}
-          minCardWidth={CONTINUE_MIN_CARD_WIDTH}
-          maxCards={CONTINUE_MAX_CARDS}
-        />
+        <Section gap={gap - space.xl}>
+          {heroIsDemo ? (
+            continueShelf
+          ) : (
+            <TwoColumn
+              main={continueShelf}
+              side={
+                <View style={isWide ? styles.besideShelf : null}>
+                  <DemoStoryCard onStart={startDemo} variant={isWide ? 'hero' : 'card'} />
+                </View>
+              }
+              sideWidth={SIDE_WIDTH}
+              gap={space.xxl}
+            />
+          )}
+        </Section>
+      ) : heroIsDemo ? null : (
+        <Section gap={gap}>
+          <DemoStoryCard onStart={startDemo} />
+        </Section>
+      )}
+
+      {popular.length > 0 ? (
+        <Section gap={gap}>
+          <TagCloud tags={popular} />
+        </Section>
       ) : null}
 
-      <View onLayout={onRowsLayout}>
-      {loading ? (
-        <View accessible accessibilityLabel={t('common:state.loading')} aria-busy>
-          <ShelfSkeleton />
-          <ShelfSkeleton />
-        </View>
-      ) : failed ? (
-        <ErrorState error={pool.error} onRetry={() => void refetchAll()} />
-      ) : visibleRows.length === 0 ? (
-        <EmptyState title={t('home:home.empty')} />
-      ) : (
-        groups.map(([first, second]) =>
-          second ? (
-            <View key={`${first.key}+${second.key}`} style={styles.pair}>
-              <View style={styles.half}>
-                <SeriesShelf row={first} />
-              </View>
-              <View style={styles.half}>
-                <SeriesShelf row={second} />
-              </View>
-            </View>
+      {arrivals || editors ? (
+        <Section gap={gap}>
+          {arrivals && editors ? (
+            <TwoColumn main={arrivals} side={editors} sideWidth={EDITORS_WIDTH} gap={space.xxl} />
           ) : (
-            <SeriesShelf key={first.key} row={first} />
-          ),
-        )
-      )}
-      </View>
+            arrivals ?? editors
+          )}
+        </Section>
+      ) : null}
+
+      {store.completed.length > 0 ? (
+        <Section gap={gap} testID="home-completed">
+          <SectionHeader
+            title={t('home:home.store.completedSeries')}
+            action={<SeeAllLink title={t('home:home.store.completedSeries')} options={{ ranking: 'completed' }} />}
+          />
+          <PosterRow items={completedRow} tags={tagRows} label={t('home:home.store.completedSeries')} columns={posterCols} />
+        </Section>
+      ) : null}
+
+      <Section gap={gap}>
+        <PromoBanners />
+      </Section>
     </PageContainer>
   );
 }
 
-function SeriesShelf({ row }: { row: HomeRow }) {
+function Section({ gap, children, testID }: { gap: number; children: ReactNode; testID?: string }) {
   return (
-    <Shelf
-      title={row.title}
-      items={row.items}
-      keyExtractor={seriesKey}
-      renderItem={renderTile}
-      seeAll={{ ranking: row.ranking, tagId: row.tagId }}
-    />
-  );
-}
-
-function HeroSkeleton() {
-  const { size } = useLayout();
-  const cover = heroCoverWidth(size);
-  return (
-    <View style={styles.heroSkeleton}>
-      <Skeleton width={cover} height={Math.ceil((cover * 4) / 3)} />
-      <View style={styles.heroSkeletonText}>
-        <Skeleton width="30%" />
-        <Skeleton width="70%" height={space.xxl} />
-        <Skeleton width="50%" />
-        <Skeleton width="90%" />
-      </View>
-    </View>
-  );
-}
-
-function ShelfSkeleton() {
-  const { hasTopNav, width } = useLayout();
-  // Wide: as many covers as the real shelf will show; phones: three of the fixed width (the row runs off screen).
-  const shelf = hasTopNav ? shelfLayout(columnWidth(width)) : null;
-  const count = shelf ? shelf.perView : 3;
-  const cardWidth = shelf ? shelf.cardWidth : SHELF_CARD_WIDTH;
-  return (
-    <View style={styles.skeleton}>
-      <Skeleton width={SKELETON_TITLE_WIDTH} height={space.xl} />
-      <View style={[styles.skeletonRow, shelf ? { gap: shelf.gap } : null]}>
-        {Array.from({ length: count }, (_, i) => (
-          <Skeleton key={i} width={cardWidth} height={tileHeight(cardWidth)} />
-        ))}
-      </View>
+    <View style={{ marginTop: gap }} testID={testID}>
+      {children}
     </View>
   );
 }
@@ -238,15 +259,6 @@ const styles = StyleSheet.create({
   // The search button's hit area reaches into the gutter, so the icon sits where it always did.
   header: { flexDirection: 'row', alignItems: 'center', minHeight: HEADER_HEIGHT, marginRight: -space.sm },
   wordmark: { flex: 1 },
-  heroRow: { flexDirection: 'row', alignItems: 'stretch', gap: space.lg },
-  heroMain: { flex: 1, minWidth: 0 },
-  heroSide: { width: HERO_SIDE_WIDTH },
-  heroStack: { gap: space.lg },
-  // Two short shelves side by side: the shelf gap between them keeps their covers on the full rows' grid.
-  pair: { flexDirection: 'row', gap: SHELF_GAP },
-  half: { flex: 1, minWidth: 0 },
-  heroSkeleton: { flexDirection: 'row', gap: space.xl, alignItems: 'center' },
-  heroSkeletonText: { flex: 1, gap: space.md },
-  skeleton: { marginTop: space.xl, gap: space.md },
-  skeletonRow: { flexDirection: 'row', gap: space.md, overflow: 'hidden' },
+  // The shelf beside it starts with its own top margin; the card lines up with the shelf's title.
+  besideShelf: { paddingTop: space.xl },
 });

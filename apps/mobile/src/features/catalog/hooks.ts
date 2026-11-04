@@ -5,7 +5,7 @@
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { userKey } from '../../lib/keys';
 import { useAuth } from '../auth';
 import {
@@ -13,6 +13,7 @@ import {
   fetchProgressOf, fetchSeries, fetchTags, setFollowing,
 } from './sources';
 import { cardKey, PAGE_SIZE, type CardQuery } from './logic';
+import { episodeSummary } from './storefront';
 
 /** Rows of watch history the app loads at once (Home's "Continue watching" and the Library share them). */
 export const HISTORY_LIMIT = 50;
@@ -101,6 +102,16 @@ export function useEpisodes(seriesId: string | undefined) {
     enabled: !!userId && !!seriesId,
     queryFn: () => fetchEpisodes(seriesId ?? ''),
   });
+}
+
+/**
+ * How many episodes a series has and which one comes first ("Watch now"), from the same query as the series
+ * page, so opening the series afterwards needs no new request.
+ */
+export function useEpisodeSummary(seriesId: string | undefined) {
+  const episodes = useEpisodes(seriesId);
+  const summary = useMemo(() => episodeSummary(episodes.data), [episodes.data]);
+  return { ...summary, loaded: episodes.isSuccess, isPending: episodes.isPending };
 }
 
 /** The server's price for one episode. Rows already known to be free pass `enabled: false` and cost no request. */

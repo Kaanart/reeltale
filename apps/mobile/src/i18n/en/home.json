@@ -32,6 +32,64 @@
     "shelf": {
       "previousA11y": "Previous in {{title}}",
       "nextA11y": "Next in {{title}}"
+    },
+    "store": {
+      "weeklyPick": "Weekly pick",
+      "carouselA11y": "Weekly pick, {{total}} series",
+      "slideA11y": "{{index}} of {{total}}",
+      "showSlideA11y": "Show {{title}} ({{index}} of {{total}})",
+      "pauseA11y": "Stop the Weekly pick from moving on",
+      "playA11y": "Let the Weekly pick move on by itself",
+      "watchNow": "Watch now",
+      "watchNowA11y": "Watch {{title}} from episode 1",
+      "openA11y": "Open {{title}}",
+      "genreMeta": "{{genre}} · {{format}}",
+      "editorsPick": "Editor’s Pick",
+      "meet": {
+        "title": "Meet ReelTale",
+        "ai": {
+          "title": "Make a story with AI",
+          "body": "Choose what happens next and watch each scene appear."
+        },
+        "creator": {
+          "title": "Become a creator",
+          "body": "Post your short vertical series and find its audience."
+        },
+        "about": {
+          "title": "How ReelTale works",
+          "body": "Episodes of one to two minutes. The first ones of every series are free."
+        }
+      },
+      "weeklyFeatured": "Weekly featured",
+      "switch": "Switch",
+      "switchA11y": "Show other series in Weekly featured",
+      "rankings": "Rankings",
+      "more": "More",
+      "moreA11y": "More in {{title}}",
+      "rankA11y": "Number {{rank}}: {{label}}",
+      "rankEmpty": "Nothing here yet.",
+      "completedLabel": "Completed",
+      "popularTags": "Popular tags",
+      "tagA11y": "Browse {{tag}}",
+      "newArrivals": "New arrivals",
+      "arrivalsPickA11y": "Show {{title}}",
+      "editorsChoice": "Editors’ choice",
+      "completedSeries": "Completed series",
+      "banners": {
+        "a11y": "More from ReelTale",
+        "series": {
+          "title": "Browse all series",
+          "body": "Live action, stop-motion and AI living comics."
+        },
+        "creator": {
+          "title": "Become a creator",
+          "body": "Shoot it, upload it, and keep making episodes."
+        },
+        "ai": {
+          "title": "Make a story with AI",
+          "body": "Pick what happens next, one scene at a time."
+        }
+      }
     }
   },
   "discover": {

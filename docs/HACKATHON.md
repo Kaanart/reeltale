@@ -20,9 +20,10 @@ and to readers who want to steer a story themselves.
 2. You're in the sample catalog: browse Home, Discover and a series page, watch the free episodes, and see a
    locked episode's coin price. Everything there is sample data on your device (the ribbon says so).
 3. Open **Try the demo story** on Home: a living comic made with AI. Pick a choice, open **How this scene was made**.
-4. **Live AI stories** need an account (Meta's terms require 18+ accounts): _[how judges sign in: see the note at
-   the end of this file]_. Then Create → AI story → write an opening; on the web you can also press the mic and
-   *say* your choice (Muse Voice Transcribe).
+4. **Live AI stories** need an account (Meta's terms require 18+ accounts). Press **Sign in for AI stories** in the
+   ribbon and sign in with the shared judge account from the submission form (it has coins and AI access). Then
+   Create → AI story → write an opening; on the web you can also press the mic and *say* your choice
+   (Muse Voice Transcribe).
 
 ## How Meta's models power it (what the code really calls)
 | Model | What it does in ReelTale | Where |
@@ -72,6 +73,6 @@ after an access check) and serves the site. Hard limits keep R2 and model spend 
 Creator uploads with real series, store launch, creator payouts, Meta video models as soon as there is an API.
 
 ---
-_Note for Kaan before submitting (delete this section): Supabase's built-in email only reaches members of the
-Euragnos org, so judges can't sign up by e-mail code yet. For live AI stories either give judges one password account
-in the submission form, or set up Resend SMTP (custom domain mail). Also fill in the video link and the brand date._
+_Note for Kaan before submitting (delete this section): put `judge@reeltale.net` and its password (JUDGE_PASSWORD in
+~/.config/reeltale/secrets.env) in the submission form only, never in this repo. Fill in the video link and the brand
+date._

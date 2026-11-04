@@ -463,6 +463,8 @@ test('series made with AI always carry the AI badge wherever a series is drawn',
   const drawers = OWN_FILES.filter((f) => /<Cover\b/.test(readFileSync(f, 'utf8'))).map((f) => f.slice(src.length + 'features/catalog/'.length));
   assert.deepEqual(drawers.sort(), [
     'components/ContinueCard.tsx', 'components/FeaturedHero.tsx', 'components/SeriesRow.tsx', 'components/SeriesTile.tsx',
+    'components/store/NewArrivals.tsx', 'components/store/PosterCard.tsx', 'components/store/Rankings.tsx',
+    'components/store/WeeklyPick.tsx',
     'screens/SeriesScreen.tsx', 'screens/SeriesWide.tsx',
   ]);
   for (const f of drawers) {

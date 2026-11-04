@@ -18,10 +18,11 @@ const TAG_SLOP = { top: (layout.minTarget - TAG_HEIGHT) / 2, bottom: (layout.min
  * real <a href> (keyboard, Cmd-click for a new tab); a plain click navigates inside the app.
  *
  *   'text': "See all" next to a shelf         'tag': a tag chip on the series page
+ *   'chip': a larger tag chip (Home's "Popular tags")
  */
 export function DiscoverLink({
   options, label, accessibilityLabel, variant,
-}: { options: DiscoverOptions; label: string; accessibilityLabel: string; variant: 'text' | 'tag' }) {
+}: { options: DiscoverOptions; label: string; accessibilityLabel: string; variant: 'text' | 'tag' | 'chip' }) {
   const router = useRouter();
   const { hovered, focusVisible, handlers } = useInteraction();
   const web = Platform.OS === 'web';
@@ -38,6 +39,8 @@ export function DiscoverLink({
   // react-native-web renders a Pressable with an href as an <a>; React Native's types don't list it.
   const anchor = web ? ({ href: routes.discoverUrl(options) } as object) : null;
   const tag = variant === 'tag';
+  const chip = variant === 'chip';
+  const active = hovered;
   return (
     <Pressable
       {...anchor}
@@ -47,12 +50,16 @@ export function DiscoverLink({
       accessibilityRole="link"
       accessibilityLabel={accessibilityLabel}
       style={({ pressed }) => [
-        tag ? styles.tag : styles.text,
-        (hovered || pressed) && (tag ? styles.tagHover : styles.textHover),
+        chip ? styles.chip : tag ? styles.tag : styles.text,
+        (active || pressed) && (chip ? styles.chipHover : tag ? styles.tagHover : styles.textHover),
         focusVisible && focusRing,
       ]}
     >
-      <Text variant={tag ? 'caption' : 'bodySmall'} style={tag ? styles.tagLabel : styles.textLabel}>
+      <Text
+        variant={tag ? 'caption' : 'bodySmall'}
+        color={chip && active ? 'accentStrong' : 'ink'}
+        style={chip ? styles.chipLabel : tag ? styles.tagLabel : styles.textLabel}
+      >
         {label}
       </Text>
     </Pressable>
@@ -96,4 +103,15 @@ const styles = StyleSheet.create({
   },
   tagHover: { borderColor: colors.inkMuted },
   tagLabel: { fontFamily: fonts.sansMedium },
+  chip: {
+    minHeight: layout.minTarget,
+    justifyContent: 'center',
+    paddingHorizontal: space.lg,
+    borderRadius: radius.chip,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.surface,
+  },
+  chipHover: { borderColor: colors.accentStrong },
+  chipLabel: { fontFamily: fonts.sansMedium },
 });

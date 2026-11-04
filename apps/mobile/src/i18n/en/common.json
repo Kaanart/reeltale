@@ -104,6 +104,13 @@
     "notice": "Report illegal content",
     "imprint": "ReelTale is made by Euragnos B.V., the Netherlands",
     "adultsOnly": "For adults 18+",
-    "newTab": "{{label}} (opens in a new tab)"
+    "newTab": "{{label}} (opens in a new tab)",
+    "columns": {
+      "site": "ReelTale",
+      "legal": "Legal",
+      "creators": "Creators"
+    },
+    "becomeCreator": "Become a creator",
+    "tagline": "Short vertical series, one to two minutes an episode."
   }
 }
