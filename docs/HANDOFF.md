@@ -3,6 +3,13 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **PITCH VIDEO STOPPED (~6 PM EST, Kaan at 99% weekly tokens):** real site clips are DONE in `prep/video/site/`
+  (b3, b4, b5, b8, b10 .mp4 + posters). Higgsfield generation was REFUSED (trial plan: "end the trial or move to a paid,
+  non-trial plan"), so NO AI shots, narration or music exist and no credits were spent. All prompts are ready in
+  `prep/video/session/shots_plan.json` and `narration/narration_prompts.json`; voice candidates Helena / Nora
+  (see `session/budget.md`). Next session, cheapest path: Kaan records the narration from docs/VIDEO.md himself
+  and the site clips are cut together with ffmpeg (free), OR upgrade Higgsfield and rerun only the produce step.
+  Workflow script for reference: `~/.claude/projects/-Users-kaanuysal-claude-ReelTale/c34fe42a-c069-4963-886d-75f066fa2e9b/workflows/scripts/reeltale-pitch-video-wf_b81168fd-a24.js`.
 - **PITCH VIDEO RUNNING (~5:30 PM EST):** workflow `wf_b81168fd-a24` (script under
   `~/.claude/projects/-Users-kaanuysal-claude-ReelTale/c34fe42a-c069-4963-886d-75f066fa2e9b/workflows/scripts/`).
   Choices: Claymotion preset, warm female voice, soft music, burned-in captions, 16:9, ~2:30, 11 narration blocks
