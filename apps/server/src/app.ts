@@ -5,13 +5,14 @@
 //     (src/lib/rate-limit.ts); failed auth is limited per client address
 //  3. association files (/.well-known/*, /app-ads.txt)
 //  4. /series/:slug share pages (web app + OpenGraph tags; the tag lookup is limited per client address)
-//  5. everything else: the Expo web build from static assets (SPA fallback)
+//  5. everything else: the Expo web build from static assets (SPA fallback), with byte ranges (src/lib/range.ts)
 // Every response gets security headers; HTML also gets a strict CSP.
 
 import { Hono } from 'hono';
 import type { AppContext, Env } from './env.ts';
 import { AuthError, bearerToken, supabaseJwks, verifyUserJwt } from './lib/auth.ts';
 import { htmlCsp, jsonError, withSecurityHeaders } from './lib/http.ts';
+import { withByteRanges } from './lib/range.ts';
 import { serviceDb } from './lib/db.ts';
 import { revenueCatWebhook } from './webhooks/revenuecat.ts';
 import { streamWebhook, sweepIngest } from './webhooks/stream.ts';
@@ -126,7 +127,7 @@ app.get('/series/:slug', async (c) => {
 });
 
 // ---- Static web app ------------------------------------------------------------------------------
-app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw));
+app.all('*', async (c) => withByteRanges(c.req.raw, await c.env.ASSETS.fetch(c.req.raw)));
 
 app.onError((err, c) => {
   console.error('unhandled', err instanceof Error ? err.message : err);

@@ -2,6 +2,14 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-05: video byte ranges for Safari
+- The Worker now answers `Range` requests on the static web build itself (`apps/server/src/lib/range.ts`): 206 with
+  `Content-Range`, 416 past the end, `Accept-Ranges: bytes` on whole files. Workers Static Assets sent the whole
+  file (200) for a range, which iPhone/Mac Safari won't play from, and which made seeking re-download the video.
+- The assets binding sends no Content-Length, so the first ranged request for a file reads it whole to learn its
+  size (remembered per path + ETag in the isolate); later ranges stream only their slice.
+- Checked on wrangler dev: 206s with the right bytes, 416, seeking in the browser. Not checked on a real iPhone.
+
 ## 2026-11-05: a real sample episode and cover (The Clockmaker's Mice)
 - Episode 1 "Tick" of The Clockmaker's Mice is now a real 61 s vertical episode (720x1280, 24 fps, narrated,
   music, burned-in captions, title and end card), and the series has a real cover. Both were made with AI through

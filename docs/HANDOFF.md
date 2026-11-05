@@ -13,7 +13,11 @@ Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D
 - Seedance 2.0 Mini is no longer in the Higgsfield catalog. Seedance 1.5 Pro is 1.2 credits/s at 720p (sound
   included); GPT Image 2.5 medium 1k is 0.5 per image, high 2k is 2.75.
 - Checked locally (wrangler dev + the web export): landing, Home weekly pick, episode 1 plays with sound on desktop
-  and phone sizes, episode 2 still shows the placeholder notice. Live deploy waits for Kaan's OK to commit and push.
+  and phone sizes, episode 2 still shows the placeholder notice.
+- Deployed as beaae09 (live 4 min after the push). Found then: reeltale.net ignored `Range` (200 + whole file), so
+  Safari might not play the episode. Fix in `apps/server/src/lib/range.ts` (206/416, size learned once per isolate
+  because the assets binding sends no Content-Length); tested on wrangler dev, not yet on a real iPhone.
+  If many people watch at once, the better home for videos is R2 (native ranges) or Cloudflare Stream.
 - Next cheap win: real covers for the other five sample series (about 0.5–2.75 credits each).
 
 ## Nov 4 (evening) checkpoints (newest first)
