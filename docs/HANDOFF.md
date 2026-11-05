@@ -18,6 +18,9 @@ Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D
   Safari might not play the episode. Fix in `apps/server/src/lib/range.ts` (206/416, size learned once per isolate
   because the assets binding sends no Content-Length); tested on wrangler dev, not yet on a real iPhone.
   If many people watch at once, the better home for videos is R2 (native ranges) or Cloudflare Stream.
+- **Scrubber:** the player's bottom bar can be dragged or tapped to seek (`ProgressBar.tsx` + `logic/scrub.ts`;
+  `seekTo` prop on both VideoSurfaces). Tested on wrangler dev at desktop and phone sizes, not on real devices.
+  Keyboard seek isn't there (the pager owns the arrow keys).
 - Next cheap win: real covers for the other five sample series (about 0.5–2.75 credits each).
 
 ## Nov 4 (evening) checkpoints (newest first)

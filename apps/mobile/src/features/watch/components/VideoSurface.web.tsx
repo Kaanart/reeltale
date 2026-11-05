@@ -54,7 +54,7 @@ function tryPlay(video: HTMLVideoElement, onMuted: () => void): void {
 }
 
 export function VideoSurface(props: VideoSurfaceProps) {
-  const { source, playing, muted, captions, style } = props;
+  const { source, playing, muted, captions, seekTo, style } = props;
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   // Event handlers read the newest props without re-attaching the source.
@@ -143,6 +143,11 @@ export function VideoSurface(props: VideoSurfaceProps) {
     const video = videoRef.current;
     if (video) video.muted = muted;
   }, [muted]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && seekTo && Number.isFinite(seekTo.seconds)) video.currentTime = seekTo.seconds;
+  }, [seekTo]);
 
   useEffect(() => {
     const video = videoRef.current;

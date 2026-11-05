@@ -2,6 +2,19 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-05: drag the player's bar to skip ahead or back
+- The progress bar at the bottom of the player is now a scrubber (`features/watch/components/ProgressBar.tsx`):
+  drag it or tap it to jump. While dragging, the line thickens, a thumb follows the finger and the time shows above
+  it ("0:22 of 1:01"); the video jumps once, on release. The touch area is 28 px tall, not just the 3 px line.
+- One component for iOS, Android and the web (PanResponder). Once a drag starts the pager can't take it over; on the
+  web `touch-action: none` keeps the page from scrolling under the finger. Only the bar takes touches in the info
+  card, so tapping the title still plays/pauses.
+- Screen readers get an adjustable slider that moves 5 s a step, with the time read out (`logic/scrub.ts`, tested).
+- Checked on wrangler dev (desktop and phone sizes): a drag landed on the expected second, a tap seeks, play/pause
+  still works. Not checked on a real iPhone or Android phone. The arrow keys stay with the pager (next episode),
+  so there is no keyboard seek yet.
+- Didn't work at first: react-native-web ignores `accessibilityValue`, so the slider values are `aria-value*` props.
+
 ## 2026-11-05: video byte ranges for Safari
 - The Worker now answers `Range` requests on the static web build itself (`apps/server/src/lib/range.ts`): 206 with
   `Content-Range`, 416 past the end, `Accept-Ranges: bytes` on whole files. Workers Static Assets sent the whole

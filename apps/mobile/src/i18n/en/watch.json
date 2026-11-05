@@ -12,6 +12,8 @@
   "play": "Play",
   "pause": "Pause",
   "scrubber": "Video position",
+  "scrubberValue": "{{position}} of {{duration}}",
+  "scrubberHint": "Drag or tap to skip ahead or back",
   "captions": {
     "label": "Captions",
     "on": "Captions on",

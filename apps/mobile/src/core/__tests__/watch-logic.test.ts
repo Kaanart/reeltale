@@ -15,6 +15,7 @@ import {
   isComplete, MAX_POSITION_S, progressByEpisode, ProgressThrottle, resumePosition, SAVE_INTERVAL_MS, toPositionS,
 } from '../../features/watch/logic/progress.ts';
 import { parseUnlockResult, unlockFailure, unlockSheetView, type WalletFacts } from '../../features/watch/logic/unlock.ts';
+import { clock, SCRUB_STEP_S, secondsAt, stepSeconds } from '../../features/watch/logic/scrub.ts';
 
 // The watch track's pure logic: what a page may do with an episode, the player window, watch progress, the
 // unlock sheet's states and the end-of-episode offer.
@@ -327,4 +328,35 @@ test('the countdown counts whole seconds down to zero', () => {
   assert.equal(secondsLeft(1000, 1000 + NEXT_COUNTDOWN_S * 1000), 0);
   assert.equal(secondsLeft(1000, 999_999), 0);
   assert.equal(secondsLeft(5000, 1000), NEXT_COUNTDOWN_S, 'a clock that went back does not add time');
+});
+
+// ---- Scrubber: drag or tap the bar to skip ---------------------------------------------------------------
+
+test('secondsAt: the second under the finger, clamped to the video', () => {
+  assert.equal(secondsAt(0, 200, 61), 0);
+  assert.equal(secondsAt(100, 200, 61), 30.5);
+  assert.equal(secondsAt(200, 200, 61), 61);
+  assert.equal(secondsAt(-40, 200, 61), 0, 'dragged off the left end');
+  assert.equal(secondsAt(500, 200, 61), 61, 'dragged off the right end');
+  assert.equal(secondsAt(50, 0, 61), 0, 'not laid out yet');
+  assert.equal(secondsAt(50, 200, 0), 0, 'duration unknown');
+  assert.equal(secondsAt(Number.NaN, 200, 61), 0);
+});
+
+test('stepSeconds: a screen reader step is 5 s, inside the video', () => {
+  assert.equal(SCRUB_STEP_S, 5);
+  assert.equal(stepSeconds(10, 61, 1), 15);
+  assert.equal(stepSeconds(10, 61, -1), 5);
+  assert.equal(stepSeconds(59, 61, 1), 61);
+  assert.equal(stepSeconds(2, 61, -1), 0);
+});
+
+test('clock: minutes and seconds, hours when needed', () => {
+  assert.equal(clock(0), '0:00');
+  assert.equal(clock(7.9), '0:07');
+  assert.equal(clock(65), '1:05');
+  assert.equal(clock(750), '12:30');
+  assert.equal(clock(3723), '1:02:03');
+  assert.equal(clock(-3), '0:00');
+  assert.equal(clock(Number.NaN), '0:00');
 });

@@ -19,6 +19,8 @@ export interface VideoSurfaceProps {
   captions: boolean;
   /** Seconds to start from (applied once, when the video is ready). */
   startAt: number;
+  /** Jump here whenever this changes (a new object each time, so the same second can be asked twice). */
+  seekTo?: { seconds: number } | null;
   /** About once a second while the video moves: position and duration in seconds. */
   onProgress: (positionSeconds: number, durationSeconds: number) => void;
   /** The first frame is on screen: the poster can go. */
@@ -39,7 +41,7 @@ function toVideoSource(source: PlaybackSource): VideoSource {
 }
 
 export function VideoSurface(props: VideoSurfaceProps) {
-  const { source, playing, muted, captions, startAt, style } = props;
+  const { source, playing, muted, captions, startAt, seekTo, style } = props;
   const player = useVideoPlayer(toVideoSource(source), (p) => {
     p.loop = false;
     p.muted = muted;
@@ -69,6 +71,10 @@ export function VideoSurface(props: VideoSurfaceProps) {
   useEffect(() => {
     player.muted = muted;
   }, [player, muted]);
+
+  useEffect(() => {
+    if (seekTo && Number.isFinite(seekTo.seconds)) player.currentTime = seekTo.seconds;
+  }, [player, seekTo]);
 
   useEffect(() => {
     if (!playing) {

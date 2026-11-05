@@ -108,6 +108,8 @@ function LivePage({
   const [load, setLoad] = useState<LoadState>('ok');
   const [captionsAvailable, setCaptionsAvailable] = useState(false);
   const [time, setTime] = useState({ position: 0, duration: episode.duration_s ?? 0 });
+  // The scrubber's last jump, handed to the player (a new object per jump).
+  const [seekTo, setSeekTo] = useState<{ seconds: number } | null>(null);
   const saver = useProgressSaver(episode.id, series.id, episode.duration_s);
 
   const playing = active && inFront && !paused && load !== 'failed';
@@ -151,6 +153,12 @@ function LivePage({
     saveProgress(position, duration);
     if (active) setTime({ position, duration: duration > 0 ? duration : (episode.duration_s ?? 0) });
   }, [saveProgress, active, episode.duration_s]);
+
+  // Dragging or tapping the bar: jump there, and show the new position at once (the player reports it next).
+  const onSeek = useCallback((seconds: number) => {
+    setSeekTo({ seconds });
+    setTime((prev) => ({ ...prev, position: seconds }));
+  }, []);
 
   const onReady = useCallback(() => {
     setReady(true);
@@ -242,6 +250,7 @@ function LivePage({
             muted={muted}
             captions={captions}
             startAt={startAt}
+            seekTo={seekTo}
             onProgress={onProgress}
             onReady={onReady}
             onEnd={onEnd}
@@ -291,25 +300,26 @@ function LivePage({
         <View style={[styles.bottom, { paddingBottom: bottomInset + space.md }]} pointerEvents="box-none">
           {/* In the theatre the panel names the episode: the video keeps its AI label and the progress. */}
           {!theater || ai || controls ? (
-            <View style={[styles.infoCard, theater && controls && styles.infoCardTheater]} pointerEvents="none">
+            // Only the scrubber takes touches: a tap anywhere else on the card still reaches play/pause below.
+            <View style={[styles.infoCard, theater && controls && styles.infoCardTheater]} pointerEvents="box-none">
               {ai ? (
-                <View style={[styles.aiBadge, theater && !controls && styles.aiBadgeAlone]}>
+                <View style={[styles.aiBadge, theater && !controls && styles.aiBadgeAlone]} pointerEvents="none">
                   <AIBadge size="sm" />
                 </View>
               ) : null}
               {theater ? null : (
-                <>
+                <View pointerEvents="none">
                   <Text variant="subheading" color="surface" numberOfLines={2}>
                     {episode.title}
                   </Text>
                   <Text variant="bodySmall" color="surface">
                     {t('common:episode.number', { number: episode.number })}
                   </Text>
-                </>
+                </View>
               )}
               {controls ? (
                 <View style={[styles.progress, theater && styles.progressTheater]}>
-                  <ProgressBar position={time.position} duration={time.duration} label={t('watch:scrubber')} />
+                  <ProgressBar position={time.position} duration={time.duration} label={t('watch:scrubber')} onSeek={onSeek} />
                 </View>
               ) : null}
             </View>
@@ -369,7 +379,7 @@ const styles = StyleSheet.create({
   infoCardTheater: { flexGrow: 1, marginRight: 0 },
   aiBadge: { marginBottom: space.xs },
   aiBadgeAlone: { marginBottom: 0 },
-  progress: { marginTop: space.sm, minWidth: PROGRESS_MIN_WIDTH },
+  progress: { marginTop: space.xs, minWidth: PROGRESS_MIN_WIDTH },
   progressTheater: { marginTop: 0 },
   rail: { marginLeft: 'auto', alignItems: 'center' },
   railGap: { height: space.md },
