@@ -2,6 +2,11 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: pitch video attempt (stopped)
+- Real site clips captured with headless Chrome (`prep/video/site/`). Higgsfield CLI + skills installed and checked.
+- Didn't work: Higgsfield refused generation on a trial plan, so no AI shots, narration or music were made (no credits
+  spent). Stopped at 99% of Kaan's weekly tokens; next steps in HANDOFF.
+
 ## 2026-11-04: WebNovel-style Home, free start without an account, 10 free episodes
 - "Coming soon" placeholder posters fill sparse storefront rows; an empty live catalog invites creators instead.
 - Without a Meta key the Worker answers `ai_paused` before holding coins (was: the job failed and refunded later).
