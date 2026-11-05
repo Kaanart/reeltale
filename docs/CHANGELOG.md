@@ -2,6 +2,12 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: pitch video v4 (final)
+- 8 new AI b-roll shots without people (Seedance 2.5, 1080p) in the dark premium style, interpolated to a true
+  60 fps; real site footage, new music and the v3 look kept. The write-up's video note lists the AI parts again.
+- Didn't work at first: the shots took ~6 min to render; one download was cut off when generation was paused, and
+  was redone.
+
 ## 2026-11-04: pitch video v3 (60 fps, no clay figure)
 - The clay character shots are gone: animated title cards, a Ken Burns move over real site stills and real footage
   of the sample AI story take their place. Rendered at 60 fps (site recordings are 30 fps captures).

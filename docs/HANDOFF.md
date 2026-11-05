@@ -3,6 +3,13 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **PITCH VIDEO v4 = FINAL (8:25 PM EST): `prep/video/versions/v4/reeltale-demo.mp4`**, 2:25, 1080p, 60 fps.
+  Kaan bought Higgsfield credits (1000). v3 + 8 new AI b-roll shots without people (Seedance 2.5 t2v 1080p: phone
+  wall, closed studio door, book to screens, coins, tripod + miniature street, phone playing a film, comic panels,
+  glass choice cards), motion-interpolated 24 -> 60 fps (ffmpeg minterpolate, 1600x900). Labelled "AI-generated".
+  `docs/HACKATHON.md` video note matches v4 again (AI b-roll + voice + music). Submission texts:
+  `prep/submission_description.txt`, `prep/project_description.txt`. NOTE: `META_API_KEY` in secrets.env is still
+  empty, so live AI stories are likely still paused (`ai_paused`); the descriptions don't claim they run.
 - **PITCH VIDEO v3 (8:04 PM EST): `prep/video/versions/v3/reeltale-demo.mp4`, 60 fps, no clay figure** (Kaan's ask).
   v2 look and music; the clay shots are replaced by the script's own fallbacks (animated title cards for B1/B2, Ken
   Burns over real site stills for B6, real sample-AI-story footage for B7). Clay clips parked in
