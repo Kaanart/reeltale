@@ -282,7 +282,7 @@ function LivePage({
 
         {panel}
 
-        {source?.kind === 'demo' && active ? (
+        {source?.kind === 'demo' && source.placeholder && active ? (
           <View style={[styles.noticeRow, { top: topInset }]} pointerEvents="none">
             <DemoNotice label={t('watch:demo.notice')} />
           </View>

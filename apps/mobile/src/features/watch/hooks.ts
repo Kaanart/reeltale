@@ -18,7 +18,7 @@ import {
   demoEpisodePrice, demoProgressFor, demoSaveProgress, demoUnlock, demoUseFreePass, demoWalletCell, demoWatchSeries,
   DemoRpcError,
 } from './demo';
-import { DEMO_VIDEO } from './demoMedia';
+import { DEMO_VIDEO, demoVideoFor } from './demoMedia';
 import { playbackFreshForMs } from './logic/access';
 import { progressByEpisode, type SavedProgress } from './logic/progress';
 import { parseUnlockResult, type UnlockOutcome, type WalletFacts } from './logic/unlock';
@@ -120,7 +120,8 @@ export function useEpisodePrice(episodeId: string, enabled: boolean) {
 
 export type PlaybackSource =
   | { kind: 'stream'; uri: string; expiresAt: number }
-  | { kind: 'demo'; asset: number };
+  /** A bundled demo video; `placeholder` when it is the stand-in clip rather than the episode itself. */
+  | { kind: 'demo'; asset: number; placeholder: boolean };
 
 /**
  * The signed HLS URL for one episode. `allowed` must come from the price check (logic/access.ts
@@ -140,7 +141,10 @@ export function usePlayback(episodeId: string, allowed: boolean) {
     queryFn: ({ signal }) => {
       if (!allowed) return Promise.reject(new ApiError(402, 'locked'));
       return fromSource<PlaybackSource>({
-        demo: () => ({ kind: 'demo', asset: DEMO_VIDEO }),
+        demo: () => {
+          const asset = demoVideoFor(episodeId);
+          return { kind: 'demo', asset, placeholder: asset === DEMO_VIDEO };
+        },
         live: async () => {
           const r = await api.getPlayback(episodeId, { signal });
           return { kind: 'stream', uri: r.hls, expiresAt: r.expires_at };

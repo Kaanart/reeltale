@@ -298,11 +298,11 @@ test('the demo database filters like the real one: rankings, formats, tags, sear
   assert.deepEqual(slugs(run({ ranking: 'new' })), ['salt-and-static', 'low-tide', 'neon-ronin', 'the-clockmakers-mice', 'paper-moons']);
   assert.deepEqual(slugs(run({ ranking: 'completed' })), ['paper-moons']);
   assert.deepEqual(slugs(run({ ranking: 'editorsPicks' })).sort(), ['low-tide', 'the-clockmakers-mice']);
-  assert.deepEqual(slugs(run({ ranking: 'aiStories' })).sort(), ['low-tide', 'neon-ronin']);
+  assert.deepEqual(slugs(run({ ranking: 'aiStories' })).sort(), ['low-tide', 'neon-ronin', 'the-clockmakers-mice']);
   assert.ok(run({ ranking: 'aiStories' }).every((s) => s.format === 'ai_generated'));
 
-  assert.deepEqual(slugs(run({ formats: ['stop_motion'] })).sort(), ['paper-moons', 'the-clockmakers-mice']);
-  assert.deepEqual(slugs(run({ formats: ['stop_motion', 'live_action'] })).length, 3);
+  assert.deepEqual(slugs(run({ formats: ['stop_motion'] })).sort(), ['paper-moons']);
+  assert.deepEqual(slugs(run({ formats: ['stop_motion', 'live_action'] })).length, 2);
   const mystery = demoTags.find((t) => t.slug === 'mystery')!;
   const sleuth = demoTags.find((t) => t.slug === 'amateur-sleuth')!;
   assert.deepEqual(slugs(run({ tagIds: [mystery.id] })), ['low-tide']);

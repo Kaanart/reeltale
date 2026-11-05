@@ -2,6 +2,20 @@
 
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
+## Nov 5: a real sample episode (newest)
+- **The Clockmaker's Mice, episode 1 "Tick"** is a real 61 s AI-made episode, and the series has a real cover:
+  `apps/mobile/src/features/watch/assets/clockmakers-mice-1.mp4` (11.9 MB, bundled; Worker asset limit is 25 MiB)
+  and `apps/mobile/src/demo/assets/cover-clockmaker.jpg`. The series is now labelled AI (`ai_generated`, origin
+  `creator`, episodes `ai_video`). Other demo episodes still play the 12 s placeholder.
+- Sources, prompts and the rebuild script (free to rerun): `prep/episode/clockmaker-ep1/` (not in git);
+  `python3 prep/episode/clockmaker-ep1/whisper_timings.py prep/episode/clockmaker-ep1` (captions' word timings),
+  then `python3 prep/episode/clockmaker-ep1/assemble_ep1.py`. Higgsfield balance: 89 credits.
+- Seedance 2.0 Mini is no longer in the Higgsfield catalog. Seedance 1.5 Pro is 1.2 credits/s at 720p (sound
+  included); GPT Image 2.5 medium 1k is 0.5 per image, high 2k is 2.75.
+- Checked locally (wrangler dev + the web export): landing, Home weekly pick, episode 1 plays with sound on desktop
+  and phone sizes, episode 2 still shows the placeholder notice. Live deploy waits for Kaan's OK to commit and push.
+- Next cheap win: real covers for the other five sample series (about 0.5–2.75 credits each).
+
 ## Nov 4 (evening) checkpoints (newest first)
 - **PITCH VIDEO v6 = FINAL (8:44 PM EST): `prep/video/versions/v6/reeltale-demo.mp4`**, 2:19, full screen, 60 fps.
   Kaan's edits: new "future of entertainment" section (narration BF + title card: scroll + Netflix-style series +

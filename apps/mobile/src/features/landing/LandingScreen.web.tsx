@@ -86,7 +86,7 @@ function Landing({ isDemo, onDemo }: { isDemo: boolean; onDemo: () => void }) {
           </Heading>
           <ResponsiveGrid columns={{ compact: 1, medium: 3, wide: 3 }} gap={space.xl} accessibilityLabel={t('landing:formats.a11y')}>
             <FormatCard image={demoCover('salt-and-static')} titleKey="landing:formats.liveAction.title" bodyKey="landing:formats.liveAction.body" />
-            <FormatCard image={demoCover('the-clockmakers-mice')} titleKey="landing:formats.stopMotion.title" bodyKey="landing:formats.stopMotion.body" />
+            <FormatCard image={demoCover('paper-moons')} titleKey="landing:formats.stopMotion.title" bodyKey="landing:formats.stopMotion.body" />
             <FormatCard image={demoPanelImage(DEMO_PANEL_KEYS[1] ?? '')} titleKey="landing:formats.aiComics.title" bodyKey="landing:formats.aiComics.body" ai />
           </ResponsiveGrid>
         </Band>

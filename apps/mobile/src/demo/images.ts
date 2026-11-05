@@ -1,12 +1,13 @@
-// Bundled placeholder pictures for demo mode (generated flat-colour PNGs: no text, no people, no URLs).
-// Covers are 3:4, comic panels 9:16 like the real ones. Use with expo-image or <Image source={...}>.
+// Bundled pictures for demo mode (no text, no people, no URLs). Most are generated flat-colour placeholder PNGs;
+// The Clockmaker's Mice has a real cover made with AI (GPT Image 2.5 through Higgsfield), like its first episode, and
+// the series is labelled AI. Covers are 3:4, comic panels 9:16 like the real ones. Use with expo-image or <Image source={...}>.
 
 import type { ImageSourcePropType } from 'react-native';
 import { DEMO_PANEL_KEYS, demoSeries } from './fixtures';
 
 const COVERS: Record<string, ImageSourcePropType> = {
   'salt-and-static': require('./assets/cover-salt-static.png'),
-  'the-clockmakers-mice': require('./assets/cover-clockmaker.png'),
+  'the-clockmakers-mice': require('./assets/cover-clockmaker.jpg'),
   'night-shift-at-the-wax-museum': require('./assets/cover-wax-museum.png'),
   'paper-moons': require('./assets/cover-paper-moons.png'),
   'low-tide': require('./assets/cover-low-tide.png'),

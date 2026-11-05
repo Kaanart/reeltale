@@ -49,6 +49,8 @@ test('Weekly pick: Editor’s Picks first (one not made with AI leads), then Tre
   assert.deepEqual(heroSeries([], trending, 3).map((s) => s.id), ['t1', 'pick', 't2'], 'no picks: Trending alone');
   assert.deepEqual(heroSeries([card('x')], [], 4), [], 'a series that is not a pick is not featured as one');
   assert.deepEqual(heroSeries([ai], []).map((s) => s.id), ['ai'], 'an AI pick when it is the only one');
+  const aiVideo = card('aiv', { editors_pick: true, format: 'ai_generated', origin: 'creator' });
+  assert.deepEqual(heroSeries([ai, aiVideo], []).map((s) => s.id), ['aiv', 'ai'], 'a creator series made with AI before an AI story');
   assert.deepEqual(heroSeries([], []), []);
 });
 
@@ -95,7 +97,7 @@ test('the demo catalog fills every section, and mature series stay out for a rea
   assert.ok(all.length > 0);
   assert.ok(all.every((s) => s.maturity === 'general'), 'no mature series without the opt-in');
   assert.ok(store.hero.length >= 3, 'three or four slides');
-  assert.equal(store.hero[0]?.slug, 'the-clockmakers-mice', 'the pick not made with AI leads');
+  assert.equal(store.hero[0]?.slug, 'the-clockmakers-mice', 'a creator series leads, before the AI story');
   assert.ok(store.rankings.trending.length > 0 && store.rankings.fresh.length > 0 && store.rankings.completed.length > 0);
   assert.equal(store.rankings.fresh[0]?.slug, 'salt-and-static', 'the newest demo series');
 });

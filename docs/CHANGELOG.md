@@ -2,6 +2,23 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-05: a real sample episode and cover (The Clockmaker's Mice)
+- Episode 1 "Tick" of The Clockmaker's Mice is now a real 61 s vertical episode (720x1280, 24 fps, narrated,
+  music, burned-in captions, title and end card), and the series has a real cover. Both were made with AI through
+  Higgsfield: GPT Image 2.5 (character lineup, 9 keyframes, cover), Seedance 1.5 Pro (9 shots, with ambient
+  sound), Seed Audio (narration, voice Helena), ElevenLabs Music v2.5. About 109 credits spent, 89 left.
+- Because it's AI-made, the series is now labelled AI: format `ai_generated` with origin `creator`, its episodes
+  are `ai_video` (AI stories stay `ai_comic`), and the synopsis says "An animated series made with AI". The landing
+  page's stop-motion card now shows Paper Moons; the hero picture shows the mice cover with the AI badge.
+- The Weekly pick and the featured series fall back to a creator's series made with AI before an AI story when no
+  pick is free of AI, so the mice series still leads Home.
+- Demo playback picks a video per episode (`demoVideoFor`); every other demo episode keeps the 12 s placeholder, and
+  the "placeholder clip" notice now shows only on the placeholder.
+- Didn't work at first: Seedance 2.0 Mini (used for the pitch video) is gone from the catalog, so Seedance 1.5 Pro
+  was used (1.2 credits/s); batch submits hit a rate limit (max 6 videos at once) and were resubmitted; one
+  narration take was clipped ("He was ret-") and re-taken; shot 7's screws vanish after 5 s, so only its first 5 s
+  are used (slowed to 0.8x); the first cut lost its end card because the music ducking stopped with the narration.
+
 ## 2026-11-04: pitch video v6 (final)
 - New "future of entertainment" section, faster narration and site clips, tighter cuts, full screen, 2:19 at 60 fps.
   The on-screen AI label was dropped at Kaan's request; the write-up still lists every AI part of the video.

@@ -62,11 +62,11 @@ type HeroCandidate = Identified & Pick<SeriesCard, 'editors_pick' | 'format' | '
 /**
  * The "Weekly pick" carousel: Editor's Picks first, then Trending fills it up to `max`. The first slide is a
  * pick that isn't made with AI when there is one (the panel beside it already invites people to make an AI
- * story), as the old featured panel did.
+ * story), as the old featured panel did; failing that, a creator's series made with AI before an AI story.
  */
 export function heroSeries<T extends HeroCandidate>(picks: readonly T[], trending: readonly T[], max: number = HERO_MAX): T[] {
   const eligible = picks.filter((s) => s.editors_pick);
-  const lead = eligible.find((s) => !isAiSeries(s));
+  const lead = eligible.find((s) => !isAiSeries(s)) ?? eligible.find((s) => s.origin !== 'ai_story');
   const ordered = lead ? [lead, ...eligible.filter((s) => s !== lead)] : eligible;
   return uniqueById([...ordered, ...trending]).slice(0, Math.max(0, Math.floor(max)));
 }

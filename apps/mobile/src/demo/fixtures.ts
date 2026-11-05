@@ -46,7 +46,7 @@ export const demoAccount: AccountRow = {
 
 export const demoCreators: readonly ProfileRow[] = [
   { id: id('c0', 1), handle: 'harbour_films', display_name: 'Harbour Films', bio: 'Short dramas shot on the coast.', avatar_key: null },
-  { id: id('c0', 2), handle: 'tiny_frames', display_name: 'Tiny Frames', bio: 'Stop-motion, one frame at a time.', avatar_key: null },
+  { id: id('c0', 2), handle: 'tiny_frames', display_name: 'Tiny Frames', bio: 'Small worlds in stop-motion and AI animation.', avatar_key: null },
   { id: id('c0', 3), handle: 'night_owl_studio', display_name: 'Night Owl Studio', bio: 'Mysteries after dark.', avatar_key: null },
 ];
 
@@ -96,8 +96,9 @@ const SPECS: SeriesSpec[] = [
     episodes: ['Dead Air', 'Caller Number Nine', 'Low Signal', 'The Harbour Party', 'Static', 'Off the Record', 'Storm Warning', 'Sign-Off'],
   },
   {
-    n: 2, slug: 'the-clockmakers-mice', title: 'The Clockmaker’s Mice', format: 'stop_motion', creator: 2, tags: [2, 6, 118], editorsPick: true, price: 15, seconds: 70,
-    synopsis: 'Three mice live inside a grandfather clock and keep it ticking. When the clockmaker retires, they have one week to train his clumsy apprentice.',
+    // Episode 1 is a real AI-made video (features/watch/demoMedia.ts), so the series is labelled AI.
+    n: 2, slug: 'the-clockmakers-mice', title: 'The Clockmaker’s Mice', format: 'ai_generated', creator: 2, tags: [2, 6, 118], editorsPick: true, price: 15, seconds: 66, // episode 1 runs 61 s
+    synopsis: 'Three mice live inside a grandfather clock and keep it ticking. When the clockmaker retires, they have one week to train his clumsy apprentice. An animated series made with AI.',
     episodes: ['Tick', 'Tock', 'The New Hands', 'Oil and Springs', 'Midnight Chime', 'Wound Too Tight', 'Half Past Brave'],
   },
   {
@@ -162,7 +163,8 @@ export const demoEpisodes: readonly EpisodeRow[] = SPECS.flatMap((s) =>
       number,
       title,
       duration_s: s.seconds - (number % 3) * 5,
-      kind: s.format === 'ai_generated' ? 'ai_comic' : 'video',
+      // AI stories are living comics; a creator's AI series is video.
+      kind: s.format !== 'ai_generated' ? 'video' : s.origin === 'ai_story' ? 'ai_comic' : 'ai_video',
       // Later episodes cost a little more, in steps of 5 like the real catalog.
       price_coins: free || s.price === null ? null : s.price + (number > 6 ? 5 : 0),
       is_free: free,

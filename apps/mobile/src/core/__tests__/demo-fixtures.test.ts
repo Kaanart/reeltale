@@ -58,7 +58,7 @@ test('6 to 10 episodes each, the first five free, prices 10–100 coins in steps
       ids.add(e.id);
       assert.equal(e.number, i + 1);
       assert.ok(e.duration_s !== null && e.duration_s >= 1 && e.duration_s <= 120);
-      assert.equal(e.kind, s.format === 'ai_generated' ? 'ai_comic' : 'video');
+      assert.equal(e.kind, s.format !== 'ai_generated' ? 'video' : s.origin === 'ai_story' ? 'ai_comic' : 'ai_video');
       if (e.number <= DEMO_FREE_EPISODES) {
         assert.equal(e.is_free, true, `${s.slug} #${e.number} must be free`);
         assert.equal(e.price_coins, null);

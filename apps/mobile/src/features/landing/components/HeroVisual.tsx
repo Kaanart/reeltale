@@ -6,8 +6,9 @@ import { DEMO_PANEL_KEYS, demoCover, demoPanelImage } from '../../../demo';
 import { colors, fonts, radius, space } from '../../../theme/tokens';
 
 // The hero's picture, made from the bundled demo art (no network, no external images): two series covers
-// (live action, stop-motion; each names its format at the top, clear of the overlap) and a phone showing a living comic panel that ends with a choice. The AI panel
-// carries the AI badge like every AI picture in the app. Screen readers get one description of the whole
+// (live action, and The Clockmaker's Mice, an animated series made with AI; each is labelled at the top, clear of the
+// overlap) and a phone showing a living comic panel that ends with a choice. The AI cover and the AI panel
+// carry the AI badge like every AI picture in the app. Screen readers get one description of the whole
 // picture instead of its pieces.
 //
 // It is drawn at BASE_W x BASE_H and scaled to `width`, so the composition keeps its shape on any screen.
@@ -25,7 +26,7 @@ export function HeroVisual({ width }: { width: number }) {
   const { t } = useTranslation();
   const s = Math.max(0.5, Math.min(1.2, width / BASE_W));
   const live = demoCover('salt-and-static');
-  const stop = demoCover('the-clockmakers-mice');
+  const animated = demoCover('the-clockmakers-mice');
   const panel = demoPanelImage(DEMO_PANEL_KEYS[3] ?? '');
 
   const box = (g: { x: number; y: number; w: number; h: number }) => ({
@@ -47,8 +48,10 @@ export function HeroVisual({ width }: { width: number }) {
         <FormatChip label={t('common:format.live_action')} />
       </View>
       <View style={[styles.cover, box(COVER_B), { transform: [{ rotate: COVER_B.rotate }] }]}>
-        {stop ? <Image source={stop} style={styles.fill} resizeMode="cover" /> : null}
-        <FormatChip label={t('common:format.stop_motion')} />
+        {animated ? <Image source={animated} style={styles.fill} resizeMode="cover" /> : null}
+        <View style={[styles.badge, { top: space.sm, left: space.sm }]}>
+          <AIBadge size="sm" />
+        </View>
       </View>
 
       <View style={[styles.phone, box(PHONE), { borderRadius: radius.sheet * 1.5 * s, borderWidth: BEZEL * s }]}>

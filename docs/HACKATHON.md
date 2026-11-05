@@ -69,6 +69,9 @@ after an access check) and serves the site. Hard limits keep R2 and model spend 
   says "AI stories are paused for now" before any coins are held; the sample story shows the player and choices.
 - No filmed series yet: the catalog visitors see is sample data, labelled as such. Real creator uploads (Cloudflare
   Stream + the ingest Workflow with Spark safety checks) are built but have no content yet.
+- Added after the deadline (Nov 5): the first episode of the sample series The Clockmaker's Mice is a real 61 s
+  episode made with AI video, image, voice and music models through Higgsfield (third-party models, not Meta's), so
+  that series is labelled AI. The other sample episodes play a short placeholder clip.
 - The native iOS/Android apps share the code but weren't submitted to the stores; the website is the entry.
 
 ## About the demo video

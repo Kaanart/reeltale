@@ -196,12 +196,12 @@ export const HERO_SIDE_WIDTH = layout.sidePanelWidth;
 
 /**
  * The Editor's Pick Home features. The panel beside it already invites people into an AI story, so the first
- * pick that isn't made with AI goes here when there is one (it shows the range of the catalog); otherwise the
- * first pick. Picks arrive in the catalog's own order (newest first).
+ * pick that isn't made with AI goes here when there is one (it shows the range of the catalog); otherwise a
+ * creator's series made with AI before an AI story; otherwise the first pick. Picks arrive in the catalog's own order (newest first).
  */
 export function featuredSeries<T extends Pick<SeriesCard, 'editors_pick' | 'format' | 'origin'>>(picks: readonly T[]): T | null {
   const eligible = picks.filter((s) => s.editors_pick);
-  return eligible.find((s) => !isAiSeries(s)) ?? eligible[0] ?? null;
+  return eligible.find((s) => !isAiSeries(s)) ?? eligible.find((s) => s.origin !== 'ai_story') ?? eligible[0] ?? null;
 }
 
 // ---- Links that compute their target when clicked ----------------------------------------------------------

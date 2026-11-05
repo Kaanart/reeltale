@@ -196,8 +196,9 @@ test('Home features an Editor’s Pick, preferring one that is not made with AI'
   assert.equal(featuredSeries([card('a', false, 'live_action')]), null, 'only picks are featured');
   assert.equal(featuredSeries([card('ai', true, 'ai_generated', 'ai_story'), card('sm', true, 'stop_motion')])?.id, 'sm');
   assert.equal(featuredSeries([card('ai', true, 'ai_generated', 'ai_story')])?.id, 'ai', 'an AI pick when it is the only one');
+  assert.equal(featuredSeries([card('ai', true, 'ai_generated', 'ai_story'), card('aiv', true, 'ai_generated')])?.id, 'aiv', 'a creator series made with AI before an AI story');
   assert.equal(featuredSeries([card('o', true, 'live_action', 'ai_story'), card('b', true, 'live_action')])?.id, 'b', 'an AI story by origin counts as AI');
-  // The demo has two picks: the stop-motion one is featured.
+  // The demo has two picks, both made with AI: the creator's animated series is featured, not the AI story.
   const picks = demoCatalog().filter((s) => s.editors_pick);
   assert.ok(picks.length >= 2);
   assert.equal(featuredSeries(picks)?.slug, 'the-clockmakers-mice');
