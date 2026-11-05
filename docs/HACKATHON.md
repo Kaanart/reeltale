@@ -72,9 +72,10 @@ after an access check) and serves the site. Hard limits keep R2 and model spend 
 - The native iOS/Android apps share the code but weren't submitted to the stores; the website is the entry.
 
 ## About the demo video
-The site clips in the video are real recordings of reeltale.net. The claymotion b-roll shots, the narration voice and
-the music were made with Higgsfield (third-party AI video and audio models); every AI shot is labelled
-"AI-generated" on screen. The pipeline diagram and end card were made by hand.
+The site clips and stills in the video are real recordings of reeltale.net. The narration voice and the music were
+made with Higgsfield (third-party AI audio models). The title cards, pipeline diagram and end card were made by hand.
+The video contains no AI-generated footage; "AI-generated" badges visible on screen belong to the site's own sample
+AI story.
 
 ## What's next
 Creator uploads with real series, store launch, creator payouts, Meta video models as soon as there is an API.

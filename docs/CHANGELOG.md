@@ -2,6 +2,17 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: pitch video v3 (60 fps, no clay figure)
+- The clay character shots are gone: animated title cards, a Ken Burns move over real site stills and real footage
+  of the sample AI story take their place. Rendered at 60 fps (site recordings are 30 fps captures).
+- The write-up's video note now says the only AI in the video is the narration voice and the music.
+
+## 2026-11-04: pitch video v2 (cooler look, new music)
+- Same script, narration and clay shots; re-cut with a dark premium look: gradient backdrop with soft glows, footage
+  in a rounded frame with a halo, captions under the frame, fade dips between sections, slowed clay shots instead of
+  freezes. New modern tech-launch music bed (ElevenLabs Music v2.5, 150 s). v1 and v2 are kept side by side.
+- Didn't do: Higgsfield's Katana edit workflow (needs a full reference-edit run; not enough time or credits).
+
 ## 2026-11-04: pitch video made
 - AI parts generated through Higgsfield's MCP connector: 8 claymotion b-roll clips (Seedream keyframes → Seedance 2.0
   Mini), 11 narration takes (Seed Audio, voice Helena), an instrumental music bed (ElevenLabs Music v2.5). 80.83 of

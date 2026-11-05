@@ -3,6 +3,22 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **PITCH VIDEO v3 (8:04 PM EST): `prep/video/versions/v3/reeltale-demo.mp4`, 60 fps, no clay figure** (Kaan's ask).
+  v2 look and music; the clay shots are replaced by the script's own fallbacks (animated title cards for B1/B2, Ken
+  Burns over real site stills for B6, real sample-AI-story footage for B7). Clay clips parked in
+  `prep/video/session/clips_clay/`. Script now renders at 60 fps (site captures are 30 fps, shown frame-doubled).
+  `docs/HACKATHON.md` "About the demo video" now matches v3 (AI = narration voice + music only); if v1/v2 is
+  submitted instead, that paragraph must mention the AI clay shots again. Higgsfield balance 3.97: the "plus" plan's
+  100 credits were the ones already used, nothing new arrived.
+- **PITCH VIDEO v2 (7:51 PM EST): `prep/video/versions/v2/reeltale-demo.mp4`** (also the current
+  `prep/video/final/`). Kaan asked for a cooler, cleaner look and less generic music. Free re-edit in
+  `assemble_final.py`: dark premium backdrop (near-black gradient, coral/violet glows), footage in a rounded frame
+  with a soft halo, captions under the frame, 0.22 s fade dips between sections, clay shots slowed instead of
+  frozen. New music `session/music/music_bed_v2.mp3` (ElevenLabs Music v2.5, 150 s, 21.8 credits); v1 music moved to
+  `session/music_v1/`. Higgsfield balance now 3.97 (no new AI shots possible without more credits). Katana (Higgsfield's
+  edit workflow) was looked at but not used: it needs a full reference-edit run, too slow and costly before 9 PM.
+  Known: the "reeltale.net" tag slightly overlaps the site footer on B5/B10. Submission description:
+  `prep/submission_description.txt`.
 - **PITCH VIDEO DONE (7:34 PM EST): `prep/video/final/reeltale-demo.mp4` (2:25, 1080p, -16 LUFS) + `.srt`.**
   Made through the Higgsfield MCP connector (`https://mcp.higgsfield.ai/mcp`, Kaan added it in Claude Settings →
   Connectors); the CLI is still refused on the trial (`only_mcp_usage_on_trial_is_available`). Generated: 8 Claymotion
