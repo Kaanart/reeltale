@@ -2,6 +2,18 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: pitch video made
+- AI parts generated through Higgsfield's MCP connector: 8 claymotion b-roll clips (Seedream keyframes → Seedance 2.0
+  Mini), 11 narration takes (Seed Audio, voice Helena), an instrumental music bed (ElevenLabs Music v2.5). 80.83 of
+  110 credits (84.23 with re-takes). Cut locally with `prep/video/scripts/assemble_final.py` together with the real site clips; every AI
+  shot carries an on-screen "AI-generated" label.
+- Didn't work: the Higgsfield CLI still refuses generation on a trial plan (only the MCP connector may generate);
+  5 of the first 11 narration submissions were refused as "out of credits" while 96 credits were left (a concurrency
+  limit), and went through on one retry. The music model returned 125 s instead of the 145 s asked for, so the
+  assembly script now fades a short bed out instead of looping it. Two narration takes (B3, B11) were clipped at the
+  edges and were re-taken with a longer slot. Whisper was given the script as a prompt and dropped opening words,
+  so caption timing was guessed for 5 lines; the prompt is gone and 10 of 11 lines now align at ≥ 0.93.
+
 ## 2026-11-04: pitch video attempt (stopped)
 - Real site clips captured with headless Chrome (`prep/video/site/`). Higgsfield CLI + skills installed and checked.
 - Didn't work: Higgsfield refused generation on a trial plan, so no AI shots, narration or music were made (no credits

@@ -3,6 +3,19 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **PITCH VIDEO DONE (7:34 PM EST): `prep/video/final/reeltale-demo.mp4` (2:25, 1080p, -16 LUFS) + `.srt`.**
+  Made through the Higgsfield MCP connector (`https://mcp.higgsfield.ai/mcp`, Kaan added it in Claude Settings →
+  Connectors); the CLI is still refused on the trial (`only_mcp_usage_on_trial_is_available`). Generated: 8 Claymotion
+  keyframes → 8 Seedance 2.0 Mini clips (`prep/video/session/clips/`), 11 narration takes in voice Helena
+  (`session/narration/B1..B11.wav`; B3 and B11 re-taken because the first takes were clipped at the edges, B11 now
+  says "This is ReelTale. …"), a 125 s ElevenLabs Music v2.5 bed. 84.23 of 110 credits spent, 25.77 left (ledger in
+  `session/budget.md`). Rebuild for free: `python3 prep/video/scripts/assemble_final.py`. Script fixes: a short music
+  bed fades out instead of looping; Whisper no longer gets the script as `initial_prompt` (it dropped opening words,
+  so captions were guessed). Known: the B7 clay shots hold their last frame ~1 s; Whisper spells the brand "RealTail".
+  **v1 is frozen in `prep/video/versions/v1/`** (mp4, srt, assembly.json, script copy, narration takes); Kaan has edit
+  ideas for a v2: build v2 from `session/`, keep v1 untouched.
+  **Kaan, before 9 PM:** watch it once, upload it (YouTube unlisted or similar), put the link in the submission form,
+  make the GitHub repo public, submit.
 - **PITCH VIDEO STOPPED (~6 PM EST, Kaan at 99% weekly tokens):** real site clips are DONE in `prep/video/site/`
   (b3, b4, b5, b8, b10 .mp4 + posters). Higgsfield generation was REFUSED (trial plan: "end the trial or move to a paid,
   non-trial plan"), so NO AI shots, narration or music exist and no credits were spent. All prompts are ready in
