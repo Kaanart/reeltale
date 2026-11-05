@@ -2,6 +2,10 @@
 
 Newest first. One entry per finished task, including what was tried and didn't work.
 
+## 2026-11-04: pitch video v6 (final)
+- New "future of entertainment" section, faster narration and site clips, tighter cuts, full screen, 2:19 at 60 fps.
+  The on-screen AI label was dropped at Kaan's request; the write-up still lists every AI part of the video.
+
 ## 2026-11-04: pitch video v4 (final)
 - 8 new AI b-roll shots without people (Seedance 2.5, 1080p) in the dark premium style, interpolated to a true
   60 fps; real site footage, new music and the v3 look kept. The write-up's video note lists the AI parts again.

@@ -3,6 +3,12 @@
 Read this first, then `CLAUDE.md`. Older history is in `prep/HANDOFF.md` (D1–D2 setup notes, not in git).
 
 ## Nov 4 (evening) checkpoints (newest first)
+- **PITCH VIDEO v6 = FINAL (8:44 PM EST): `prep/video/versions/v6/reeltale-demo.mp4`**, 2:19, full screen, 60 fps.
+  Kaan's edits: new "future of entertainment" section (narration BF + title card: scroll + Netflix-style series +
+  open platforms Instagram/Facebook/TikTok/WebNovel/Roblox), narration 8% faster (atempo; originals in
+  `versions/v1/narration/`), site clips at 1.25x, shorter gaps and fades, no rounded frame, and NO on-screen
+  "AI-generated" label (Kaan's call); the write-up's video note still discloses the AI shots, voice and music.
+  v5 (same, with the label) is in `versions/v5/`.
 - **PITCH VIDEO v4 = FINAL (8:25 PM EST): `prep/video/versions/v4/reeltale-demo.mp4`**, 2:25, 1080p, 60 fps.
   Kaan bought Higgsfield credits (1000). v3 + 8 new AI b-roll shots without people (Seedance 2.5 t2v 1080p: phone
   wall, closed studio door, book to screens, coins, tripod + miniature street, phone playing a film, comic panels,

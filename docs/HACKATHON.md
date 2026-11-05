@@ -74,8 +74,8 @@ after an access check) and serves the site. Hard limits keep R2 and model spend 
 ## About the demo video
 The site clips in the video are real recordings of reeltale.net. The b-roll shots (phones, a studio door, a book,
 coins, a tripod and miniature set, glass cards; no people) were generated with Seedance 2.5, and the narration voice
-and the music with AI audio models, all through Higgsfield (third-party models). Every AI shot is labelled
-"AI-generated" on screen. The pipeline diagram and end card were made by hand.
+and the music with AI audio models, all through Higgsfield (third-party models). The title cards, pipeline diagram
+and end card were made by hand.
 
 ## What's next
 Creator uploads with real series, store launch, creator payouts, Meta video models as soon as there is an API.
